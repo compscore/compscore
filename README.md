@@ -1,2 +1,2 @@
 # compscore
-Cyber Competition Scoring Plaform
+Cyber Competition Scoring Platform
