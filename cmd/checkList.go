@@ -7,18 +7,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var checksCmd = &cobra.Command{
+var checkListCmd = &cobra.Command{
 	Use:   "checks",
 	Short: "Displays all available checks",
 	Args:  cobra.NoArgs,
-	Run:   versionCmdRun,
+	Run:   checkList,
 }
 
 func init() {
-	RootCmd.AddCommand(checksCmd)
+	RootCmd.AddCommand(checkListCmd)
 }
 
-func versionCmdRun(cmd *cobra.Command, args []string) {
+func checkList(cmd *cobra.Command, args []string) {
 	longestCheckName := len("name")
 	for _, check := range checks.Checks {
 		if len(check.Name) > longestCheckName {
