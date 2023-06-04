@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"fmt"
+	"net"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -18,5 +19,32 @@ func init() {
 }
 
 func engineStatus(cmd *cobra.Command, args []string) {
-	fmt.Println("Checking status of engine")
+	logrus.Info("Checking status of engine")
+
+	conn, err := net.Dial("unix", "compscore.sock")
+	if err != nil {
+		logrus.Info("Stopped")
+		return
+	}
+
+	_, err = conn.Write([]byte("status"))
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to write to unix socket")
+		return
+	}
+
+	buf := make([]byte, 1024)
+
+	response_len, err := conn.Read(buf)
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to read from unix socket")
+		return
+	}
+
+	logrus.Info(string(buf[:response_len]))
+
+	err = conn.Close()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to close connection")
+	}
 }
