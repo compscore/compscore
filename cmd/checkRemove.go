@@ -8,7 +8,7 @@ import (
 
 var checkRemoveCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Removw a check to the scoring engine",
+	Short: "Remove a check to the scoring engine",
 	Args:  cobra.NoArgs,
 	Run:   checkRemove,
 }
