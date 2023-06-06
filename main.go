@@ -3,6 +3,9 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"os/exec"
+	"runtime"
+	"strings"
 
 	"github.com/compscore/compscore/cmd"
 	"github.com/spf13/cobra"
@@ -27,5 +30,20 @@ func init() {
 }
 
 func versionCmdRun(cmd *cobra.Command, args []string) {
-	fmt.Println(version)
+	fmt.Println("Version:", version)
+	fmt.Println("Git Commit:", getGitCommit())
+	fmt.Println("Go Version:", runtime.Version())
+	fmt.Println("OS/Arch:", runtime.GOOS+"/"+runtime.GOARCH)
+}
+
+func getGitCommit() string {
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	output, err := cmd.Output()
+
+	if err != nil {
+		fmt.Println("Error getting git commit:", err)
+		return ""
+	}
+
+	return strings.TrimSpace(string(output))
 }
