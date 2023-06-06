@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"syscall"
 	"time"
@@ -54,6 +55,10 @@ func socketAlive() bool {
 }
 
 func worker() {
+	// Handle SIGTERM
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGTERM)
+
 	// Open the file for writing
 	file, err := os.OpenFile("output.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -61,14 +66,23 @@ func worker() {
 	}
 	defer file.Close()
 
+	ticker := time.NewTicker(time.Second)
+
 	s := "x"
 	for {
-		// Write the string to the file
-		if _, err := file.WriteString(s); err != nil {
-			panic(err)
+		select {
+		case <-signalChan:
+			_, err := file.WriteString(" Done ")
+			if err != nil {
+				logrus.WithError(err).Error("Failed to write to file")
+			}
+			return
+		case <-ticker.C:
+			_, err := file.WriteString(s)
+			if err != nil {
+				logrus.WithError(err).Error("Failed to write to file")
+			}
 		}
-
-		time.Sleep(time.Second)
 	}
 }
 
@@ -150,11 +164,16 @@ func control() {
 
 	go func() {
 		for range stopChan {
-			if cmd != nil {
-				if cmd.Process != nil {
-					cmd.Process.Kill()
-				}
+			err := syscall.Kill(cmd.Process.Pid, syscall.SIGTERM)
+			if err != nil {
+				logrus.WithError(err).Error("Failed to kill worker")
 			}
+
+			err = cmd.Wait()
+			if err != nil {
+				logrus.WithError(err).Error("Failed to wait for worker")
+			}
+
 			paused = true
 		}
 	}()
