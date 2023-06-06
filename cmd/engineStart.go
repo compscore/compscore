@@ -208,7 +208,7 @@ func control() {
 
 func start() {
 	if socketAlive() {
-		logrus.Info("Engine already running")
+		logrus.Info("Restarting engine....\n")
 		conn, err := net.Dial("unix", "compscore.sock")
 		if err != nil {
 			logrus.WithError(err).Fatal("Failed to connect to unix socket")
@@ -221,14 +221,12 @@ func start() {
 			return
 		}
 
-		logrus.Info("Started")
-
 		err = conn.Close()
 		if err != nil {
 			logrus.WithError(err).Error("Failed to close connection")
 		}
 	} else {
-		logrus.Info("Spawning control process...")
+		logrus.Info("Starting engine....\n")
 
 		control := exec.Command(os.Args[0], "engine", "start", "--control")
 		control.SysProcAttr = &syscall.SysProcAttr{
@@ -240,9 +238,5 @@ func start() {
 			logrus.WithError(err).Fatal("Failed to spawn control process")
 			return
 		}
-
-		logrus.Info("Spawned control process")
-		logrus.Info(control)
-		os.Exit(0)
 	}
 }

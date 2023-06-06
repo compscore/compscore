@@ -19,7 +19,7 @@ func init() {
 }
 
 func engineStop(cmd *cobra.Command, args []string) {
-	logrus.Info("Stopping engine")
+	logrus.Info("Stopping engine....\n")
 
 	conn, err := net.Dial("unix", "compscore.sock")
 	if err != nil {
@@ -32,8 +32,6 @@ func engineStop(cmd *cobra.Command, args []string) {
 		logrus.WithError(err).Fatal("Failed to write to unix socket")
 		return
 	}
-
-	logrus.Info("Stopped")
 
 	err = conn.Close()
 	if err != nil {

@@ -19,11 +19,11 @@ func init() {
 }
 
 func engineStatus(cmd *cobra.Command, args []string) {
-	logrus.Info("Checking status of engine")
+	logrus.Info("Checking engine status....\n")
 
 	conn, err := net.Dial("unix", "compscore.sock")
 	if err != nil {
-		logrus.Info("Stopped")
+		logrus.Info("dead")
 		return
 	}
 
