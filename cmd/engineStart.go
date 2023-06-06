@@ -18,6 +18,14 @@ var (
 	socketPath string = "compscore.sock"
 )
 
+// Statuses of the scoring engine
+var (
+	STOPPED  string = "stopped"
+	RUNNING  string = "running"
+	STOPPING string = "stopping"
+	KILLED   string = "killed"
+)
+
 var engineStartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Starts the scoring engine",
@@ -72,10 +80,6 @@ func worker() {
 	for {
 		select {
 		case <-signalChan:
-			_, err := file.WriteString(" Done ")
-			if err != nil {
-				logrus.WithError(err).Error("Failed to write to file")
-			}
 			return
 		case <-ticker.C:
 			_, err := file.WriteString(s)
@@ -93,7 +97,7 @@ func control() {
 		stopChan  = make(chan struct{})
 		startChan = make(chan struct{})
 		killChan  = make(chan struct{})
-		paused    = false
+		status    string
 		cmd       *exec.Cmd
 	)
 
@@ -142,11 +146,7 @@ func control() {
 			// Handle command
 			switch strings.TrimSpace(string(buf[:n])) {
 			case "status":
-				if paused {
-					conn.Write([]byte("Paused"))
-				} else {
-					conn.Write([]byte("Running"))
-				}
+				conn.Write([]byte(status))
 			case "start":
 				startChan <- struct{}{}
 				conn.Write([]byte("Started"))
@@ -169,12 +169,14 @@ func control() {
 				logrus.WithError(err).Error("Failed to kill worker")
 			}
 
+			status = STOPPING
+
 			err = cmd.Wait()
 			if err != nil {
 				logrus.WithError(err).Error("Failed to wait for worker")
 			}
 
-			paused = true
+			status = STOPPED
 		}
 	}()
 
@@ -185,7 +187,7 @@ func control() {
 	for {
 		select {
 		case <-startChan:
-			paused = false
+			status = RUNNING
 
 			cmd = exec.Command(os.Args[0], "engine", "start", "--worker")
 			cmd.Stdout = &stdout
@@ -197,6 +199,7 @@ func control() {
 				return
 			}
 		case <-killChan:
+			status = KILLED
 			cmd.Process.Kill()
 			return
 		}
