@@ -1,0 +1,72 @@
+competition "example-config" {
+    server {
+        api-path = "/api"
+        hostname = "127.0.0.1"
+        port = 8080
+    }
+
+    teams {
+        amount = 15
+        name-format = "Team %d"
+        password = "changeme"
+    }
+
+    scoring {
+        interval = 30 # seconds
+        attempts = 3
+    }
+
+    checks {
+        check "host_a-ssh" {
+            git {
+                remote = "git@github.com:compscore/ssh.git"
+                branch = "main"
+            }
+
+            credential {
+                user = "ubuntu"
+                password = "changeme"
+            }
+
+            target = "10.{ team }.1.1"
+            port = 22
+
+            commmand = "whoami"
+            expected-output = "ubuntu"
+
+            weight = 2
+        }
+
+        check "host_b-ssh" {
+            git {
+                remote = "git@github.com:compscore/ssh.git"
+                branch = "main"
+            }
+
+            credential {
+                user = "kali"
+                password = "changeme"
+            }
+
+            target = "10.{ team }.1.2"
+            port = 22
+            
+            commmand = "whoami"
+            expected-output = "kali"
+
+            weight = 2
+        }
+
+        check "host_a-ping" {
+            git {
+                remote = "git@github.com:compscore/ping.git"
+                branch = "main"
+            }
+
+            target = "10.{ team }.1.1"
+
+            weight = 1
+        }
+    }
+}
+
