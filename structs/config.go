@@ -1,7 +1,6 @@
 package structs
 
 type Competition struct {
-	Name    string  `mapstructure:"name"`
 	Server  Server  `mapstructure:"server"`
 	Teams   Teams   `mapstructure:"teams"`
 	Scoring Scoring `mapstructure:"scoring"`

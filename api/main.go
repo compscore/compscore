@@ -18,7 +18,7 @@ func init() {
 
 func Start() {
 	loadRoutes()
-	Router.Run(config.Hostname + ":" + config.Port)
+	Router.Run(config.Competition.Server.Hostname + ":" + config.Competition.Server.Port)
 }
 
 func loadRoutes() {

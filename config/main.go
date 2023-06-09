@@ -1,20 +1,21 @@
 package config
 
 import (
+	"github.com/compscore/compscore/structs"
 	"github.com/fsnotify/fsnotify"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 var (
-	Hostname string
-	Port     string
+	Competition structs.Competition
 )
 
 func init() {
 	viper.SetConfigFile("config.yml")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(err)
+		logrus.WithError(err).Fatal("Error reading config file")
 	}
 
 	UpdateConfigs()
@@ -32,6 +33,8 @@ func init() {
 }
 
 func UpdateConfigs() {
-	Hostname = viper.GetString("hostname")
-	Port = viper.GetString("port")
+	err := viper.Unmarshal(&Competition)
+	if err != nil {
+		logrus.WithError(err).Error("Error unmarshalling config file")
+	}
 }

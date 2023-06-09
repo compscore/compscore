@@ -3,3 +3,4 @@ build/*
 
 output.txt
 compscore.socket
+config.yml
