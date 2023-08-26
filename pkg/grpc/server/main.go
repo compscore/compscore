@@ -31,20 +31,20 @@ func Serve() {
 	grpcServer = _grpcServer
 
 	proto.RegisterPingSeviceServer(grpcServer, &pingServer_s{})
+	proto.RegisterStatusServiceServer(grpcServer, &statusServer_s{})
 
 	logrus.Info("Serving gRPC server")
 
 	err = grpcServer.Serve(lis)
-	if err != nil {
+	if err != nil && err != grpc.ErrServerStopped {
 		logrus.WithError(err).Fatal("Failed to serve gRPC server")
 	}
 }
 
 func Close() {
-	grpcServer.Stop()
+	grpcServer.GracefulStop()
+}
 
-	err := lis.Close()
-	if err != nil {
-		logrus.WithError(err).Fatal("Failed to close gRPC listener")
-	}
+func ForceClose() {
+	grpcServer.Stop()
 }

@@ -21,6 +21,7 @@ func Open() {
 	conn = _conn
 
 	pingClient = proto.NewPingSeviceClient(conn)
+	statusClient = proto.NewStatusServiceClient(conn)
 }
 
 func Close() {

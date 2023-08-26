@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/compscore/compscore/pkg/grpc/proto"
+	"github.com/sirupsen/logrus"
 )
 
 type pingServer_s struct {
@@ -12,6 +12,6 @@ type pingServer_s struct {
 }
 
 func (s *pingServer_s) Ping(ctx context.Context, in *proto.PingRequest) (*proto.PongResponse, error) {
-	fmt.Println("Received message:", in.GetMessage())
+	logrus.Info("Received message: ", in.GetMessage())
 	return &proto.PongResponse{Message: in.GetMessage()}, nil
 }

@@ -14,3 +14,21 @@ message PingRequest {
 message PongResponse {
   string message = 1;
 }
+
+enum StatusEnum {
+  UNKNOWN = 0;
+  RUNNING = 1;
+  PAUSED = 2;
+  ERROR = 3;
+}
+
+service StatusService {
+  rpc Status (StatusRequest) returns (StatusResponse);
+}
+
+message StatusRequest {}
+
+message StatusResponse {
+  StatusEnum status = 1;
+  string message = 2;
+}
