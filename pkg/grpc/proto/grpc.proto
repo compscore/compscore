@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/compscore/compscore/pkg/grpc/proto";
+
+service Compscore {
+  rpc Status (StatusRequest) returns (StatusResponse);
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
+  rpc Start (StartRequest) returns (StartResponse);
+  rpc Pause (PauseRequest) returns (PauseResponse);
+  rpc Kill (KillRequest) returns (KillResponse);
+}
+
+// Status
+enum StatusEnum {
+  UNKNOWN = 0;
+  RUNNING = 1;
+  PAUSED = 2;
+  ERROR = 3;
+}
+
+message StatusRequest {}
+
+message StatusResponse {
+  StatusEnum status = 1;
+  string message = 2;
+}
+
+// Heartbeat
+message HeartbeatRequest {}
+
+message HeartbeatResponse {}
+
+// Start
+message StartRequest {}
+
+message StartResponse {
+  string message = 1;
+}
+
+// Pause
+message PauseRequest {}
+
+message PauseResponse {
+  string message = 1;
+}
+
+// Kill
+message KillRequest {}
+
+message KillResponse {
+  string message = 1;
+}
