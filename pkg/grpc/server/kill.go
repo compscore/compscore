@@ -9,5 +9,10 @@ import (
 
 func (*compscoreServer_s) Kill(ctx context.Context, in *proto.KillRequest) (*proto.KillResponse, error) {
 	logrus.Info("Received kill request")
+
+	Status = proto.StatusEnum_UNKNOWN
+
+	kill <- struct{}{}
+
 	return &proto.KillResponse{Message: "killed"}, nil
 }

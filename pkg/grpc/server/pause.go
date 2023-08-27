@@ -9,5 +9,8 @@ import (
 
 func (*compscoreServer_s) Pause(ctx context.Context, in *proto.PauseRequest) (*proto.PauseResponse, error) {
 	logrus.Info("Received pause request")
+
+	Status = proto.StatusEnum_PAUSED
+
 	return &proto.PauseResponse{Message: "paused"}, nil
 }

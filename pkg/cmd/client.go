@@ -4,15 +4,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var clientCmd = &cobra.Command{
-	Use: "client",
-	Run: clientRun,
+var engineCmd = &cobra.Command{
+	Use: "engine",
+	Run: engineRun,
 }
 
-func clientRun(cmd *cobra.Command, args []string) {
+func engineRun(cmd *cobra.Command, args []string) {
 	cmd.Help()
 }
 
 func init() {
-	rootCmd.AddCommand(clientCmd)
+	rootCmd.AddCommand(engineCmd)
 }

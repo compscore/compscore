@@ -8,13 +8,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var clientHeartbeatCmd = &cobra.Command{
+var engineHeartbeatCmd = &cobra.Command{
 	Use:     "heartbeat",
+	Short:   "Send a heartbeat to the engine",
+	Long:    "Send a heartbeat to the engine",
 	Aliases: []string{"ping"},
-	Run:     clientPingRun,
+	Run:     enginePingRun,
 }
 
-func clientPingRun(cmd *cobra.Command, args []string) {
+func enginePingRun(cmd *cobra.Command, args []string) {
 	client.Open()
 	defer client.Close()
 
@@ -27,5 +29,5 @@ func clientPingRun(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	clientCmd.AddCommand(clientHeartbeatCmd)
+	engineCmd.AddCommand(engineHeartbeatCmd)
 }
