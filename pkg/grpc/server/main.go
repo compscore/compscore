@@ -25,12 +25,12 @@ var (
 )
 
 func Serve() {
-	err := os.Remove(config.UnixSocket)
+	err := os.Remove(config.Engine.Socket)
 	if err != nil && !os.IsNotExist(err) {
 		logrus.WithError(err).Fatal("Failed to remove existing socket")
 	}
 
-	_lis, err := net.Listen("unix", config.UnixSocket)
+	_lis, err := net.Listen("unix", config.Engine.Socket)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to listen on socket")
 	}

@@ -9,6 +9,7 @@ service Compscore {
   rpc Start (StartRequest) returns (StartResponse);
   rpc Pause (PauseRequest) returns (PauseResponse);
   rpc Kill (KillRequest) returns (KillResponse);
+  rpc GetConfig (GetConfigRequest) returns (GetConfigResponse);
 }
 
 // Status
@@ -50,4 +51,11 @@ message KillRequest {}
 
 message KillResponse {
   string message = 1;
+}
+
+// ConfigGet
+message GetConfigRequest {}
+
+message GetConfigResponse {
+  string config = 1;
 }
