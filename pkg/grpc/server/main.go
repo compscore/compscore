@@ -3,6 +3,7 @@ package server
 import (
 	"net"
 	"os"
+	"time"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/proto"
@@ -18,6 +19,7 @@ var (
 	lis             net.Listener
 	grpcServer      *grpc.Server
 	compscoreServer compscoreServer_s = compscoreServer_s{}
+	kill            chan struct{}     = make(chan struct{}, 1)
 )
 
 func Serve() {
@@ -38,6 +40,29 @@ func Serve() {
 	proto.RegisterCompscoreServer(grpcServer, &compscoreServer)
 
 	logrus.Info("Serving gRPC server")
+
+	go func() {
+		<-kill
+
+		time.Sleep(time.Second)
+
+		// Force Close
+		go func() {
+			time.Sleep(5 * time.Second)
+
+			grpcServer.Stop()
+		}()
+
+		// Force Exit
+		go func() {
+			time.Sleep(10 * time.Second)
+
+			os.Exit(1)
+		}()
+
+		// Normal Close
+		grpcServer.GracefulStop()
+	}()
 
 	err = grpcServer.Serve(lis)
 	if err != nil && err != grpc.ErrServerStopped {
