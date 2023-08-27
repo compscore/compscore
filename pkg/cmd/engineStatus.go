@@ -8,12 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var clientStatusCmd = &cobra.Command{
+var engineStatusCmd = &cobra.Command{
 	Use: "status",
-	Run: clientStatusRun,
+	Run: engineStatusRun,
 }
 
-func clientStatusRun(cmd *cobra.Command, args []string) {
+func engineStatusRun(cmd *cobra.Command, args []string) {
 	client.Open()
 	defer client.Close()
 
@@ -26,5 +26,5 @@ func clientStatusRun(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	clientCmd.AddCommand(clientStatusCmd)
+	engineCmd.AddCommand(engineStatusCmd)
 }

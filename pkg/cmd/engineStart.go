@@ -12,14 +12,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var startCmd = &cobra.Command{
+var engineStartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start the compscore server",
 	Long:  `Start the compscore server`,
-	Run:   startRun,
+	Run:   engineStartRun,
 }
 
-func startRun(cmd *cobra.Command, args []string) {
+func engineStartRun(cmd *cobra.Command, args []string) {
 	exists, err := helpers.UnixSocketExists()
 	if err != nil {
 		logrus.WithError(err).Fatal("Error checking if unix socket exists")
@@ -77,5 +77,5 @@ func startRun(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	rootCmd.AddCommand(startCmd)
+	engineCmd.AddCommand(engineStartCmd)
 }

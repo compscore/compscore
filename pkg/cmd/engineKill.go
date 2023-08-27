@@ -8,12 +8,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var clientKillCmd = &cobra.Command{
-	Use: "kill",
-	Run: clientKillRun,
+var engineKillCmd = &cobra.Command{
+	Use:   "kill",
+	Short: "Kill the engine",
+	Long:  "Kill the engine",
+	Run:   engineKillRun,
 }
 
-func clientKillRun(cmd *cobra.Command, args []string) {
+func engineKillRun(cmd *cobra.Command, args []string) {
 	client.Open()
 	defer client.Close()
 
@@ -26,5 +28,5 @@ func clientKillRun(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	clientCmd.AddCommand(clientKillCmd)
+	engineCmd.AddCommand(engineKillCmd)
 }

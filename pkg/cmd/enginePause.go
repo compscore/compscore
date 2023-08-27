@@ -8,12 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var clientPauseCmd = &cobra.Command{
+var enginePauseCmd = &cobra.Command{
 	Use: "pause",
-	Run: clientPauseRun,
+	Run: enginePauseRun,
 }
 
-func clientPauseRun(cmd *cobra.Command, args []string) {
+func enginePauseRun(cmd *cobra.Command, args []string) {
 	client.Open()
 	defer client.Close()
 
@@ -26,5 +26,5 @@ func clientPauseRun(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	clientCmd.AddCommand(clientPauseCmd)
+	engineCmd.AddCommand(enginePauseCmd)
 }
