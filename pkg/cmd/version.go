@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -51,17 +52,17 @@ func init() {
 // gitCommit gets the current git commit hash
 func gitCommit() string {
 	command, _ := exec.Command("git", "rev-parse", "HEAD").Output()
-	return string(command)
+	return strings.TrimSpace(string(command))
 }
 
 // gitBranch gets the current git branch
 func gitBranch() string {
 	command, _ := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
-	return string(command)
+	return strings.TrimSpace(string(command))
 }
 
 // buildDate gets the current build date
 func buildDate() string {
 	command, _ := exec.Command("date", "+%Y-%m-%d").Output()
-	return string(command)
+	return strings.TrimSpace(string(command))
 }
