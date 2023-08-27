@@ -17,7 +17,7 @@ func clientStatusRun(cmd *cobra.Command, args []string) {
 	client.Open()
 	defer client.Close()
 
-	status, message, err := client.Status.Status(context.Background())
+	status, message, err := client.Status(context.Background())
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to Status server")
 	}

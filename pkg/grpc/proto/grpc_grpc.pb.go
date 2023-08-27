@@ -18,172 +18,230 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// PingSeviceClient is the client API for PingSevice service.
+// CompscoreClient is the client API for Compscore service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PingSeviceClient interface {
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PongResponse, error)
-}
-
-type pingSeviceClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewPingSeviceClient(cc grpc.ClientConnInterface) PingSeviceClient {
-	return &pingSeviceClient{cc}
-}
-
-func (c *pingSeviceClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PongResponse, error) {
-	out := new(PongResponse)
-	err := c.cc.Invoke(ctx, "/proto.PingSevice/Ping", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// PingSeviceServer is the server API for PingSevice service.
-// All implementations must embed UnimplementedPingSeviceServer
-// for forward compatibility
-type PingSeviceServer interface {
-	Ping(context.Context, *PingRequest) (*PongResponse, error)
-	mustEmbedUnimplementedPingSeviceServer()
-}
-
-// UnimplementedPingSeviceServer must be embedded to have forward compatible implementations.
-type UnimplementedPingSeviceServer struct {
-}
-
-func (UnimplementedPingSeviceServer) Ping(context.Context, *PingRequest) (*PongResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
-func (UnimplementedPingSeviceServer) mustEmbedUnimplementedPingSeviceServer() {}
-
-// UnsafePingSeviceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PingSeviceServer will
-// result in compilation errors.
-type UnsafePingSeviceServer interface {
-	mustEmbedUnimplementedPingSeviceServer()
-}
-
-func RegisterPingSeviceServer(s grpc.ServiceRegistrar, srv PingSeviceServer) {
-	s.RegisterService(&PingSevice_ServiceDesc, srv)
-}
-
-func _PingSevice_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PingSeviceServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.PingSevice/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PingSeviceServer).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// PingSevice_ServiceDesc is the grpc.ServiceDesc for PingSevice service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var PingSevice_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.PingSevice",
-	HandlerType: (*PingSeviceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Ping",
-			Handler:    _PingSevice_Ping_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "grpc.proto",
-}
-
-// StatusServiceClient is the client API for StatusService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type StatusServiceClient interface {
+type CompscoreClient interface {
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
+	Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
+	Pause(ctx context.Context, in *PauseRequest, opts ...grpc.CallOption) (*PauseResponse, error)
+	Kill(ctx context.Context, in *KillRequest, opts ...grpc.CallOption) (*KillResponse, error)
 }
 
-type statusServiceClient struct {
+type compscoreClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewStatusServiceClient(cc grpc.ClientConnInterface) StatusServiceClient {
-	return &statusServiceClient{cc}
+func NewCompscoreClient(cc grpc.ClientConnInterface) CompscoreClient {
+	return &compscoreClient{cc}
 }
 
-func (c *statusServiceClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+func (c *compscoreClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	out := new(StatusResponse)
-	err := c.cc.Invoke(ctx, "/proto.StatusService/Status", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Compscore/Status", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// StatusServiceServer is the server API for StatusService service.
-// All implementations must embed UnimplementedStatusServiceServer
+func (c *compscoreClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error) {
+	out := new(HeartbeatResponse)
+	err := c.cc.Invoke(ctx, "/proto.Compscore/Heartbeat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *compscoreClient) Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error) {
+	out := new(StartResponse)
+	err := c.cc.Invoke(ctx, "/proto.Compscore/Start", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *compscoreClient) Pause(ctx context.Context, in *PauseRequest, opts ...grpc.CallOption) (*PauseResponse, error) {
+	out := new(PauseResponse)
+	err := c.cc.Invoke(ctx, "/proto.Compscore/Pause", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *compscoreClient) Kill(ctx context.Context, in *KillRequest, opts ...grpc.CallOption) (*KillResponse, error) {
+	out := new(KillResponse)
+	err := c.cc.Invoke(ctx, "/proto.Compscore/Kill", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CompscoreServer is the server API for Compscore service.
+// All implementations must embed UnimplementedCompscoreServer
 // for forward compatibility
-type StatusServiceServer interface {
+type CompscoreServer interface {
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
-	mustEmbedUnimplementedStatusServiceServer()
+	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	Start(context.Context, *StartRequest) (*StartResponse, error)
+	Pause(context.Context, *PauseRequest) (*PauseResponse, error)
+	Kill(context.Context, *KillRequest) (*KillResponse, error)
+	mustEmbedUnimplementedCompscoreServer()
 }
 
-// UnimplementedStatusServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedStatusServiceServer struct {
+// UnimplementedCompscoreServer must be embedded to have forward compatible implementations.
+type UnimplementedCompscoreServer struct {
 }
 
-func (UnimplementedStatusServiceServer) Status(context.Context, *StatusRequest) (*StatusResponse, error) {
+func (UnimplementedCompscoreServer) Status(context.Context, *StatusRequest) (*StatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
 }
-func (UnimplementedStatusServiceServer) mustEmbedUnimplementedStatusServiceServer() {}
+func (UnimplementedCompscoreServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
+}
+func (UnimplementedCompscoreServer) Start(context.Context, *StartRequest) (*StartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+}
+func (UnimplementedCompscoreServer) Pause(context.Context, *PauseRequest) (*PauseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Pause not implemented")
+}
+func (UnimplementedCompscoreServer) Kill(context.Context, *KillRequest) (*KillResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Kill not implemented")
+}
+func (UnimplementedCompscoreServer) mustEmbedUnimplementedCompscoreServer() {}
 
-// UnsafeStatusServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to StatusServiceServer will
+// UnsafeCompscoreServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CompscoreServer will
 // result in compilation errors.
-type UnsafeStatusServiceServer interface {
-	mustEmbedUnimplementedStatusServiceServer()
+type UnsafeCompscoreServer interface {
+	mustEmbedUnimplementedCompscoreServer()
 }
 
-func RegisterStatusServiceServer(s grpc.ServiceRegistrar, srv StatusServiceServer) {
-	s.RegisterService(&StatusService_ServiceDesc, srv)
+func RegisterCompscoreServer(s grpc.ServiceRegistrar, srv CompscoreServer) {
+	s.RegisterService(&Compscore_ServiceDesc, srv)
 }
 
-func _StatusService_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Compscore_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StatusServiceServer).Status(ctx, in)
+		return srv.(CompscoreServer).Status(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.StatusService/Status",
+		FullMethod: "/proto.Compscore/Status",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StatusServiceServer).Status(ctx, req.(*StatusRequest))
+		return srv.(CompscoreServer).Status(ctx, req.(*StatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// StatusService_ServiceDesc is the grpc.ServiceDesc for StatusService service.
+func _Compscore_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CompscoreServer).Heartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Compscore/Heartbeat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CompscoreServer).Heartbeat(ctx, req.(*HeartbeatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Compscore_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CompscoreServer).Start(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Compscore/Start",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CompscoreServer).Start(ctx, req.(*StartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Compscore_Pause_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PauseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CompscoreServer).Pause(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Compscore/Pause",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CompscoreServer).Pause(ctx, req.(*PauseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Compscore_Kill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KillRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CompscoreServer).Kill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Compscore/Kill",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CompscoreServer).Kill(ctx, req.(*KillRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Compscore_ServiceDesc is the grpc.ServiceDesc for Compscore service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var StatusService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.StatusService",
-	HandlerType: (*StatusServiceServer)(nil),
+var Compscore_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.Compscore",
+	HandlerType: (*CompscoreServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Status",
-			Handler:    _StatusService_Status_Handler,
+			Handler:    _Compscore_Status_Handler,
+		},
+		{
+			MethodName: "Heartbeat",
+			Handler:    _Compscore_Heartbeat_Handler,
+		},
+		{
+			MethodName: "Start",
+			Handler:    _Compscore_Start_Handler,
+		},
+		{
+			MethodName: "Pause",
+			Handler:    _Compscore_Pause_Handler,
+		},
+		{
+			MethodName: "Kill",
+			Handler:    _Compscore_Kill_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,18 +3,15 @@ syntax = "proto3";
 package proto;
 option go_package = "github.com/compscore/compscore/pkg/grpc/proto";
 
-service PingSevice {
-  rpc Ping (PingRequest) returns (PongResponse);
+service Compscore {
+  rpc Status (StatusRequest) returns (StatusResponse);
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
+  rpc Start (StartRequest) returns (StartResponse);
+  rpc Pause (PauseRequest) returns (PauseResponse);
+  rpc Kill (KillRequest) returns (KillResponse);
 }
 
-message PingRequest {
-  string message = 1;
-}
-
-message PongResponse {
-  string message = 1;
-}
-
+// Status
 enum StatusEnum {
   UNKNOWN = 0;
   RUNNING = 1;
@@ -22,13 +19,35 @@ enum StatusEnum {
   ERROR = 3;
 }
 
-service StatusService {
-  rpc Status (StatusRequest) returns (StatusResponse);
-}
-
 message StatusRequest {}
 
 message StatusResponse {
   StatusEnum status = 1;
   string message = 2;
+}
+
+// Heartbeat
+message HeartbeatRequest {}
+
+message HeartbeatResponse {}
+
+// Start
+message StartRequest {}
+
+message StartResponse {
+  string message = 1;
+}
+
+// Pause
+message PauseRequest {}
+
+message PauseResponse {
+  string message = 1;
+}
+
+// Kill
+message KillRequest {}
+
+message KillResponse {
+  string message = 1;
 }

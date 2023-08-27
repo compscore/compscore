@@ -10,9 +10,14 @@ import (
 	"google.golang.org/grpc"
 )
 
+type compscoreServer_s struct {
+	proto.UnimplementedCompscoreServer
+}
+
 var (
-	lis        net.Listener
-	grpcServer *grpc.Server
+	lis             net.Listener
+	grpcServer      *grpc.Server
+	compscoreServer compscoreServer_s = compscoreServer_s{}
 )
 
 func Serve() {
@@ -30,8 +35,7 @@ func Serve() {
 	_grpcServer := grpc.NewServer()
 	grpcServer = _grpcServer
 
-	proto.RegisterPingSeviceServer(grpcServer, &pingServer_s{})
-	proto.RegisterStatusServiceServer(grpcServer, &statusServer_s{})
+	proto.RegisterCompscoreServer(grpcServer, &compscoreServer)
 
 	logrus.Info("Serving gRPC server")
 

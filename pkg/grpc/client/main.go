@@ -1,6 +1,9 @@
 package client
 
 import (
+	"context"
+	"time"
+
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/proto"
 	"github.com/sirupsen/logrus"
@@ -9,19 +12,22 @@ import (
 )
 
 var (
-	conn *grpc.ClientConn
+	conn            *grpc.ClientConn
+	compscoreClient proto.CompscoreClient
 )
 
 func Open() {
-	_conn, err := grpc.Dial("unix:"+config.UnixSocket, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+
+	_conn, err := grpc.DialContext(ctx, "unix:"+config.UnixSocket, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to connect to gRPC server")
 	}
+	cancel()
 
 	conn = _conn
 
-	pingClient = proto.NewPingSeviceClient(conn)
-	statusClient = proto.NewStatusServiceClient(conn)
+	compscoreClient = proto.NewCompscoreClient(conn)
 }
 
 func Close() {
