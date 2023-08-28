@@ -7,6 +7,8 @@ import (
 )
 
 var (
+	ConfigFile string = "config.yml"
+
 	Name    string
 	Web     Web_s
 	Teams   Teams_s
@@ -16,7 +18,7 @@ var (
 )
 
 func init() {
-	viper.SetConfigFile("config.yml")
+	viper.SetConfigFile(ConfigFile)
 	err := viper.ReadInConfig()
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to read config file")
