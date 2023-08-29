@@ -5,6 +5,7 @@ go 1.20
 require (
 	entgo.io/ent v0.12.3
 	github.com/fsnotify/fsnotify v1.6.0
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
