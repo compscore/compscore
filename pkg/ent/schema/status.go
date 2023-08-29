@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -34,14 +35,29 @@ func (Status) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("check", Check.Type).
 			Comment("Check").
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			).
 			Required().
 			Unique(),
 		edge.To("team", Team.Type).
 			Comment("Team").
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			).
 			Required().
 			Unique(),
 		edge.To("round", Round.Type).
 			Comment("Round").
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			).
 			Required().
 			Unique(),
 	}
