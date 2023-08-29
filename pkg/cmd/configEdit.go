@@ -30,7 +30,7 @@ func configEditRun(cmd *cobra.Command, args []string) {
 		logrus.Fatal("No editor found, try using -e/--editor to specify one")
 	}
 
-	err := helpers.EditFile(config.ConfigFile, editor)
+	err := helpers.EditFile(config.RunningConfigFile, editor)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to edit config file")
 	}

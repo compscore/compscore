@@ -26,7 +26,7 @@ func configGetRun(cmd *cobra.Command, args []string) {
 	client.Open()
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.Engine.Timeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(config.RunningConfig.Engine.Timeout)*time.Second)
 	defer cancel()
 
 	conf, err := client.GetConfig(ctx)

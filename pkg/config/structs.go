@@ -42,3 +42,27 @@ type Check_s struct {
 	ExpectedOutput string        `yaml:"expectedOutput"`
 	Weight         int           `yaml:"weight"`
 }
+
+type Team_s struct {
+	Name     string    `yaml:"name"`
+	Password string    `yaml:"password"`
+	Number   int       `yaml:"number"`
+	Checks   []Check_s `yaml:"checks"`
+}
+
+type Config_s struct {
+	Name    string    `yaml:"name"`
+	Web     Web_s     `yaml:"web"`
+	Teams   Teams_s   `yaml:"teams"`
+	Scoring Scoring_s `yaml:"scoring"`
+	Engine  Engine_s  `yaml:"engine"`
+	Checks  []Check_s `yaml:"checks"`
+}
+
+type RunningConfig_s struct {
+	Name    string    `yaml:"name"`
+	Web     Web_s     `yaml:"web"`
+	Scoring Scoring_s `yaml:"scoring"`
+	Engine  Engine_s  `yaml:"engine"`
+	Teams   []Team_s  `yaml:"teams"`
+}
