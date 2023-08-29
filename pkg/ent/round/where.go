@@ -53,49 +53,49 @@ func IDLTE(id int) predicate.Round {
 	return predicate.Round(sql.FieldLTE(FieldID, id))
 }
 
-// Round applies equality check predicate on the "round" field. It's identical to RoundEQ.
-func Round(v int) predicate.Round {
-	return predicate.Round(sql.FieldEQ(FieldRound, v))
+// Number applies equality check predicate on the "number" field. It's identical to NumberEQ.
+func Number(v int) predicate.Round {
+	return predicate.Round(sql.FieldEQ(FieldNumber, v))
 }
 
-// RoundEQ applies the EQ predicate on the "round" field.
-func RoundEQ(v int) predicate.Round {
-	return predicate.Round(sql.FieldEQ(FieldRound, v))
+// NumberEQ applies the EQ predicate on the "number" field.
+func NumberEQ(v int) predicate.Round {
+	return predicate.Round(sql.FieldEQ(FieldNumber, v))
 }
 
-// RoundNEQ applies the NEQ predicate on the "round" field.
-func RoundNEQ(v int) predicate.Round {
-	return predicate.Round(sql.FieldNEQ(FieldRound, v))
+// NumberNEQ applies the NEQ predicate on the "number" field.
+func NumberNEQ(v int) predicate.Round {
+	return predicate.Round(sql.FieldNEQ(FieldNumber, v))
 }
 
-// RoundIn applies the In predicate on the "round" field.
-func RoundIn(vs ...int) predicate.Round {
-	return predicate.Round(sql.FieldIn(FieldRound, vs...))
+// NumberIn applies the In predicate on the "number" field.
+func NumberIn(vs ...int) predicate.Round {
+	return predicate.Round(sql.FieldIn(FieldNumber, vs...))
 }
 
-// RoundNotIn applies the NotIn predicate on the "round" field.
-func RoundNotIn(vs ...int) predicate.Round {
-	return predicate.Round(sql.FieldNotIn(FieldRound, vs...))
+// NumberNotIn applies the NotIn predicate on the "number" field.
+func NumberNotIn(vs ...int) predicate.Round {
+	return predicate.Round(sql.FieldNotIn(FieldNumber, vs...))
 }
 
-// RoundGT applies the GT predicate on the "round" field.
-func RoundGT(v int) predicate.Round {
-	return predicate.Round(sql.FieldGT(FieldRound, v))
+// NumberGT applies the GT predicate on the "number" field.
+func NumberGT(v int) predicate.Round {
+	return predicate.Round(sql.FieldGT(FieldNumber, v))
 }
 
-// RoundGTE applies the GTE predicate on the "round" field.
-func RoundGTE(v int) predicate.Round {
-	return predicate.Round(sql.FieldGTE(FieldRound, v))
+// NumberGTE applies the GTE predicate on the "number" field.
+func NumberGTE(v int) predicate.Round {
+	return predicate.Round(sql.FieldGTE(FieldNumber, v))
 }
 
-// RoundLT applies the LT predicate on the "round" field.
-func RoundLT(v int) predicate.Round {
-	return predicate.Round(sql.FieldLT(FieldRound, v))
+// NumberLT applies the LT predicate on the "number" field.
+func NumberLT(v int) predicate.Round {
+	return predicate.Round(sql.FieldLT(FieldNumber, v))
 }
 
-// RoundLTE applies the LTE predicate on the "round" field.
-func RoundLTE(v int) predicate.Round {
-	return predicate.Round(sql.FieldLTE(FieldRound, v))
+// NumberLTE applies the LTE predicate on the "number" field.
+func NumberLTE(v int) predicate.Round {
+	return predicate.Round(sql.FieldLTE(FieldNumber, v))
 }
 
 // HasStatus applies the HasEdge predicate on the "status" edge.

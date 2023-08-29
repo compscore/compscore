@@ -14,7 +14,7 @@ type Round struct {
 // Fields of the Round.
 func (Round) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("round").
+		field.Int("number").
 			Comment("Round number").
 			Positive().
 			Unique(),

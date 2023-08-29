@@ -28,16 +28,16 @@ func (ru *RoundUpdate) Where(ps ...predicate.Round) *RoundUpdate {
 	return ru
 }
 
-// SetRound sets the "round" field.
-func (ru *RoundUpdate) SetRound(i int) *RoundUpdate {
-	ru.mutation.ResetRound()
-	ru.mutation.SetRound(i)
+// SetNumber sets the "number" field.
+func (ru *RoundUpdate) SetNumber(i int) *RoundUpdate {
+	ru.mutation.ResetNumber()
+	ru.mutation.SetNumber(i)
 	return ru
 }
 
-// AddRound adds i to the "round" field.
-func (ru *RoundUpdate) AddRound(i int) *RoundUpdate {
-	ru.mutation.AddRound(i)
+// AddNumber adds i to the "number" field.
+func (ru *RoundUpdate) AddNumber(i int) *RoundUpdate {
+	ru.mutation.AddNumber(i)
 	return ru
 }
 
@@ -111,9 +111,9 @@ func (ru *RoundUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ru *RoundUpdate) check() error {
-	if v, ok := ru.mutation.Round(); ok {
-		if err := round.RoundValidator(v); err != nil {
-			return &ValidationError{Name: "round", err: fmt.Errorf(`ent: validator failed for field "Round.round": %w`, err)}
+	if v, ok := ru.mutation.Number(); ok {
+		if err := round.NumberValidator(v); err != nil {
+			return &ValidationError{Name: "number", err: fmt.Errorf(`ent: validator failed for field "Round.number": %w`, err)}
 		}
 	}
 	return nil
@@ -131,11 +131,11 @@ func (ru *RoundUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ru.mutation.Round(); ok {
-		_spec.SetField(round.FieldRound, field.TypeInt, value)
+	if value, ok := ru.mutation.Number(); ok {
+		_spec.SetField(round.FieldNumber, field.TypeInt, value)
 	}
-	if value, ok := ru.mutation.AddedRound(); ok {
-		_spec.AddField(round.FieldRound, field.TypeInt, value)
+	if value, ok := ru.mutation.AddedNumber(); ok {
+		_spec.AddField(round.FieldNumber, field.TypeInt, value)
 	}
 	if ru.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -202,16 +202,16 @@ type RoundUpdateOne struct {
 	mutation *RoundMutation
 }
 
-// SetRound sets the "round" field.
-func (ruo *RoundUpdateOne) SetRound(i int) *RoundUpdateOne {
-	ruo.mutation.ResetRound()
-	ruo.mutation.SetRound(i)
+// SetNumber sets the "number" field.
+func (ruo *RoundUpdateOne) SetNumber(i int) *RoundUpdateOne {
+	ruo.mutation.ResetNumber()
+	ruo.mutation.SetNumber(i)
 	return ruo
 }
 
-// AddRound adds i to the "round" field.
-func (ruo *RoundUpdateOne) AddRound(i int) *RoundUpdateOne {
-	ruo.mutation.AddRound(i)
+// AddNumber adds i to the "number" field.
+func (ruo *RoundUpdateOne) AddNumber(i int) *RoundUpdateOne {
+	ruo.mutation.AddNumber(i)
 	return ruo
 }
 
@@ -298,9 +298,9 @@ func (ruo *RoundUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ruo *RoundUpdateOne) check() error {
-	if v, ok := ruo.mutation.Round(); ok {
-		if err := round.RoundValidator(v); err != nil {
-			return &ValidationError{Name: "round", err: fmt.Errorf(`ent: validator failed for field "Round.round": %w`, err)}
+	if v, ok := ruo.mutation.Number(); ok {
+		if err := round.NumberValidator(v); err != nil {
+			return &ValidationError{Name: "number", err: fmt.Errorf(`ent: validator failed for field "Round.number": %w`, err)}
 		}
 	}
 	return nil
@@ -335,11 +335,11 @@ func (ruo *RoundUpdateOne) sqlSave(ctx context.Context) (_node *Round, err error
 			}
 		}
 	}
-	if value, ok := ruo.mutation.Round(); ok {
-		_spec.SetField(round.FieldRound, field.TypeInt, value)
+	if value, ok := ruo.mutation.Number(); ok {
+		_spec.SetField(round.FieldNumber, field.TypeInt, value)
 	}
-	if value, ok := ruo.mutation.AddedRound(); ok {
-		_spec.AddField(round.FieldRound, field.TypeInt, value)
+	if value, ok := ruo.mutation.AddedNumber(); ok {
+		_spec.AddField(round.FieldNumber, field.TypeInt, value)
 	}
 	if ruo.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{

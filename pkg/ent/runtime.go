@@ -24,10 +24,10 @@ func init() {
 	check.NameValidator = checkDescName.Validators[0].(func(string) error)
 	roundFields := schema.Round{}.Fields()
 	_ = roundFields
-	// roundDescRound is the schema descriptor for round field.
-	roundDescRound := roundFields[0].Descriptor()
-	// round.RoundValidator is a validator for the "round" field. It is called by the builders before save.
-	round.RoundValidator = roundDescRound.Validators[0].(func(int) error)
+	// roundDescNumber is the schema descriptor for number field.
+	roundDescNumber := roundFields[0].Descriptor()
+	// round.NumberValidator is a validator for the "number" field. It is called by the builders before save.
+	round.NumberValidator = roundDescNumber.Validators[0].(func(int) error)
 	statusFields := schema.Status{}.Fields()
 	_ = statusFields
 	// statusDescTime is the schema descriptor for time field.

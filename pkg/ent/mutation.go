@@ -458,8 +458,8 @@ type RoundMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	round         *int
-	addround      *int
+	number        *int
+	addnumber     *int
 	clearedFields map[string]struct{}
 	status        map[int]struct{}
 	removedstatus map[int]struct{}
@@ -567,60 +567,60 @@ func (m *RoundMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetRound sets the "round" field.
-func (m *RoundMutation) SetRound(i int) {
-	m.round = &i
-	m.addround = nil
+// SetNumber sets the "number" field.
+func (m *RoundMutation) SetNumber(i int) {
+	m.number = &i
+	m.addnumber = nil
 }
 
-// Round returns the value of the "round" field in the mutation.
-func (m *RoundMutation) Round() (r int, exists bool) {
-	v := m.round
+// Number returns the value of the "number" field in the mutation.
+func (m *RoundMutation) Number() (r int, exists bool) {
+	v := m.number
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldRound returns the old "round" field's value of the Round entity.
+// OldNumber returns the old "number" field's value of the Round entity.
 // If the Round object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RoundMutation) OldRound(ctx context.Context) (v int, err error) {
+func (m *RoundMutation) OldNumber(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRound is only allowed on UpdateOne operations")
+		return v, errors.New("OldNumber is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRound requires an ID field in the mutation")
+		return v, errors.New("OldNumber requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRound: %w", err)
+		return v, fmt.Errorf("querying old value for OldNumber: %w", err)
 	}
-	return oldValue.Round, nil
+	return oldValue.Number, nil
 }
 
-// AddRound adds i to the "round" field.
-func (m *RoundMutation) AddRound(i int) {
-	if m.addround != nil {
-		*m.addround += i
+// AddNumber adds i to the "number" field.
+func (m *RoundMutation) AddNumber(i int) {
+	if m.addnumber != nil {
+		*m.addnumber += i
 	} else {
-		m.addround = &i
+		m.addnumber = &i
 	}
 }
 
-// AddedRound returns the value that was added to the "round" field in this mutation.
-func (m *RoundMutation) AddedRound() (r int, exists bool) {
-	v := m.addround
+// AddedNumber returns the value that was added to the "number" field in this mutation.
+func (m *RoundMutation) AddedNumber() (r int, exists bool) {
+	v := m.addnumber
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetRound resets all changes to the "round" field.
-func (m *RoundMutation) ResetRound() {
-	m.round = nil
-	m.addround = nil
+// ResetNumber resets all changes to the "number" field.
+func (m *RoundMutation) ResetNumber() {
+	m.number = nil
+	m.addnumber = nil
 }
 
 // AddStatuIDs adds the "status" edge to the Status entity by ids.
@@ -712,8 +712,8 @@ func (m *RoundMutation) Type() string {
 // AddedFields().
 func (m *RoundMutation) Fields() []string {
 	fields := make([]string, 0, 1)
-	if m.round != nil {
-		fields = append(fields, round.FieldRound)
+	if m.number != nil {
+		fields = append(fields, round.FieldNumber)
 	}
 	return fields
 }
@@ -723,8 +723,8 @@ func (m *RoundMutation) Fields() []string {
 // schema.
 func (m *RoundMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case round.FieldRound:
-		return m.Round()
+	case round.FieldNumber:
+		return m.Number()
 	}
 	return nil, false
 }
@@ -734,8 +734,8 @@ func (m *RoundMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *RoundMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case round.FieldRound:
-		return m.OldRound(ctx)
+	case round.FieldNumber:
+		return m.OldNumber(ctx)
 	}
 	return nil, fmt.Errorf("unknown Round field %s", name)
 }
@@ -745,12 +745,12 @@ func (m *RoundMutation) OldField(ctx context.Context, name string) (ent.Value, e
 // type.
 func (m *RoundMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case round.FieldRound:
+	case round.FieldNumber:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetRound(v)
+		m.SetNumber(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Round field %s", name)
@@ -760,8 +760,8 @@ func (m *RoundMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *RoundMutation) AddedFields() []string {
 	var fields []string
-	if m.addround != nil {
-		fields = append(fields, round.FieldRound)
+	if m.addnumber != nil {
+		fields = append(fields, round.FieldNumber)
 	}
 	return fields
 }
@@ -771,8 +771,8 @@ func (m *RoundMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *RoundMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case round.FieldRound:
-		return m.AddedRound()
+	case round.FieldNumber:
+		return m.AddedNumber()
 	}
 	return nil, false
 }
@@ -782,12 +782,12 @@ func (m *RoundMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *RoundMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case round.FieldRound:
+	case round.FieldNumber:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddRound(v)
+		m.AddNumber(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Round numeric field %s", name)
@@ -816,8 +816,8 @@ func (m *RoundMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *RoundMutation) ResetField(name string) error {
 	switch name {
-	case round.FieldRound:
-		m.ResetRound()
+	case round.FieldNumber:
+		m.ResetNumber()
 		return nil
 	}
 	return fmt.Errorf("unknown Round field %s", name)

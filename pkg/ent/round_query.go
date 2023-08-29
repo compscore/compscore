@@ -298,12 +298,12 @@ func (rq *RoundQuery) WithStatus(opts ...func(*StatusQuery)) *RoundQuery {
 // Example:
 //
 //	var v []struct {
-//		Round int `json:"round,omitempty"`
+//		Number int `json:"number,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Round.Query().
-//		GroupBy(round.FieldRound).
+//		GroupBy(round.FieldNumber).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rq *RoundQuery) GroupBy(field string, fields ...string) *RoundGroupBy {
@@ -321,11 +321,11 @@ func (rq *RoundQuery) GroupBy(field string, fields ...string) *RoundGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Round int `json:"round,omitempty"`
+//		Number int `json:"number,omitempty"`
 //	}
 //
 //	client.Round.Query().
-//		Select(round.FieldRound).
+//		Select(round.FieldNumber).
 //		Scan(ctx, &v)
 func (rq *RoundQuery) Select(fields ...string) *RoundSelect {
 	rq.ctx.Fields = append(rq.ctx.Fields, fields...)

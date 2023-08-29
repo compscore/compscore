@@ -12,8 +12,8 @@ const (
 	Label = "round"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldRound holds the string denoting the round field in the database.
-	FieldRound = "round"
+	// FieldNumber holds the string denoting the number field in the database.
+	FieldNumber = "number"
 	// EdgeStatus holds the string denoting the status edge name in mutations.
 	EdgeStatus = "status"
 	// Table holds the table name of the round in the database.
@@ -30,7 +30,7 @@ const (
 // Columns holds all SQL columns for round fields.
 var Columns = []string{
 	FieldID,
-	FieldRound,
+	FieldNumber,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -44,8 +44,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// RoundValidator is a validator for the "round" field. It is called by the builders before save.
-	RoundValidator func(int) error
+	// NumberValidator is a validator for the "number" field. It is called by the builders before save.
+	NumberValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Round queries.
@@ -56,9 +56,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByRound orders the results by the round field.
-func ByRound(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRound, opts...).ToFunc()
+// ByNumber orders the results by the number field.
+func ByNumber(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNumber, opts...).ToFunc()
 }
 
 // ByStatusCount orders the results by status count.

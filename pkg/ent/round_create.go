@@ -20,9 +20,9 @@ type RoundCreate struct {
 	hooks    []Hook
 }
 
-// SetRound sets the "round" field.
-func (rc *RoundCreate) SetRound(i int) *RoundCreate {
-	rc.mutation.SetRound(i)
+// SetNumber sets the "number" field.
+func (rc *RoundCreate) SetNumber(i int) *RoundCreate {
+	rc.mutation.SetNumber(i)
 	return rc
 }
 
@@ -75,12 +75,12 @@ func (rc *RoundCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *RoundCreate) check() error {
-	if _, ok := rc.mutation.Round(); !ok {
-		return &ValidationError{Name: "round", err: errors.New(`ent: missing required field "Round.round"`)}
+	if _, ok := rc.mutation.Number(); !ok {
+		return &ValidationError{Name: "number", err: errors.New(`ent: missing required field "Round.number"`)}
 	}
-	if v, ok := rc.mutation.Round(); ok {
-		if err := round.RoundValidator(v); err != nil {
-			return &ValidationError{Name: "round", err: fmt.Errorf(`ent: validator failed for field "Round.round": %w`, err)}
+	if v, ok := rc.mutation.Number(); ok {
+		if err := round.NumberValidator(v); err != nil {
+			return &ValidationError{Name: "number", err: fmt.Errorf(`ent: validator failed for field "Round.number": %w`, err)}
 		}
 	}
 	return nil
@@ -109,9 +109,9 @@ func (rc *RoundCreate) createSpec() (*Round, *sqlgraph.CreateSpec) {
 		_node = &Round{config: rc.config}
 		_spec = sqlgraph.NewCreateSpec(round.Table, sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt))
 	)
-	if value, ok := rc.mutation.Round(); ok {
-		_spec.SetField(round.FieldRound, field.TypeInt, value)
-		_node.Round = value
+	if value, ok := rc.mutation.Number(); ok {
+		_spec.SetField(round.FieldNumber, field.TypeInt, value)
+		_node.Number = value
 	}
 	if nodes := rc.mutation.StatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

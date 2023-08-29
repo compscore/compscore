@@ -17,7 +17,7 @@ type Round struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Round number
-	Round int `json:"round,omitempty"`
+	Number int `json:"number,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoundQuery when eager-loading is set.
 	Edges        RoundEdges `json:"edges"`
@@ -47,7 +47,7 @@ func (*Round) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case round.FieldID, round.FieldRound:
+		case round.FieldID, round.FieldNumber:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -70,11 +70,11 @@ func (r *Round) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			r.ID = int(value.Int64)
-		case round.FieldRound:
+		case round.FieldNumber:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field round", values[i])
+				return fmt.Errorf("unexpected type %T for field number", values[i])
 			} else if value.Valid {
-				r.Round = int(value.Int64)
+				r.Number = int(value.Int64)
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -117,8 +117,8 @@ func (r *Round) String() string {
 	var builder strings.Builder
 	builder.WriteString("Round(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
-	builder.WriteString("round=")
-	builder.WriteString(fmt.Sprintf("%v", r.Round))
+	builder.WriteString("number=")
+	builder.WriteString(fmt.Sprintf("%v", r.Number))
 	builder.WriteByte(')')
 	return builder.String()
 }

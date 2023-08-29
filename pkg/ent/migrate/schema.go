@@ -22,7 +22,7 @@ var (
 	// RoundsColumns holds the columns for the "rounds" table.
 	RoundsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "round", Type: field.TypeInt, Unique: true},
+		{Name: "number", Type: field.TypeInt, Unique: true},
 	}
 	// RoundsTable holds the schema information for the "rounds" table.
 	RoundsTable = &schema.Table{
