@@ -2,10 +2,10 @@ package config
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"text/template"
 
+	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -16,8 +16,8 @@ var (
 	ConfigFile        string = "config.yml"
 	RunningConfigFile string = "running-config.yml"
 
-	RunningConfig *RunningConfig_s
-	Config        *Config_s
+	RunningConfig *structs.RunningConfig_s
+	Config        *structs.Config_s
 )
 
 func init() {
@@ -67,18 +67,18 @@ func UpdateRunningConfig() {
 	}
 }
 
-func GenerateIntialConfig() (*Config_s, *RunningConfig_s, error) {
+func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error) {
 	var (
-		runningConfig *RunningConfig_s = &RunningConfig_s{}
-		config        *Config_s        = &Config_s{}
+		runningConfig *structs.RunningConfig_s = &structs.RunningConfig_s{}
+		config        *structs.Config_s        = &structs.Config_s{}
 
 		name    string
-		web     Web_s
-		teams_s Teams_s
-		engine  Engine_s
-		checks  []Check_s
+		web     structs.Web_s
+		teams_s structs.Teams_s
+		engine  structs.Engine_s
+		checks  []structs.Check_s
 
-		teams []Team_s
+		teams []structs.Team_s
 	)
 
 	viper.SetConfigFile(ConfigFile)
@@ -131,13 +131,13 @@ func GenerateIntialConfig() (*Config_s, *RunningConfig_s, error) {
 			return config, runningConfig, err
 		}
 
-		team := Team_s{
+		team := structs.Team_s{
 			Name:     team_name.String(),
 			Number:   i + 1,
 			Password: teams_s.Password,
 		}
 
-		checks := []Check_s{}
+		checks := []structs.Check_s{}
 
 		for _, check := range config.Checks {
 			target := bytes.NewBuffer([]byte{})
@@ -152,13 +152,13 @@ func GenerateIntialConfig() (*Config_s, *RunningConfig_s, error) {
 				return config, runningConfig, err
 			}
 
-			checks = append(checks, Check_s{
+			checks = append(checks, structs.Check_s{
 				Name: check.Name,
-				Git: Git_s{
+				Git: structs.Git_s{
 					Remote: check.Git.Remote,
 					Branch: check.Git.Branch,
 				},
-				Credentials: Credentials_s{
+				Credentials: structs.Credentials_s{
 					Username: check.Credentials.Username,
 					Password: check.Credentials.Password,
 				},
@@ -181,15 +181,11 @@ func GenerateIntialConfig() (*Config_s, *RunningConfig_s, error) {
 		return config, runningConfig, err
 	}
 
-	fmt.Println(runningConfig)
-
 	out, err := yaml.Marshal(runningConfig)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to marshal running config")
 		return config, runningConfig, err
 	}
-
-	fmt.Println(string(out))
 
 	_, err = file.Write(out)
 	if err != nil {

@@ -1,4 +1,4 @@
-package config
+package structs
 
 type Web_s struct {
 	Hostname string `yaml:"hostname"`
