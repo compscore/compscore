@@ -35,6 +35,16 @@ func init() {
 	viper.WatchConfig()
 }
 
+func RegenerateConfiguration() {
+	config, runningConfig, err := GenerateIntialConfig()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to generate running config")
+	}
+
+	RunningConfig = runningConfig
+	Config = config
+}
+
 func UpdateConfiguration() {
 	exists, err := FileExists(RunningConfigFile)
 	if err != nil {
