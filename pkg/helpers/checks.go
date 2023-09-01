@@ -12,6 +12,10 @@ import (
 )
 
 func GetReleaseAsset(organization string, repo string, tag string) (path string, err error) {
+	if tag == "" {
+		tag = "latest"
+	}
+
 	filename := "plugins/" + organization + "-" + repo + "-" + tag + ".so"
 
 	exists, err := FileExists(filename)
@@ -26,10 +30,17 @@ func GetReleaseAsset(organization string, repo string, tag string) (path string,
 	return DownloadReleaseAsset(organization, repo, tag)
 }
 
-func DownloadReleaseAsset(organization string, repo string, tag string) (path string, err error) {
+func DownloadReleaseAsset(organization string, repo string, tag string) (filepath string, err error) {
 	githubClient := github.NewClient(nil)
 
-	release, _, err := githubClient.Repositories.GetReleaseByTag(context.Background(), organization, repo, tag)
+	var release *github.RepositoryRelease
+
+	if tag == "latest" {
+		release, _, err = githubClient.Repositories.GetLatestRelease(context.Background(), organization, repo)
+	} else {
+		release, _, err = githubClient.Repositories.GetReleaseByTag(context.Background(), organization, repo, tag)
+	}
+
 	if err != nil {
 		return "", err
 	}
@@ -49,9 +60,9 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (path st
 
 	resp, err := http.Get(asset.GetBrowserDownloadURL())
 
-	filename := "plugins/" + organization + "-" + repo + "-" + tag + ".so"
+	filepath = "plugins/" + organization + "-" + repo + "-" + tag + ".so"
 
-	file, err := os.Create(filename)
+	file, err := os.Create(filepath)
 	if err != nil {
 		return "", err
 	}
@@ -62,5 +73,5 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (path st
 		return "", err
 	}
 
-	return filename, nil
+	return filepath, nil
 }
