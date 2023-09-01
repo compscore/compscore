@@ -5,6 +5,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/compscore/compscore/pkg/grpc/client"
+	"github.com/compscore/compscore/pkg/helpers"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
@@ -23,17 +25,25 @@ var (
 
 func init() {
 	UpdateConfiguration()
+	LoadExternalVariables()
 
 	viper.OnConfigChange(
 		func(e fsnotify.Event) {
 			if e.Op == fsnotify.Write {
 				logrus.Info("Config file changed:", e.Name)
 				UpdateConfiguration()
+				LoadExternalVariables()
 			}
 		},
 	)
 
 	viper.WatchConfig()
+}
+
+func LoadExternalVariables() {
+	helpers.CheckFileName = CheckFileName
+	helpers.SocketPath = RunningConfig.Engine.Socket
+	client.SocketPath = RunningConfig.Engine.Socket
 }
 
 func RegenerateConfiguration() {
@@ -163,12 +173,17 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				return config, runningConfig, err
 			}
 
+			_, tag, err := helpers.GetReleaseAssetWithTag(check.Release.Org, check.Release.Repo, check.Release.Tag)
+			if err != nil {
+				return config, runningConfig, err
+			}
+
 			checks = append(checks, structs.Check_s{
 				Name: check.Name,
 				Release: structs.Release_s{
 					Org:  check.Release.Org,
 					Repo: check.Release.Repo,
-					Tag:  check.Release.Tag,
+					Tag:  tag,
 				},
 				Credentials: structs.Credentials_s{
 					Username: check.Credentials.Username,

@@ -8,8 +8,17 @@ import (
 	"os"
 	"plugin"
 
-	"github.com/compscore/compscore/pkg/config"
 	"github.com/google/go-github/github"
+)
+
+type releaseAssetCacheStruct struct {
+	Path string
+	Tag  string
+}
+
+var (
+	CheckFileName     string
+	releaseAssetCache map[string]releaseAssetCacheStruct = make(map[string]releaseAssetCacheStruct)
 )
 
 func GetCheckFunction(organization string, repo string, tag string) (func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string), error) {
@@ -37,10 +46,20 @@ func GetCheckFunction(organization string, repo string, tag string) (func(ctx co
 }
 
 func GetReleaseAsset(organization string, repo string, tag string) (path string, err error) {
+	path, _, err = GetReleaseAssetWithTag(organization, repo, tag)
+	return path, err
+}
+
+func GetReleaseAssetWithTag(organization string, repo string, tag string) (path string, tagParsed string, err error) {
+	releaseExists, ok := releaseAssetCache[organization+"/"+repo+"/"+tag]
+	if ok {
+		return releaseExists.Path, releaseExists.Tag, nil
+	}
+
 	if tag == "latest" || tag == "" {
 		tag, err = GetLatestRelease(organization, repo)
 		if err != nil {
-			return "", err
+			return "", "", err
 		}
 
 	}
@@ -49,20 +68,39 @@ func GetReleaseAsset(organization string, repo string, tag string) (path string,
 
 	exists, err := FileExists(path)
 	if err != nil {
-		return "", err
+		return "", tag, err
 	}
 
 	if exists {
-		return path, nil
+		releaseAssetCache[organization+"/"+repo+"/"+tag] = releaseAssetCacheStruct{
+			Path: path,
+			Tag:  tag,
+		}
+
+		return path, tag, nil
 	}
 
-	return DownloadReleaseAsset(organization, repo, tag)
+	path, err = DownloadReleaseAsset(organization, repo, tag)
+	if err != nil {
+		return "", tag, err
+	}
+
+	releaseAssetCache[organization+"/"+repo+"/"+tag] = releaseAssetCacheStruct{
+		Path: path,
+		Tag:  tag,
+	}
+
+	return path, tag, nil
 }
 
 func GetLatestRelease(organization string, repo string) (tag string, err error) {
 	githubClient := github.NewClient(nil)
 
-	release, _, err := githubClient.Repositories.GetLatestRelease(context.Background(), organization, repo)
+	release, response, err := githubClient.Repositories.GetLatestRelease(context.Background(), organization, repo)
+	if response.StatusCode != 200 {
+		return "", fmt.Errorf("release endpoint returned %d for: %s/%s", response.StatusCode, organization, repo)
+	}
+
 	if err != nil {
 		return "", err
 	}
@@ -85,7 +123,7 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (filepat
 	var asset *github.ReleaseAsset
 
 	for _, a := range release.Assets {
-		if a.GetName() == config.CheckFileName {
+		if a.GetName() == CheckFileName {
 			asset = &a
 			break
 		}

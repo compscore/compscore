@@ -22,7 +22,7 @@ func init() {
 }
 
 func loadCheckRun(cmd *cobra.Command, args []string) {
-	file, err := helpers.GetReleaseAsset("compscore", "check-template", "v1.0.1")
+	file, err := helpers.GetReleaseAsset("compscore", "check-template", "v1.0.0")
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to get release asset")
 	}
