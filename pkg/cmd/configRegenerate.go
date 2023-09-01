@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -18,5 +19,9 @@ func init() {
 }
 
 func configRegenerateRun(cmd *cobra.Command, args []string) {
-	config.RegenerateConfiguration()
+	confirmed := helpers.UserConfirm("Regerating running configuration will overwrite any changes you have made to the running configuration (DO NOT DO THIS MID-COMPETITION).\nAre you sure you want to continue?")
+
+	if confirmed {
+		config.RegenerateConfiguration()
+	}
 }
