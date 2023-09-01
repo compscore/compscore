@@ -6,10 +6,35 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"plugin"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/google/go-github/github"
 )
+
+func GetCheckFunction(organization string, repo string, tag string) (func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string), error) {
+	file, err := GetReleaseAsset(organization, repo, tag)
+	if err != nil {
+		return nil, err
+	}
+
+	plugin, err := plugin.Open(file)
+	if err != nil {
+		return nil, err
+	}
+
+	runSymbol, err := plugin.Lookup("Run")
+	if err != nil {
+		return nil, err
+	}
+
+	runFunc, ok := runSymbol.(func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string))
+	if !ok {
+		return nil, fmt.Errorf("failed to cast Run to func")
+	}
+
+	return runFunc, nil
+}
 
 func GetReleaseAsset(organization string, repo string, tag string) (path string, err error) {
 	if tag == "" {

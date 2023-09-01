@@ -16,9 +16,9 @@ engine:
   timeout: 5 # seconds
 checks:
   - name: host_a-ssh
-    git:
-      remote: git@github.com:compscore/ssh.git
-      branch: main
+    release:
+      org: compscore
+      repo: ssh
     credentials:
       username: ubuntu
       password: changeme
@@ -28,9 +28,9 @@ checks:
     expectedOutput: ubuntu
     weight: 2
   - name: host_a-ssh
-    git:
-      remote: git@github.com:compscore/ssh.git
-      branch: main
+    release:
+      org: compscore
+      repo: ssh
     credentials:
       username: kali
       password: changeme
@@ -40,8 +40,8 @@ checks:
     expectedOutput: kali
     weight: 2
   - name: host_a-ping
-    git:
-      remote: git@github.com:compscore/ping.git
-      branch: main
+    release:
+      org: compscore
+      repo: ping
     target: 10.{{ .Team }}.1.1
     weight: 1

@@ -33,16 +33,16 @@ func Run() {
 	}
 }
 
-func GetAllGitRemotes() []structs.Git_s {
-	remoteMap := make(map[structs.Git_s]bool)
+func GetAllGitRemotes() []structs.Release_s {
+	remoteMap := make(map[structs.Release_s]bool)
 
 	for _, team := range config.RunningConfig.Teams {
 		for _, check := range team.Checks {
-			remoteMap[check.Git] = true
+			remoteMap[check.Release] = true
 		}
 	}
 
-	remoteSlice := make([]structs.Git_s, len(remoteMap))
+	remoteSlice := make([]structs.Release_s, len(remoteMap))
 	i := 0
 	for remote := range remoteMap {
 		remoteSlice[i] = remote

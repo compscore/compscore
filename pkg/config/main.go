@@ -155,9 +155,10 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 
 			checks = append(checks, structs.Check_s{
 				Name: check.Name,
-				Git: structs.Git_s{
-					Remote: check.Git.Remote,
-					Branch: check.Git.Branch,
+				Release: structs.Release_s{
+					Org:  check.Release.Org,
+					Repo: check.Release.Repo,
+					Tag:  check.Release.Tag,
 				},
 				Credentials: structs.Credentials_s{
 					Username: check.Credentials.Username,

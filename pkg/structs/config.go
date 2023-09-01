@@ -22,9 +22,10 @@ type Engine_s struct {
 	Timeout int    `yaml:"timeout"`
 }
 
-type Git_s struct {
-	Remote string `yaml:"remote"`
-	Branch string `yaml:"branch"`
+type Release_s struct {
+	Org  string `yaml:"org"`
+	Repo string `yaml:"repo"`
+	Tag  string `yaml:"version"`
 }
 
 type Credentials_s struct {
@@ -34,7 +35,7 @@ type Credentials_s struct {
 
 type Check_s struct {
 	Name           string        `yaml:"name"`
-	Git            Git_s         `yaml:"git"`
+	Release        Release_s     `yaml:"release"`
 	Credentials    Credentials_s `yaml:"credentials"`
 	Target         string        `yaml:"target"`
 	Port           int           `yaml:"port"`
