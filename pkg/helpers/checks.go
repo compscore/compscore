@@ -37,33 +37,45 @@ func GetCheckFunction(organization string, repo string, tag string) (func(ctx co
 }
 
 func GetReleaseAsset(organization string, repo string, tag string) (path string, err error) {
-	if tag == "" {
-		tag = "latest"
+	if tag == "latest" || tag == "" {
+		tag, err = GetLatestRelease(organization, repo)
+		if err != nil {
+			return "", err
+		}
+
 	}
 
-	filename := "plugins/" + organization + "-" + repo + "-" + tag + ".so"
+	path = GeneratePath(organization, repo, tag)
 
-	exists, err := FileExists(filename)
+	exists, err := FileExists(path)
 	if err != nil {
 		return "", err
 	}
 
 	if exists {
-		return filename, nil
+		return path, nil
 	}
 
 	return DownloadReleaseAsset(organization, repo, tag)
 }
 
+func GetLatestRelease(organization string, repo string) (tag string, err error) {
+	githubClient := github.NewClient(nil)
+
+	release, _, err := githubClient.Repositories.GetLatestRelease(context.Background(), organization, repo)
+	if err != nil {
+		return "", err
+	}
+
+	return release.GetTagName(), nil
+}
+
 func DownloadReleaseAsset(organization string, repo string, tag string) (filepath string, err error) {
 	githubClient := github.NewClient(nil)
 
-	var release *github.RepositoryRelease
-
-	if tag == "latest" {
-		release, _, err = githubClient.Repositories.GetLatestRelease(context.Background(), organization, repo)
-	} else {
-		release, _, err = githubClient.Repositories.GetReleaseByTag(context.Background(), organization, repo, tag)
+	release, response, err := githubClient.Repositories.GetReleaseByTag(context.Background(), organization, repo, tag)
+	if response.StatusCode != 200 {
+		return "", fmt.Errorf("release endpoint returned %d", response.StatusCode)
 	}
 
 	if err != nil {
@@ -85,7 +97,7 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (filepat
 
 	resp, err := http.Get(asset.GetBrowserDownloadURL())
 
-	filepath = "plugins/" + organization + "-" + repo + "-" + tag + ".so"
+	filepath = GeneratePath(organization, repo, tag)
 
 	file, err := os.Create(filepath)
 	if err != nil {
@@ -99,4 +111,8 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (filepat
 	}
 
 	return filepath, nil
+}
+
+func GeneratePath(organization string, repo string, tag string) string {
+	return "plugins/" + organization + "-" + repo + "-" + tag + ".so"
 }
