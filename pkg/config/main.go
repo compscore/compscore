@@ -15,6 +15,7 @@ import (
 var (
 	ConfigFile        string = "config.yml"
 	RunningConfigFile string = "running-config.yml"
+	CheckFileName     string = "check.so"
 
 	RunningConfig *structs.RunningConfig_s
 	Config        *structs.Config_s

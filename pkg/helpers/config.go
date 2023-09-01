@@ -1,9 +1,26 @@
 package helpers
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 )
+
+func FileExists(filepath string) (bool, error) {
+	stat, err := os.Stat(filepath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	if stat.IsDir() {
+		return false, fmt.Errorf("file is a directory: %s", filepath)
+	}
+
+	return true, nil
+}
 
 func GetEditor() string {
 	editors := []string{"nano", "vim", "emacs", "vi"}

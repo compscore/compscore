@@ -1,4 +1,7 @@
 build/*
 !build/.gitkeep
 
+plugins/*
+!plugins/.gitkeep
+
 running-config.yml
