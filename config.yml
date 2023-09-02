@@ -42,6 +42,6 @@ checks:
   - name: host_a-ping
     release:
       org: compscore
-      repo: check-template
+      repo: ping
     target: 10.{{ .Team }}.1.1
     weight: 1
