@@ -18,7 +18,7 @@ checks:
   - name: host_a-ssh
     release:
       org: compscore
-      repo: check-template
+      repo: ssh
     credentials:
       username: ubuntu
       password: changeme
@@ -30,7 +30,7 @@ checks:
   - name: host_a-ssh
     release:
       org: compscore
-      repo: check-template
+      repo: ssh
     credentials:
       username: kali
       password: changeme
