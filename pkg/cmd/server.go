@@ -10,7 +10,11 @@ import (
 )
 
 var serverCmd = &cobra.Command{
-	Use: "server",
+	Use:     "server",
+	Short:   "Run the server",
+	Long:    "Run the server",
+	Aliases: []string{"s", "serve"},
+
 	Run: serverRun,
 }
 

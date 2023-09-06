@@ -13,10 +13,11 @@ import (
 )
 
 var engineStartCmd = &cobra.Command{
-	Use:   "start",
-	Short: "Start the compscore server",
-	Long:  `Start the compscore server`,
-	Run:   engineStartRun,
+	Use:     "start",
+	Aliases: []string{"run", "r"},
+	Short:   "Start the compscore server",
+	Long:    `Start the compscore server`,
+	Run:     engineStartRun,
 }
 
 func engineStartRun(cmd *cobra.Command, args []string) {

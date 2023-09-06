@@ -5,7 +5,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use: "compscore",
+	Use:   "compscore",
+	Short: "Compscore is a scoring engine for Red/Blue Competitions",
+	Long:  "Compscore is a scoring engine for Red/Blue Competitions",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

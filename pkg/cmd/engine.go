@@ -5,8 +5,9 @@ import (
 )
 
 var engineCmd = &cobra.Command{
-	Use: "engine",
-	Run: engineRun,
+	Use:     "engine",
+	Aliases: []string{"e", "eng"},
+	Run:     engineRun,
 }
 
 func engineRun(cmd *cobra.Command, args []string) {

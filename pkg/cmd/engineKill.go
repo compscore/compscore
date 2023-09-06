@@ -9,10 +9,11 @@ import (
 )
 
 var engineKillCmd = &cobra.Command{
-	Use:   "kill",
-	Short: "Kill the engine",
-	Long:  "Kill the engine",
-	Run:   engineKillRun,
+	Use:     "kill",
+	Aliases: []string{"stop"},
+	Short:   "Kill the engine",
+	Long:    "Kill the engine",
+	Run:     engineKillRun,
 }
 
 func engineKillRun(cmd *cobra.Command, args []string) {

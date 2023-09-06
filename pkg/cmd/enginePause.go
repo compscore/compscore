@@ -9,8 +9,11 @@ import (
 )
 
 var enginePauseCmd = &cobra.Command{
-	Use: "pause",
-	Run: enginePauseRun,
+	Use:     "pause",
+	Short:   "Pause the engine",
+	Long:    "Pause the engine",
+	Aliases: []string{"p"},
+	Run:     enginePauseRun,
 }
 
 func enginePauseRun(cmd *cobra.Command, args []string) {

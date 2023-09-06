@@ -12,7 +12,7 @@ var engineHeartbeatCmd = &cobra.Command{
 	Use:     "heartbeat",
 	Short:   "Send a heartbeat to the engine",
 	Long:    "Send a heartbeat to the engine",
-	Aliases: []string{"ping"},
+	Aliases: []string{"ping", "p", "h"},
 	Run:     enginePingRun,
 }
 
