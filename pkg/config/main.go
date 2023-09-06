@@ -5,8 +5,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/compscore/compscore/pkg/grpc/client"
-	"github.com/compscore/compscore/pkg/helpers"
+	"github.com/compscore/compscore/pkg/checks"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
@@ -25,14 +24,12 @@ var (
 
 func init() {
 	UpdateConfiguration()
-	LoadExternalVariables()
 
 	viper.OnConfigChange(
 		func(e fsnotify.Event) {
 			if e.Op == fsnotify.Write {
 				logrus.Info("Config file changed:", e.Name)
 				UpdateConfiguration()
-				LoadExternalVariables()
 			}
 		},
 	)
@@ -41,9 +38,7 @@ func init() {
 }
 
 func LoadExternalVariables() {
-	helpers.CheckFileName = CheckFileName
-	helpers.SocketPath = RunningConfig.Engine.Socket
-	client.SocketPath = RunningConfig.Engine.Socket
+	checks.CheckFileName = CheckFileName
 }
 
 func RegenerateConfiguration() {
@@ -86,6 +81,15 @@ func UpdateRunningConfig() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal running config")
 	}
+
+	for _, team := range RunningConfig.Teams {
+		for _, check := range team.Checks {
+			_, err = checks.GetCheckFunction(check.Release.Org, check.Release.Repo, check.Release.Tag)
+			if err != nil {
+				logrus.WithError(err).Errorf("Failed to load check; %s: %s", check.Name, check.Release.Org+"/"+check.Release.Repo+"@"+check.Release.Tag)
+			}
+		}
+	}
 }
 
 func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error) {
@@ -93,11 +97,12 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 		runningConfig *structs.RunningConfig_s = &structs.RunningConfig_s{}
 		config        *structs.Config_s        = &structs.Config_s{}
 
-		name    string
-		web     structs.Web_s
-		teams_s structs.Teams_s
-		engine  structs.Engine_s
-		checks  []structs.Check_s
+		name      string
+		web_s     structs.Web_s
+		teams_s   structs.Teams_s
+		scoring_s structs.Scoring_s
+		engine_s  structs.Engine_s
+		checks_s  []structs.Check_s
 
 		teams []structs.Team_s
 	)
@@ -112,12 +117,12 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 	runningConfig.Name = name
 	config.Name = name
 
-	err = viper.UnmarshalKey("web", &web)
+	err = viper.UnmarshalKey("web", &web_s)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	runningConfig.Web = web
-	config.Web = web
+	runningConfig.Web = web_s
+	config.Web = web_s
 
 	err = viper.UnmarshalKey("teams", &teams_s)
 	if err != nil {
@@ -126,18 +131,26 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 	runningConfig.Teams = teams
 	config.Teams = teams_s
 
-	err = viper.UnmarshalKey("engine", &engine)
+	err = viper.UnmarshalKey("scoring", &scoring_s)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	runningConfig.Engine = engine
-	config.Engine = engine
 
-	err = viper.UnmarshalKey("checks", &checks)
+	runningConfig.Scoring = scoring_s
+	config.Scoring = scoring_s
+
+	err = viper.UnmarshalKey("engine", &engine_s)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	config.Checks = checks
+	runningConfig.Engine = engine_s
+	config.Engine = engine_s
+
+	err = viper.UnmarshalKey("checks", &checks_s)
+	if err != nil {
+		return config, runningConfig, err
+	}
+	config.Checks = checks_s
 
 	name_template := template.Must(template.New("name").Parse(teams_s.NameFormat))
 
@@ -158,7 +171,7 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 			Password: teams_s.Password,
 		}
 
-		checks := []structs.Check_s{}
+		_checks := []structs.Check_s{}
 
 		for _, check := range config.Checks {
 			target := bytes.NewBuffer([]byte{})
@@ -173,12 +186,12 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				return config, runningConfig, err
 			}
 
-			_, tag, err := helpers.GetReleaseAssetWithTag(check.Release.Org, check.Release.Repo, check.Release.Tag)
+			_, tag, err := checks.GetReleaseAssetWithTag(check.Release.Org, check.Release.Repo, check.Release.Tag)
 			if err != nil {
 				return config, runningConfig, err
 			}
 
-			checks = append(checks, structs.Check_s{
+			_checks = append(_checks, structs.Check_s{
 				Name: check.Name,
 				Release: structs.Release_s{
 					Org:  check.Release.Org,
@@ -196,7 +209,7 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				Weight:         check.Weight,
 			})
 
-			team.Checks = checks
+			team.Checks = _checks
 			teams = append(teams, team)
 		}
 	}

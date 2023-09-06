@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/engine"
 	"github.com/compscore/compscore/pkg/grpc/client"
-	"github.com/compscore/compscore/pkg/helpers"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var engineStartCmd = &cobra.Command{
 }
 
 func engineStartRun(cmd *cobra.Command, args []string) {
-	exists, err := helpers.UnixSocketExists()
+	exists, err := engine.UnixSocketExists()
 	if err != nil {
 		logrus.WithError(err).Fatal("Error checking if unix socket exists")
 	}
@@ -30,14 +30,14 @@ func engineStartRun(cmd *cobra.Command, args []string) {
 		// Socket Does Not Exist
 		// Spawn Engine
 
-		err := helpers.SpawnCompscoreEngine()
+		err := engine.SpawnCompscoreEngine()
 		if err != nil {
 			logrus.WithError(err).Fatal("Error spawning compscore engine")
 		}
 
 		logrus.Info("Compscore engine spawned")
 	} else {
-		active, err := helpers.UnixSocketActive()
+		active, err := engine.UnixSocketActive()
 		if err != nil {
 			logrus.WithError(err).Fatal("Error checking if unix socket is active")
 		}
@@ -67,7 +67,7 @@ func engineStartRun(cmd *cobra.Command, args []string) {
 				logrus.WithError(err).Fatal("Error removing unix socket")
 			}
 
-			err = helpers.SpawnCompscoreEngine()
+			err = engine.SpawnCompscoreEngine()
 			if err != nil {
 				logrus.WithError(err).Fatal("Error spawning compscore engine")
 			}

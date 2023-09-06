@@ -1,12 +1,14 @@
 package engine
 
 import (
+	"os"
 	"time"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/proto"
 	"github.com/compscore/compscore/pkg/grpc/server"
 	"github.com/compscore/compscore/pkg/structs"
+	"github.com/sirupsen/logrus"
 )
 
 func Run() {
@@ -18,6 +20,7 @@ func Run() {
 	for {
 		select {
 		case <-ticker.C:
+			logrus.Info("Scoring interval")
 			if interval != config.RunningConfig.Scoring.Interval {
 				interval = config.RunningConfig.Scoring.Interval
 				ticker = time.NewTicker(time.Duration(config.RunningConfig.Scoring.Interval) * time.Second)
@@ -26,6 +29,19 @@ func Run() {
 			if server.Status != proto.StatusEnum_RUNNING {
 				return
 			}
+
+			f, err := os.OpenFile("text.log",
+				os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				logrus.WithError(err).Error("Failed to open log file")
+				continue
+			}
+			defer f.Close()
+			if _, err := f.WriteString("ballz\n"); err != nil {
+				logrus.WithError(err).Error("Failed to write to log file")
+				continue
+			}
+
 		case <-quit:
 			ticker.Stop()
 			return

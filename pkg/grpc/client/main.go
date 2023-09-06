@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/proto"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -14,13 +15,13 @@ var (
 	conn            *grpc.ClientConn
 	compscoreClient proto.CompscoreClient
 
-	SocketPath string
+	// SocketPath string
 )
 
 func Open() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 
-	_conn, err := grpc.DialContext(ctx, "unix:"+SocketPath, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	_conn, err := grpc.DialContext(ctx, "unix:"+config.RunningConfig.Engine.Socket, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to connect to gRPC server")
 	}

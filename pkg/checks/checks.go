@@ -1,4 +1,4 @@
-package helpers
+package checks
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"os"
 	"plugin"
 
+	"github.com/compscore/compscore/pkg/helpers"
 	"github.com/google/go-github/github"
 )
 
@@ -66,7 +67,7 @@ func GetReleaseAssetWithTag(organization string, repo string, tag string) (path 
 
 	path = GeneratePath(organization, repo, tag)
 
-	exists, err := FileExists(path)
+	exists, err := helpers.FileExists(path)
 	if err != nil {
 		return "", tag, err
 	}

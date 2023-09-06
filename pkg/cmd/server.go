@@ -22,18 +22,18 @@ func serverRun(cmd *cobra.Command, args []string) {
 	sigChannel := make(chan os.Signal, 1)
 	signal.Notify(sigChannel, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		force := false
-		<-sigChannel
-		if force {
-			server.ForceClose()
-		} else {
-			force = true
-			server.Close()
-		}
-	}()
+	go server.Serve()
 
-	server.Serve()
+	// close procedure
+	force := false
+	<-sigChannel
+	if force {
+		server.ForceClose()
+	} else {
+		force = true
+		server.Close()
+	}
+
 }
 
 func init() {

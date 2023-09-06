@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"plugin"
 
-	"github.com/compscore/compscore/pkg/helpers"
+	"github.com/compscore/compscore/pkg/checks"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +22,7 @@ func init() {
 }
 
 func loadCheckRun(cmd *cobra.Command, args []string) {
-	file, err := helpers.GetReleaseAsset("compscore", "check-template", "v1.0.0")
+	file, err := checks.GetReleaseAsset("compscore", "check-template", "v1.0.0")
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to get release asset")
 	}

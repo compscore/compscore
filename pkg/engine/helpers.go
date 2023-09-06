@@ -1,4 +1,4 @@
-package helpers
+package engine
 
 import (
 	"context"
@@ -7,17 +7,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/client"
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	SocketPath string
-)
-
 // UnixSocketExists checks if the unix socket exists
 func UnixSocketExists() (bool, error) {
-	stat, err := os.Stat(SocketPath)
+	stat, err := os.Stat(config.RunningConfig.Engine.Socket)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
