@@ -20,8 +20,6 @@ var (
 	grpcServer      *grpc.Server
 	compscoreServer compscoreServer_s = compscoreServer_s{}
 	kill            chan struct{}     = make(chan struct{}, 1)
-
-	Status proto.StatusEnum = proto.StatusEnum_PAUSED
 )
 
 func Serve() {

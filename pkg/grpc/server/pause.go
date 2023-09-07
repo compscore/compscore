@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	"github.com/compscore/compscore/pkg/engine"
 	"github.com/compscore/compscore/pkg/grpc/proto"
 	"github.com/sirupsen/logrus"
 )
@@ -10,7 +11,9 @@ import (
 func (*compscoreServer_s) Pause(ctx context.Context, in *proto.PauseRequest) (*proto.PauseResponse, error) {
 	logrus.Info("Received pause request")
 
-	Status = proto.StatusEnum_PAUSED
-
-	return &proto.PauseResponse{Message: "paused"}, nil
+	err := engine.Pause()
+	if err != nil {
+		return &proto.PauseResponse{Message: err.Error()}, nil
+	}
+	return &proto.PauseResponse{Message: "pausing"}, nil
 }

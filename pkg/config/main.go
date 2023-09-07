@@ -16,7 +16,6 @@ import (
 var (
 	ConfigFile        string = "config.yml"
 	RunningConfigFile string = "running-config.yml"
-	CheckFileName     string = "check.so"
 
 	RunningConfig *structs.RunningConfig_s
 	Config        *structs.Config_s
@@ -35,10 +34,6 @@ func init() {
 	)
 
 	viper.WatchConfig()
-}
-
-func LoadExternalVariables() {
-	checks.CheckFileName = CheckFileName
 }
 
 func RegenerateConfiguration() {
@@ -81,12 +76,11 @@ func UpdateRunningConfig() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal running config")
 	}
-
 	for _, team := range RunningConfig.Teams {
 		for _, check := range team.Checks {
 			_, err = checks.GetCheckFunction(check.Release.Org, check.Release.Repo, check.Release.Tag)
 			if err != nil {
-				logrus.WithError(err).Errorf("Failed to load check; %s: %s", check.Name, check.Release.Org+"/"+check.Release.Repo+"@"+check.Release.Tag)
+				logrus.WithError(err).Fatalf("Failed to load check; %s: %s", check.Name, check.Release.Org+"/"+check.Release.Repo+"@"+check.Release.Tag)
 			}
 		}
 	}

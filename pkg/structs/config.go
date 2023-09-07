@@ -25,7 +25,7 @@ type Engine_s struct {
 type Release_s struct {
 	Org  string `yaml:"org"`
 	Repo string `yaml:"repo"`
-	Tag  string `yaml:"version"`
+	Tag  string `yaml:"tag"`
 }
 
 type Credentials_s struct {

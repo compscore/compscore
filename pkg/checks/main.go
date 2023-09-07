@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"os"
 	"plugin"
+	"strings"
 
 	"github.com/compscore/compscore/pkg/helpers"
+	"github.com/compscore/compscore/pkg/structs"
 	"github.com/google/go-github/github"
 )
 
@@ -18,7 +20,6 @@ type releaseAssetCacheStruct struct {
 }
 
 var (
-	CheckFileName     string
 	releaseAssetCache map[string]releaseAssetCacheStruct = make(map[string]releaseAssetCacheStruct)
 )
 
@@ -124,7 +125,7 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (filepat
 	var asset *github.ReleaseAsset
 
 	for _, a := range release.Assets {
-		if a.GetName() == CheckFileName {
+		if strings.HasSuffix(a.GetName(), ".so") {
 			asset = &a
 			break
 		}
@@ -154,4 +155,23 @@ func DownloadReleaseAsset(organization string, repo string, tag string) (filepat
 
 func GeneratePath(organization string, repo string, tag string) string {
 	return "plugins/" + organization + "-" + repo + "-" + tag + ".so"
+}
+
+func GetAllGitRemotes(runningConfig structs.RunningConfig_s) []structs.Release_s {
+	remoteMap := make(map[structs.Release_s]bool)
+
+	for _, team := range runningConfig.Teams {
+		for _, check := range team.Checks {
+			remoteMap[check.Release] = true
+		}
+	}
+
+	remoteSlice := make([]structs.Release_s, len(remoteMap))
+	i := 0
+	for remote := range remoteMap {
+		remoteSlice[i] = remote
+		i++
+	}
+
+	return remoteSlice
 }

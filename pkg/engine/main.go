@@ -1,21 +1,54 @@
 package engine
 
 import (
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/proto"
-	"github.com/compscore/compscore/pkg/grpc/server"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/sirupsen/logrus"
 )
 
-func Run() {
+var (
+	Status proto.StatusEnum = proto.StatusEnum_PAUSED
+
+	runLock *structs.Lock = &structs.Lock{}
+	quit    chan struct{} = make(chan struct{})
+)
+
+func Pause() error {
+	if !runLock.IsLocked() {
+		return fmt.Errorf("engine is not running")
+	}
+
+	Status = proto.StatusEnum_PAUSED
+	quit <- struct{}{}
+
+	return nil
+}
+
+func Run() error {
+	err := runLock.Lock()
+	if err != nil {
+		return fmt.Errorf("failed to lock run lock: %w", err)
+	}
+	defer runLock.Unlock()
+
+	Status = proto.StatusEnum_RUNNING
+	go runEngine()
+
+	return nil
+}
+
+func runEngine() {
 	interval := config.RunningConfig.Scoring.Interval
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
-
-	quit := make(chan struct{})
+	defer ticker.Stop()
+	defer func() {
+		Status = proto.StatusEnum_PAUSED
+	}()
 
 	for {
 		select {
@@ -26,7 +59,7 @@ func Run() {
 				ticker = time.NewTicker(time.Duration(config.RunningConfig.Scoring.Interval) * time.Second)
 			}
 
-			if server.Status != proto.StatusEnum_RUNNING {
+			if Status != proto.StatusEnum_RUNNING {
 				return
 			}
 
@@ -43,27 +76,7 @@ func Run() {
 			}
 
 		case <-quit:
-			ticker.Stop()
 			return
 		}
 	}
-}
-
-func GetAllGitRemotes() []structs.Release_s {
-	remoteMap := make(map[structs.Release_s]bool)
-
-	for _, team := range config.RunningConfig.Teams {
-		for _, check := range team.Checks {
-			remoteMap[check.Release] = true
-		}
-	}
-
-	remoteSlice := make([]structs.Release_s, len(remoteMap))
-	i := 0
-	for remote := range remoteMap {
-		remoteSlice[i] = remote
-		i++
-	}
-
-	return remoteSlice
 }
