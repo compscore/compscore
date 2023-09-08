@@ -21,6 +21,8 @@ var engineStartCmd = &cobra.Command{
 }
 
 func engineStartRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	exists, err := engine.UnixSocketExists()
 	if err != nil {
 		logrus.WithError(err).Fatal("Error checking if unix socket exists")

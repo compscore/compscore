@@ -34,7 +34,6 @@ func Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to lock run lock: %w", err)
 	}
-	defer runLock.Unlock()
 
 	Status = proto.StatusEnum_RUNNING
 	go runEngine()
@@ -46,6 +45,7 @@ func runEngine() {
 	interval := config.RunningConfig.Scoring.Interval
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	defer ticker.Stop()
+	defer runLock.Unlock()
 	defer func() {
 		Status = proto.StatusEnum_PAUSED
 	}()

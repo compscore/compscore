@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/server"
 	"github.com/spf13/cobra"
 )
@@ -19,6 +20,8 @@ var serverCmd = &cobra.Command{
 }
 
 func serverRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	sigChannel := make(chan os.Signal, 1)
 	signal.Notify(sigChannel, os.Interrupt, syscall.SIGTERM)
 

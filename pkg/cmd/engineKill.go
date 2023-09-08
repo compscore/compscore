@@ -3,20 +3,22 @@ package cmd
 import (
 	"context"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/client"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var engineKillCmd = &cobra.Command{
-	Use:     "kill",
-	Aliases: []string{"stop"},
-	Short:   "Kill the engine",
-	Long:    "Kill the engine",
-	Run:     engineKillRun,
+	Use:   "kill",
+	Short: "Kill the engine",
+	Long:  "Kill the engine",
+	Run:   engineKillRun,
 }
 
 func engineKillRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	client.Open()
 	defer client.Close()
 

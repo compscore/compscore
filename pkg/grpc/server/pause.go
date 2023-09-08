@@ -15,5 +15,6 @@ func (*compscoreServer_s) Pause(ctx context.Context, in *proto.PauseRequest) (*p
 	if err != nil {
 		return &proto.PauseResponse{Message: err.Error()}, nil
 	}
+
 	return &proto.PauseResponse{Message: "pausing"}, nil
 }

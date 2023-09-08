@@ -24,6 +24,8 @@ func init() {
 }
 
 func configGetRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	client.Open()
 	defer client.Close()
 

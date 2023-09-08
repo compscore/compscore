@@ -21,7 +21,7 @@ var (
 	Config        *structs.Config_s
 )
 
-func init() {
+func Init() {
 	UpdateConfiguration()
 
 	viper.OnConfigChange(

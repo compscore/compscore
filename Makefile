@@ -13,4 +13,4 @@ build:
 	go build $(LDFLAGS) -o $(OUT_FILE) main.go
 
 install: build
-	cp $(OUT_FILE) $(GOPATH)/bin/$(BINARY_NAME)
+	sudo cp $(OUT_FILE) $(GOPATH)/bin/$(BINARY_NAME)

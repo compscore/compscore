@@ -23,6 +23,8 @@ func init() {
 }
 
 func configEditRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	if editor == "" {
 		editor = helpers.GetEditor()
 	}
