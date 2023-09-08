@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/engine"
 	"github.com/compscore/compscore/pkg/grpc/proto"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -41,33 +42,43 @@ func Serve() {
 
 	logrus.Info("Starting gRPC server")
 
-	go func() {
-		<-kill
+	closed := make(chan struct{})
 
-		time.Sleep(time.Second)
-
-		// Force Close
-		go func() {
-			time.Sleep(5 * time.Second)
-
-			grpcServer.Stop()
-		}()
-
-		// Force Exit
-		go func() {
-			time.Sleep(10 * time.Second)
-
-			os.Exit(1)
-		}()
-
-		// Normal Close
-		grpcServer.GracefulStop()
-	}()
+	go handleClose(closed)
 
 	err = grpcServer.Serve(lis)
 	if err != nil && err != grpc.ErrServerStopped {
 		logrus.WithError(err).Fatal("Failed to serve gRPC server")
 	}
+}
+
+func handleClose(closed chan struct{}) {
+	<-kill
+
+	// Normal Close
+	time.Sleep(time.Second)
+
+	err := engine.Stop()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to stop engine")
+	}
+
+	grpcServer.GracefulStop()
+
+	// Force Close
+	time.Sleep(time.Duration(config.RunningConfig.Scoring.Interval) + 1)
+
+	if grpcServer != nil {
+		grpcServer.Stop()
+		if err != nil {
+			logrus.WithError(err).Error("Failed to pause engine")
+		}
+	}
+
+	// Force Exit
+	time.Sleep(time.Duration(config.RunningConfig.Scoring.Interval) + 1)
+
+	os.Exit(1)
 }
 
 func Close() {

@@ -18,8 +18,10 @@ import (
 var (
 	Status proto.StatusEnum = proto.StatusEnum_PAUSED
 
-	runLock *structs.Lock = &structs.Lock{}
-	quit    chan struct{} = make(chan struct{})
+	runLock    *structs.Lock = &structs.Lock{}
+	quit       chan struct{} = make(chan struct{})
+	exited     chan struct{} = make(chan struct{})
+	roundMutex *sync.Mutex   = &sync.Mutex{}
 )
 
 type checkResult struct {
@@ -36,6 +38,21 @@ func Pause() error {
 
 	Status = proto.StatusEnum_PAUSED
 	quit <- struct{}{}
+
+	return nil
+}
+
+func Stop() error {
+	if !runLock.IsLocked() {
+		return nil
+	}
+
+	Status = proto.StatusEnum_UNKNOWN
+	quit <- struct{}{}
+	<-exited
+	roundMutex.Unlock()
+
+	logrus.Info("Engine stopped")
 
 	return nil
 }
@@ -61,8 +78,6 @@ func runEngine() {
 		Status = proto.StatusEnum_PAUSED
 	}()
 
-	roundMutex := &sync.Mutex{}
-
 	for {
 		select {
 		case <-ticker.C:
@@ -85,7 +100,7 @@ func runEngine() {
 		case <-quit:
 			// wait until the round is finished
 			roundMutex.Lock()
-			roundMutex.Unlock()
+			exited <- struct{}{}
 
 			return
 		}

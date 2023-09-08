@@ -18,7 +18,6 @@ var (
 	RunningConfigFile string = "running-config.yml"
 
 	RunningConfig *structs.RunningConfig_s
-	Config        *structs.Config_s
 )
 
 func Init() {
@@ -37,13 +36,12 @@ func Init() {
 }
 
 func RegenerateConfiguration() {
-	config, runningConfig, err := GenerateIntialConfig()
+	_, runningConfig, err := GenerateIntialConfig()
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to generate running config")
 	}
 
 	RunningConfig = runningConfig
-	Config = config
 }
 
 func UpdateConfiguration() {
@@ -53,13 +51,12 @@ func UpdateConfiguration() {
 	}
 
 	if !exists {
-		config, runningConfig, err := GenerateIntialConfig()
+		_, runningConfig, err := GenerateIntialConfig()
 		if err != nil {
 			logrus.WithError(err).Fatal("Failed to generate running config")
 		}
 
 		RunningConfig = runningConfig
-		Config = config
 	} else {
 		UpdateRunningConfig()
 	}
