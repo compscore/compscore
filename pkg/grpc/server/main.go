@@ -39,7 +39,7 @@ func Serve() {
 
 	proto.RegisterCompscoreServer(grpcServer, &compscoreServer)
 
-	logrus.Info("Serving gRPC server")
+	logrus.Info("Starting gRPC server")
 
 	go func() {
 		<-kill

@@ -161,7 +161,7 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 
 		team := structs.Team_s{
 			Name:     team_name.String(),
-			Number:   i + 1,
+			Number:   int8(i + 1),
 			Password: teams_s.Password,
 		}
 
@@ -196,7 +196,6 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 					Username: check.Credentials.Username,
 					Password: check.Credentials.Password,
 				},
-				Port:           check.Port,
 				Command:        check.Command,
 				Target:         target.String(),
 				ExpectedOutput: check.ExpectedOutput,

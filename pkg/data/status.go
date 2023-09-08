@@ -15,6 +15,15 @@ type status_s struct{}
 var Status = status_s{}
 
 func (*status_s) Get(roundNumber int, checkName string, teamNumber int8) (*ent.Status, error) {
+	exist, err := Status.Exists(roundNumber, checkName, teamNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return Status.Create(roundNumber, checkName, teamNumber, status.StatusUnknown)
+	}
+
 	return Client.Status.
 		Query().
 		Where(
@@ -31,6 +40,15 @@ func (*status_s) Get(roundNumber int, checkName string, teamNumber int8) (*ent.S
 }
 
 func (*status_s) GetWithEdges(roundNumber int, checkName string, teamNumber int8) (*ent.Status, error) {
+	exist, err := Status.Exists(roundNumber, checkName, teamNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return Status.Create(roundNumber, checkName, teamNumber, status.StatusUnknown)
+	}
+
 	return Client.Status.
 		Query().
 		WithRound().
@@ -50,6 +68,15 @@ func (*status_s) GetWithEdges(roundNumber int, checkName string, teamNumber int8
 }
 
 func (*status_s) GetComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *ent.Team) (*ent.Status, error) {
+	exist, err := Status.Exists(entRound.Number, entCheck.Name, entTeam.Number)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return Status.Create(entRound.Number, entCheck.Name, entTeam.Number, status.StatusUnknown)
+	}
+
 	return Client.Status.
 		Query().
 		Where(
@@ -66,6 +93,15 @@ func (*status_s) GetComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *e
 }
 
 func (*status_s) GetComplexWithEdges(entRound *ent.Round, entCheck *ent.Check, entTeam *ent.Team) (*ent.Status, error) {
+	exist, err := Status.Exists(entRound.Number, entCheck.Name, entTeam.Number)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exist {
+		return Status.Create(entRound.Number, entCheck.Name, entTeam.Number, status.StatusUnknown)
+	}
+
 	return Client.Status.
 		Query().
 		WithRound().
@@ -334,7 +370,7 @@ func (*status_s) Exists(roundNumber int, checkName string, teamNumber int8) (boo
 		).Exist(Ctx)
 }
 
-func (*status_s) Create(roundNumber int, checkName string, teamNumber int8, status string) (*ent.Status, error) {
+func (*status_s) Create(roundNumber int, checkName string, teamNumber int8, stat status.Status) (*ent.Status, error) {
 	exist, err := Status.Exists(roundNumber, checkName, teamNumber)
 	if err != nil {
 		return nil, err
@@ -364,6 +400,7 @@ func (*status_s) Create(roundNumber int, checkName string, teamNumber int8, stat
 		SetRound(entRound).
 		SetCheck(entCheck).
 		SetTeam(entTeam).
+		SetStatus(stat).
 		Save(Ctx)
 }
 

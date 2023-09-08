@@ -1,6 +1,9 @@
 package data
 
 import (
+	"fmt"
+
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/team"
 )
@@ -10,6 +13,27 @@ type team_s struct{}
 var Team = team_s{}
 
 func (*team_s) Get(number int8) (*ent.Team, error) {
+	exists, err := Team.Exists(number)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		var teamName string
+
+		for _, team := range config.RunningConfig.Teams {
+			if team.Number == number {
+				teamName = team.Name
+				break
+			}
+		}
+		if teamName == "" {
+			return nil, fmt.Errorf("unable to find name for team: %d", number)
+		}
+
+		return Team.Create(number, teamName)
+	}
+
 	return Client.Team.
 		Query().
 		Where(

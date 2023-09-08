@@ -5,3 +5,4 @@ plugins/*
 !plugins/.gitkeep
 
 running-config.yml
+database.sqlite

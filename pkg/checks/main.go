@@ -20,10 +20,16 @@ type releaseAssetCacheStruct struct {
 }
 
 var (
-	releaseAssetCache map[string]releaseAssetCacheStruct = make(map[string]releaseAssetCacheStruct)
+	releaseAssetCache  map[string]releaseAssetCacheStruct                                                                                                          = make(map[string]releaseAssetCacheStruct)
+	checkFunctionCache map[string]func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string) = make(map[string]func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string))
 )
 
 func GetCheckFunction(organization string, repo string, tag string) (func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string), error) {
+	checkFunction, ok := checkFunctionCache[organization+"/"+repo+"/"+tag]
+	if ok {
+		return checkFunction, nil
+	}
+
 	file, err := GetReleaseAsset(organization, repo, tag)
 	if err != nil {
 		return nil, err
@@ -43,6 +49,8 @@ func GetCheckFunction(organization string, repo string, tag string) (func(ctx co
 	if !ok {
 		return nil, fmt.Errorf("failed to cast Run to func")
 	}
+
+	checkFunctionCache[organization+"/"+repo+"/"+tag] = runFunc
 
 	return runFunc, nil
 }
