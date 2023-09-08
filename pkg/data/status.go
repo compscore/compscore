@@ -404,9 +404,10 @@ func (*status_s) Create(roundNumber int, checkName string, teamNumber int8, stat
 		Save(Ctx)
 }
 
-func (*status_s) Update(entStatus *ent.Status, statusEnum status.Status, error string) (*ent.Status, error) {
+func (*status_s) Update(entStatus *ent.Status, statusEnum status.Status, message string) (*ent.Status, error) {
 	return entStatus.Update().
 		SetStatus(statusEnum).
+		SetError(message).
 		SetTime(time.Now()).
 		Save(Ctx)
 }

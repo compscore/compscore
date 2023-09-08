@@ -5,7 +5,7 @@ web:
   port: 8080
   apiPath: /api
 teams:
-  amount: 1
+  amount: 2
   nameFormat: Team {{ .Team }}
   password: password
 scoring:
@@ -25,20 +25,20 @@ checks:
     command: whoami
     expectedOutput: ubuntu
     weight: 2
-  # - name: host_a-ssh
-  #   release:
-  #     org: compscore
-  #     repo: ssh
-  #   credentials:
-  #     username: kali
-  #     password: changeme
-  #   target: 10.{{ .Team }}.1.2
-  #   command: whoami
-  #   expectedOutput: kali
-  #   weight: 2
-  # - name: host_a-ping
-  #   release:
-  #     org: compscore
-  #     repo: ping
-  #   target: 10.{{ .Team }}.1.1
-  #   weight: 1
+  - name: host_b-ssh
+    release:
+      org: compscore
+      repo: ssh
+    credentials:
+      username: kali
+      password: changeme
+    target: 10.{{ .Team }}.1.2
+    command: whoami
+    expectedOutput: kali
+    weight: 2
+  - name: host_a-ping
+    release:
+      org: compscore
+      repo: ping
+    target: 10.{{ .Team }}.1.1
+    weight: 1
