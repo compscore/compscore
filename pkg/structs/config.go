@@ -14,7 +14,6 @@ type Teams_s struct {
 
 type Scoring_s struct {
 	Interval int `yaml:"interval"`
-	Retries  int `yaml:"retries"`
 }
 
 type Engine_s struct {
@@ -22,9 +21,10 @@ type Engine_s struct {
 	Timeout int    `yaml:"timeout"`
 }
 
-type Git_s struct {
-	Remote string `yaml:"remote"`
-	Branch string `yaml:"branch"`
+type Release_s struct {
+	Org  string `yaml:"org"`
+	Repo string `yaml:"repo"`
+	Tag  string `yaml:"tag"`
 }
 
 type Credentials_s struct {
@@ -34,10 +34,9 @@ type Credentials_s struct {
 
 type Check_s struct {
 	Name           string        `yaml:"name"`
-	Git            Git_s         `yaml:"git"`
+	Release        Release_s     `yaml:"release"`
 	Credentials    Credentials_s `yaml:"credentials"`
 	Target         string        `yaml:"target"`
-	Port           int           `yaml:"port"`
 	Command        string        `yaml:"command"`
 	ExpectedOutput string        `yaml:"expectedOutput"`
 	Weight         int           `yaml:"weight"`
@@ -46,7 +45,7 @@ type Check_s struct {
 type Team_s struct {
 	Name     string    `yaml:"name"`
 	Password string    `yaml:"password"`
-	Number   int       `yaml:"number"`
+	Number   int8      `yaml:"number"`
 	Checks   []Check_s `yaml:"checks"`
 }
 

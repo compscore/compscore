@@ -137,6 +137,24 @@ func (*round_s) Create(number int) (*ent.Round, error) {
 		Save(Ctx)
 }
 
+func (*round_s) CreateNextRound() (*ent.Round, error) {
+	roundCount, err := Client.Round.Query().Count(Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if roundCount == 0 {
+		return Round.Create(1)
+	}
+
+	lastRound, err := Round.GetLastRound()
+	if err != nil {
+		return nil, err
+	}
+
+	return Round.Create(lastRound.Number + 1)
+}
+
 func (*round_s) Update(round *ent.Round, number int) (*ent.Round, error) {
 	return round.Update().
 		SetNumber(number).

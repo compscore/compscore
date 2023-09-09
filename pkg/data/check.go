@@ -10,6 +10,15 @@ type check_s struct{}
 var Check = check_s{}
 
 func (*check_s) Get(name string) (*ent.Check, error) {
+	exists, err := Check.Exists(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return Check.Create(name)
+	}
+
 	return Client.Check.
 		Query().
 		Where(

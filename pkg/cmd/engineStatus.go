@@ -3,17 +3,23 @@ package cmd
 import (
 	"context"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/client"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var engineStatusCmd = &cobra.Command{
-	Use: "status",
-	Run: engineStatusRun,
+	Use:     "status",
+	Short:   "Get the status of the engine",
+	Long:    "Get the status of the engine",
+	Aliases: []string{"stat"},
+	Run:     engineStatusRun,
 }
 
 func engineStatusRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	client.Open()
 	defer client.Close()
 

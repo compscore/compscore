@@ -8,7 +8,7 @@ import (
 
 var configRegenerateCmd = &cobra.Command{
 	Use:     "regenerate",
-	Aliases: []string{"regen"},
+	Aliases: []string{"regen", "r"},
 	Short:   "Regenerate running configuration",
 	Long:    "Regenerate running configuration",
 	Run:     configRegenerateRun,

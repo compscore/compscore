@@ -12,10 +12,11 @@ import (
 )
 
 var configGetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "Get current configuration",
-	Long:  "Get current configuration",
-	Run:   configGetRun,
+	Use:     "get",
+	Aliases: []string{"g", "show", "read"},
+	Short:   "Get current configuration",
+	Long:    "Get current configuration",
+	Run:     configGetRun,
 }
 
 func init() {
@@ -23,6 +24,8 @@ func init() {
 }
 
 func configGetRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	client.Open()
 	defer client.Close()
 

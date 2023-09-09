@@ -14,6 +14,8 @@ import (
 var (
 	conn            *grpc.ClientConn
 	compscoreClient proto.CompscoreClient
+
+	// SocketPath string
 )
 
 func Open() {

@@ -8,10 +8,11 @@ import (
 )
 
 var configEditCmd = &cobra.Command{
-	Use:   "edit",
-	Short: "Edit the config file",
-	Long:  "Edit the config file",
-	Run:   configEditRun,
+	Use:     "edit",
+	Aliases: []string{"e"},
+	Short:   "Edit the config file",
+	Long:    "Edit the config file",
+	Run:     configEditRun,
 }
 
 var editor string
@@ -22,6 +23,8 @@ func init() {
 }
 
 func configEditRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	if editor == "" {
 		editor = helpers.GetEditor()
 	}

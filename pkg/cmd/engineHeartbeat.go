@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/client"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -12,11 +13,13 @@ var engineHeartbeatCmd = &cobra.Command{
 	Use:     "heartbeat",
 	Short:   "Send a heartbeat to the engine",
 	Long:    "Send a heartbeat to the engine",
-	Aliases: []string{"ping"},
+	Aliases: []string{"ping", "p", "h"},
 	Run:     enginePingRun,
 }
 
 func enginePingRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
 	client.Open()
 	defer client.Close()
 

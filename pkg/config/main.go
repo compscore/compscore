@@ -5,6 +5,7 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/compscore/compscore/pkg/checks"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
@@ -17,10 +18,9 @@ var (
 	RunningConfigFile string = "running-config.yml"
 
 	RunningConfig *structs.RunningConfig_s
-	Config        *structs.Config_s
 )
 
-func init() {
+func Init() {
 	UpdateConfiguration()
 
 	viper.OnConfigChange(
@@ -36,13 +36,12 @@ func init() {
 }
 
 func RegenerateConfiguration() {
-	config, runningConfig, err := GenerateIntialConfig()
+	_, runningConfig, err := GenerateIntialConfig()
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to generate running config")
 	}
 
 	RunningConfig = runningConfig
-	Config = config
 }
 
 func UpdateConfiguration() {
@@ -52,13 +51,12 @@ func UpdateConfiguration() {
 	}
 
 	if !exists {
-		config, runningConfig, err := GenerateIntialConfig()
+		_, runningConfig, err := GenerateIntialConfig()
 		if err != nil {
 			logrus.WithError(err).Fatal("Failed to generate running config")
 		}
 
 		RunningConfig = runningConfig
-		Config = config
 	} else {
 		UpdateRunningConfig()
 	}
@@ -75,6 +73,14 @@ func UpdateRunningConfig() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal running config")
 	}
+	for _, team := range RunningConfig.Teams {
+		for _, check := range team.Checks {
+			_, err = checks.GetCheckFunction(check.Release.Org, check.Release.Repo, check.Release.Tag)
+			if err != nil {
+				logrus.WithError(err).Fatalf("Failed to load check; %s: %s", check.Name, check.Release.Org+"/"+check.Release.Repo+"@"+check.Release.Tag)
+			}
+		}
+	}
 }
 
 func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error) {
@@ -82,11 +88,12 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 		runningConfig *structs.RunningConfig_s = &structs.RunningConfig_s{}
 		config        *structs.Config_s        = &structs.Config_s{}
 
-		name    string
-		web     structs.Web_s
-		teams_s structs.Teams_s
-		engine  structs.Engine_s
-		checks  []structs.Check_s
+		name      string
+		web_s     structs.Web_s
+		teams_s   structs.Teams_s
+		scoring_s structs.Scoring_s
+		engine_s  structs.Engine_s
+		checks_s  []structs.Check_s
 
 		teams []structs.Team_s
 	)
@@ -101,12 +108,12 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 	runningConfig.Name = name
 	config.Name = name
 
-	err = viper.UnmarshalKey("web", &web)
+	err = viper.UnmarshalKey("web", &web_s)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	runningConfig.Web = web
-	config.Web = web
+	runningConfig.Web = web_s
+	config.Web = web_s
 
 	err = viper.UnmarshalKey("teams", &teams_s)
 	if err != nil {
@@ -115,18 +122,26 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 	runningConfig.Teams = teams
 	config.Teams = teams_s
 
-	err = viper.UnmarshalKey("engine", &engine)
+	err = viper.UnmarshalKey("scoring", &scoring_s)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	runningConfig.Engine = engine
-	config.Engine = engine
 
-	err = viper.UnmarshalKey("checks", &checks)
+	runningConfig.Scoring = scoring_s
+	config.Scoring = scoring_s
+
+	err = viper.UnmarshalKey("engine", &engine_s)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	config.Checks = checks
+	runningConfig.Engine = engine_s
+	config.Engine = engine_s
+
+	err = viper.UnmarshalKey("checks", &checks_s)
+	if err != nil {
+		return config, runningConfig, err
+	}
+	config.Checks = checks_s
 
 	name_template := template.Must(template.New("name").Parse(teams_s.NameFormat))
 
@@ -143,11 +158,11 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 
 		team := structs.Team_s{
 			Name:     team_name.String(),
-			Number:   i + 1,
+			Number:   int8(i + 1),
 			Password: teams_s.Password,
 		}
 
-		checks := []structs.Check_s{}
+		_checks := []structs.Check_s{}
 
 		for _, check := range config.Checks {
 			target := bytes.NewBuffer([]byte{})
@@ -162,24 +177,29 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				return config, runningConfig, err
 			}
 
-			checks = append(checks, structs.Check_s{
+			_, tag, err := checks.GetReleaseAssetWithTag(check.Release.Org, check.Release.Repo, check.Release.Tag)
+			if err != nil {
+				return config, runningConfig, err
+			}
+
+			_checks = append(_checks, structs.Check_s{
 				Name: check.Name,
-				Git: structs.Git_s{
-					Remote: check.Git.Remote,
-					Branch: check.Git.Branch,
+				Release: structs.Release_s{
+					Org:  check.Release.Org,
+					Repo: check.Release.Repo,
+					Tag:  tag,
 				},
 				Credentials: structs.Credentials_s{
 					Username: check.Credentials.Username,
 					Password: check.Credentials.Password,
 				},
-				Port:           check.Port,
 				Command:        check.Command,
 				Target:         target.String(),
 				ExpectedOutput: check.ExpectedOutput,
 				Weight:         check.Weight,
 			})
 
-			team.Checks = checks
+			team.Checks = _checks
 			teams = append(teams, team)
 		}
 	}
