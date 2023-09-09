@@ -5,7 +5,7 @@ web:
   port: 8080
   apiPath: /api
 teams:
-  amount: 2
+  amount: 15
   nameFormat: Team {{ .Team }}
   password: password
 scoring:
@@ -32,7 +32,7 @@ checks:
     credentials:
       username: kali
       password: changeme
-    target: 10.{{ .Team }}.1.2
+    target: 10.{{ .Team }}.1.2:22
     command: whoami
     expectedOutput: kali
     weight: 2

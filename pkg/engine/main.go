@@ -38,6 +38,10 @@ func Pause() error {
 
 	Status = proto.StatusEnum_PAUSED
 	quit <- struct{}{}
+	<-exited
+	roundMutex.Unlock()
+
+	logrus.Info("Engine paused")
 
 	return nil
 }
@@ -81,7 +85,6 @@ func runEngine() {
 	for {
 		select {
 		case <-ticker.C:
-			logrus.Info("Scoring interval")
 			if interval != config.RunningConfig.Scoring.Interval {
 				interval = config.RunningConfig.Scoring.Interval
 				ticker = time.NewTicker(time.Duration(config.RunningConfig.Scoring.Interval) * time.Second)
@@ -91,8 +94,15 @@ func runEngine() {
 				return
 			}
 
+			entRound, err := data.Round.GetLastRound()
+			if err != nil {
+				logrus.WithError(err).Error("Failed to get last round")
+				return
+			}
+			logrus.Infof("Running Round %d", entRound.Number)
+
 			roundMutex.Lock()
-			err := runRound(roundMutex)
+			err = runRound(roundMutex)
 			if err != nil {
 				logrus.WithError(err).Error("Failed to run round")
 			}
@@ -201,6 +211,18 @@ func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan
 
 	go func() {
 		success, message := runFunc(checkCtx, check.Target, check.Command, check.ExpectedOutput, check.Credentials.Username, check.Credentials.Password)
+		err := recover()
+		if err != nil {
+			logrus.WithError(err.(error)).Errorf("Failed to run check: %v, due to panic: %v", check, err)
+			returnChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("check panicked: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
 		returnChan <- checkResult{
 			Success: success,
 			Message: message,
