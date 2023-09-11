@@ -42,3 +42,12 @@ checks:
       repo: ping
     target: 10.{{ .Team }}.1.1
     weight: 1
+  - name: host_a-web
+    release:
+      org: compscore
+      repo: web
+    target: https://google.com
+    weight: 2
+    command: GET
+    expectedOutput: status_code=200
+
