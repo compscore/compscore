@@ -119,7 +119,6 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 	if err != nil {
 		return config, runningConfig, err
 	}
-	runningConfig.Teams = teams
 	config.Teams = teams_s
 
 	err = viper.UnmarshalKey("scoring", &scoring_s)
@@ -198,10 +197,9 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				ExpectedOutput: check.ExpectedOutput,
 				Weight:         check.Weight,
 			})
-
 			team.Checks = _checks
-			teams = append(teams, team)
 		}
+		teams = append(teams, team)
 	}
 	runningConfig.Teams = teams
 

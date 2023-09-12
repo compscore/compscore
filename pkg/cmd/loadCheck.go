@@ -1,46 +1,27 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
-	"plugin"
-
-	"github.com/compscore/compscore/pkg/checks"
-	"github.com/sirupsen/logrus"
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
-var loadCheckCmd = &cobra.Command{
-	Use:   "load",
-	Short: "Load check",
-	Long:  `Load check`,
-	Run:   loadCheckRun,
+var testCmd = &cobra.Command{
+	Use: "test",
+	Run: testRun,
 }
 
 func init() {
-	rootCmd.AddCommand(loadCheckCmd)
+	rootCmd.AddCommand(testCmd)
 }
 
-func loadCheckRun(cmd *cobra.Command, args []string) {
-	file, err := checks.GetReleaseAsset("compscore", "check-template", "v1.0.0")
+func testRun(cmd *cobra.Command, args []string) {
+	config.Init()
+
+	out, err := yaml.Marshal(config.RunningConfig)
 	if err != nil {
-		logrus.WithError(err).Fatal("Failed to get release asset")
+		panic(err)
 	}
 
-	plugin, err := plugin.Open(file)
-	if err != nil {
-		logrus.WithError(err).Fatal("Failed to open plugin")
-	}
-
-	runSymbol, err := plugin.Lookup("Run")
-	if err != nil {
-		logrus.WithError(err).Fatal("Failed to lookup Run")
-	}
-
-	runFunc, ok := runSymbol.(func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string))
-	if !ok {
-		logrus.Fatal("Failed to cast Run to func")
-	}
-
-	fmt.Println(runFunc(context.Background(), "localhost", "echo", "hello world", "", ""))
+	println(string(out))
 }

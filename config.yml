@@ -18,6 +18,7 @@ checks:
     release:
       org: compscore
       repo: ssh
+      tag: v1.0.2
     credentials:
       username: ubuntu
       password: changeme
@@ -29,6 +30,7 @@ checks:
     release:
       org: compscore
       repo: dns
+      tag: v1.0.1
     target: 8.8.8.8
     command: A example.com
     expectedOutput: 93.184.216.34
@@ -37,12 +39,14 @@ checks:
     release:
       org: compscore
       repo: ping
+      tag: v1.0.3
     target: 10.{{ .Team }}.1.1
     weight: 1
   - name: host_a-web
     release:
       org: compscore
       repo: web
+      tag: v1.0.4
     target: https://google.com
     weight: 2
     command: GET
