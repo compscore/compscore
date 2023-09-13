@@ -18,7 +18,7 @@ checks:
     release:
       org: compscore
       repo: ssh
-      tag: v1.0.2
+      tag: v1.0.3
     credentials:
       username: ubuntu
       password: changeme
@@ -30,7 +30,7 @@ checks:
     release:
       org: compscore
       repo: dns
-      tag: v1.0.1
+      tag: v1.0.2
     target: 8.8.8.8
     command: A example.com
     expectedOutput: 93.184.216.34
@@ -39,28 +39,31 @@ checks:
     release:
       org: compscore
       repo: ping
-      tag: v1.0.3
+      tag: v1.0.4
     target: 10.{{ .Team }}.1.1
     weight: 1
   - name: host_a-web
     release:
       org: compscore
       repo: web
-      tag: v1.0.4
+      tag: v1.0.6
     target: https://google.com
     weight: 2
     command: GET
-    expectedOutput: status_code=200
+    options:
+      status_code: 200
   - name: test.rebex.net-ftp
     release:
       org: compscore
       repo: ftp
-      tag: v1.0.1
+      tag: v1.0.2
     credentials:
       username: demo
       password: password
     target: test.rebex.net
     weight: 1
     command: readme.txt
-    expectedOutput: exists;sha256=01cbe49fd2fbb312408dc5e03a35c9f0374204131652591cad8f0beb21304c3a
+    options:
+      exists:
+      sha256: 01cbe49fd2fbb312408dc5e03a35c9f0374204131652591cad8f0beb21304c3a
 
