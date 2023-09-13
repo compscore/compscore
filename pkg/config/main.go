@@ -196,6 +196,7 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				Target:         target.String(),
 				ExpectedOutput: check.ExpectedOutput,
 				Weight:         check.Weight,
+				Options:        check.Options,
 			})
 			team.Checks = _checks
 		}
