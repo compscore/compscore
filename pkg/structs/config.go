@@ -33,13 +33,14 @@ type Credentials_s struct {
 }
 
 type Check_s struct {
-	Name           string        `yaml:"name"`
-	Release        Release_s     `yaml:"release"`
-	Credentials    Credentials_s `yaml:"credentials"`
-	Target         string        `yaml:"target"`
-	Command        string        `yaml:"command"`
-	ExpectedOutput string        `yaml:"expectedOutput"`
-	Weight         int           `yaml:"weight"`
+	Name           string                 `yaml:"name"`
+	Release        Release_s              `yaml:"release"`
+	Credentials    Credentials_s          `yaml:"credentials"`
+	Target         string                 `yaml:"target"`
+	Command        string                 `yaml:"command"`
+	ExpectedOutput string                 `yaml:"expectedOutput"`
+	Weight         int                    `yaml:"weight"`
+	Options        map[string]interface{} `yaml:"options"`
 }
 
 type Team_s struct {

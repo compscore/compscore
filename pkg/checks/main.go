@@ -20,11 +20,11 @@ type releaseAssetCacheStruct struct {
 }
 
 var (
-	releaseAssetCache  map[string]releaseAssetCacheStruct                                                                                                          = make(map[string]releaseAssetCacheStruct)
-	checkFunctionCache map[string]func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string) = make(map[string]func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string))
+	releaseAssetCache  map[string]releaseAssetCacheStruct                                                                                                                                          = make(map[string]releaseAssetCacheStruct)
+	checkFunctionCache map[string]func(ctx context.Context, target string, command string, expectedOutput string, username string, password string, options map[string]interface{}) (bool, string) = make(map[string]func(ctx context.Context, target string, command string, expectedOutput string, username string, password string, options map[string]interface{}) (bool, string))
 )
 
-func GetCheckFunction(organization string, repo string, tag string) (func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string), error) {
+func GetCheckFunction(organization string, repo string, tag string) (func(ctx context.Context, target string, command string, expectedOutput string, username string, password string, options map[string]interface{}) (bool, string), error) {
 	checkFunction, ok := checkFunctionCache[organization+"/"+repo+"/"+tag]
 	if ok {
 		return checkFunction, nil
@@ -45,7 +45,7 @@ func GetCheckFunction(organization string, repo string, tag string) (func(ctx co
 		return nil, err
 	}
 
-	runFunc, ok := runSymbol.(func(ctx context.Context, target string, command string, expectedOutput string, username string, password string) (bool, string))
+	runFunc, ok := runSymbol.(func(ctx context.Context, target string, command string, expectedOutput string, username string, password string, options map[string]interface{}) (bool, string))
 	if !ok {
 		return nil, fmt.Errorf("failed to cast Run to func")
 	}

@@ -210,7 +210,7 @@ func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan
 	returnChan := make(chan checkResult)
 
 	go func() {
-		success, message := runFunc(checkCtx, check.Target, check.Command, check.ExpectedOutput, check.Credentials.Username, check.Credentials.Password)
+		success, message := runFunc(checkCtx, check.Target, check.Command, check.ExpectedOutput, check.Credentials.Username, check.Credentials.Password, check.Options)
 		err := recover()
 		if err != nil {
 			logrus.WithError(err.(error)).Errorf("Failed to run check: %v, due to panic: %v", check, err)
