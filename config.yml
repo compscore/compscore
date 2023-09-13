@@ -51,4 +51,16 @@ checks:
     weight: 2
     command: GET
     expectedOutput: status_code=200
+  - name: test.rebex.net-ftp
+    release:
+      org: compscore
+      repo: ftp
+      tag: v1.0.1
+    credentials:
+      username: demo
+      password: password
+    target: test.rebex.net
+    weight: 1
+    command: readme.txt
+    expectedOutput: exists;sha256=01cbe49fd2fbb312408dc5e03a35c9f0374204131652591cad8f0beb21304c3a
 
