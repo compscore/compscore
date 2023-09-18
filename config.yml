@@ -18,7 +18,7 @@ checks:
     release:
       org: compscore
       repo: ssh
-      tag: v1.0.3
+      tag: v1.0.4
     credentials:
       username: ubuntu
       password: changeme
@@ -46,17 +46,32 @@ checks:
     release:
       org: compscore
       repo: web
-      tag: v1.0.6
+      tag: v1.0.7
     target: https://google.com
     weight: 2
     command: GET
     options:
       status_code: 200
+  - name: host_c-winrm
+    release:
+      org: compscore
+      repo: winrm
+      tag: v1.0.1
+    credentials:
+      username: Administrator
+      password: changeme
+    target: 10.{{ .Team }}.1.3:5985
+    command: whoami
+    expectedOutput: Administrator
+    weight: 2
+    options:
+      https: false
+      insecure: true
   - name: test.rebex.net-ftp
     release:
       org: compscore
       repo: ftp
-      tag: v1.0.2
+      tag: v1.0.3
     credentials:
       username: demo
       password: password
