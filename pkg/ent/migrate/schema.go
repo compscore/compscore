@@ -50,19 +50,19 @@ var (
 				Symbol:     "status_checks_check",
 				Columns:    []*schema.Column{StatusColumns[4]},
 				RefColumns: []*schema.Column{ChecksColumns[0]},
-				OnDelete:   schema.Cascade,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "status_teams_team",
 				Columns:    []*schema.Column{StatusColumns[5]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
-				OnDelete:   schema.Cascade,
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "status_rounds_round",
 				Columns:    []*schema.Column{StatusColumns[6]},
 				RefColumns: []*schema.Column{RoundsColumns[0]},
-				OnDelete:   schema.Cascade,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
