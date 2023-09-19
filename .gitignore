@@ -6,6 +6,3 @@ plugins/*
 
 running-config.yml
 database.sqlite
-
-pkg/checks/imports/*
-!pkg/checks/imports/.gitkeep

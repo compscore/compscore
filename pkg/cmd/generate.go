@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 	"text/template"
 
@@ -35,10 +36,6 @@ func generateRun(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	for release := range releases {
-		fmt.Printf("%s/%s@%s\n", release.Org, release.Repo, release.Tag)
-	}
-
 	err := deleteImports("pkg/checks/imports")
 	if err != nil {
 		logrus.Fatalf("Failed to delete imports: %s", err.Error())
@@ -47,6 +44,38 @@ func generateRun(cmd *cobra.Command, args []string) {
 	err = writeMain()
 	if err != nil {
 		logrus.Fatalf("Failed to write main: %s", err.Error())
+	}
+
+	err = writeChecks(releases)
+	if err != nil {
+		logrus.Fatalf("Failed to write checks: %s", err.Error())
+	}
+
+	fmtCmd := exec.Command("go", "fmt", "./...")
+	fmtCmd.Stdout = os.Stdout
+	fmtCmd.Stderr = os.Stderr
+	err = fmtCmd.Run()
+	if err != nil {
+		logrus.Fatalf("Failed to run go fmt: %s", err.Error())
+	}
+
+	for release := range releases {
+		getCmd := exec.Command("go", "get", fmt.Sprintf("github.com/%s/%s@%s", release.Org, release.Repo, release.Tag))
+		getCmd.Stdout = os.Stdout
+		getCmd.Stderr = os.Stderr
+		fmt.Println("go", "get", fmt.Sprintf("github.com/%s/%s@%s", release.Org, release.Repo, release.Tag))
+		err = getCmd.Run()
+		if err != nil {
+			logrus.Fatalf("Failed to run go get: %s", err.Error())
+		}
+	}
+
+	tidyCmd := exec.Command("go", "mod", "tidy")
+	tidyCmd.Stdout = os.Stdout
+	tidyCmd.Stderr = os.Stderr
+	err = tidyCmd.Run()
+	if err != nil {
+		logrus.Fatalf("Failed to run go mod tidy: %s", err.Error())
 	}
 }
 
@@ -84,13 +113,12 @@ func writeMain() error {
 	if err != nil {
 		return err
 	}
+	defer tmplFile.Close()
 
 	tmplString, err := io.ReadAll(tmplFile)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(string(tmplString))
 
 	tmpl, err := template.New("pkg/checks/imports/main.go").Parse(string(tmplString))
 	if err != nil {
@@ -98,4 +126,37 @@ func writeMain() error {
 	}
 
 	return tmpl.Execute(outputFile, nil)
+}
+
+func writeChecks(releases map[structs.Release_s]bool) error {
+	tmplFile, err := os.Open("pkg/checks/template/check.go.tmpl")
+	if err != nil {
+		return err
+	}
+	defer tmplFile.Close()
+
+	tmplString, err := io.ReadAll(tmplFile)
+	if err != nil {
+		return err
+	}
+
+	tmpl, err := template.New("pkg/checks/imports/main.go").Parse(string(tmplString))
+	if err != nil {
+		return err
+	}
+
+	for release := range releases {
+		outputFile, err := os.Create(fmt.Sprintf("pkg/checks/imports/%s-%s.go", release.Org, release.Repo))
+		if err != nil {
+			return err
+		}
+		defer outputFile.Close()
+
+		err = tmpl.Execute(outputFile, release)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
