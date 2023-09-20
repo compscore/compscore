@@ -73,14 +73,6 @@ func UpdateRunningConfig() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal running config")
 	}
-	for _, team := range RunningConfig.Teams {
-		for _, check := range team.Checks {
-			_, err = checks.GetCheckFunction(check.Release.Org, check.Release.Repo, check.Release.Tag)
-			if err != nil {
-				logrus.WithError(err).Fatalf("Failed to load check; %s: %s", check.Name, check.Release.Org+"/"+check.Release.Repo+"@"+check.Release.Tag)
-			}
-		}
-	}
 }
 
 func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error) {
@@ -176,9 +168,15 @@ func GenerateIntialConfig() (*structs.Config_s, *structs.RunningConfig_s, error)
 				return config, runningConfig, err
 			}
 
-			_, tag, err := checks.GetReleaseAssetWithTag(check.Release.Org, check.Release.Repo, check.Release.Tag)
-			if err != nil {
-				return config, runningConfig, err
+			var tag string
+
+			if check.Release.Tag == "" || check.Release.Tag == "latest" {
+				tag, err = checks.GetLatestRelease(check.Release.Org, check.Release.Repo)
+				if err != nil {
+					return config, runningConfig, err
+				}
+			} else {
+				tag = check.Release.Tag
 			}
 
 			_checks = append(_checks, structs.Check_s{

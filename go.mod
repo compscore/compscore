@@ -4,12 +4,13 @@ go 1.20
 
 require (
 	entgo.io/ent v0.12.3
-	github.com/compscore/dns v1.0.2
-	github.com/compscore/ftp v1.0.3
-	github.com/compscore/ping v1.0.5
-	github.com/compscore/ssh v1.0.4
-	github.com/compscore/web v1.0.7
-	github.com/compscore/winrm v1.0.2
+	github.com/compscore/dns v1.0.5
+	github.com/compscore/ftp v1.0.4
+	github.com/compscore/ldap v1.0.6
+	github.com/compscore/ping v1.0.6
+	github.com/compscore/ssh v1.0.5
+	github.com/compscore/web v1.0.8
+	github.com/compscore/winrm v1.0.3
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -27,6 +28,8 @@ require (
 	github.com/ChrisTrenkamp/goxpath v0.0.0-20210404020558-97928f7e12b6 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
+	github.com/go-ldap/ldap/v3 v3.4.6 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-ping/ping v1.1.0 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
