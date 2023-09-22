@@ -3,9 +3,9 @@ package data
 import (
 	"fmt"
 
-	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/team"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type team_s struct{}
@@ -19,19 +19,7 @@ func (*team_s) Get(number int8) (*ent.Team, error) {
 	}
 
 	if !exists {
-		var teamName string
-
-		for _, team := range config.Teams {
-			if team.Number == number {
-				teamName = team.Name
-				break
-			}
-		}
-		if teamName == "" {
-			return nil, fmt.Errorf("unable to find name for team: %d", number)
-		}
-
-		return Team.Create(number, teamName)
+		return nil, fmt.Errorf("team %d does not exist", number)
 	}
 
 	return Client.Team.
@@ -69,6 +57,48 @@ func (*team_s) GetByNameWithStatus(name string) (*ent.Team, error) {
 		Only(Ctx)
 }
 
+func (*team_s) GetByNumberWithCredentials(number int8) (*ent.Team, error) {
+	return Client.Team.
+		Query().
+		Where(
+			team.NumberEQ(number),
+		).
+		WithCredential().
+		Only(Ctx)
+}
+
+func (*team_s) GetByNameWithCredentials(name string) (*ent.Team, error) {
+	return Client.Team.
+		Query().
+		Where(
+			team.NameEQ(name),
+		).
+		WithCredential().
+		Only(Ctx)
+}
+
+func (*team_s) GetByNumberWithEdges(number int8) (*ent.Team, error) {
+	return Client.Team.
+		Query().
+		Where(
+			team.NumberEQ(number),
+		).
+		WithCredential().
+		WithStatus().
+		Only(Ctx)
+}
+
+func (*team_s) GetByNameWithEdges(name string) (*ent.Team, error) {
+	return Client.Team.
+		Query().
+		Where(
+			team.NameEQ(name),
+		).
+		WithCredential().
+		WithStatus().
+		Only(Ctx)
+}
+
 func (*team_s) GetAll() ([]*ent.Team, error) {
 	return Client.Team.
 		Query().
@@ -88,6 +118,27 @@ func (*team_s) GetAllWithStatus() ([]*ent.Team, error) {
 		All(Ctx)
 }
 
+func (*team_s) GetAllWithCredentials() ([]*ent.Team, error) {
+	return Client.Team.
+		Query().
+		WithCredential().
+		Order(
+			ent.Asc(team.FieldNumber),
+		).
+		All(Ctx)
+}
+
+func (*team_s) GetAllWithEdges() ([]*ent.Team, error) {
+	return Client.Team.
+		Query().
+		WithStatus().
+		WithCredential().
+		Order(
+			ent.Asc(team.FieldNumber),
+		).
+		All(Ctx)
+}
+
 func (*team_s) Exists(number int8) (bool, error) {
 	return Client.Team.
 		Query().
@@ -96,7 +147,7 @@ func (*team_s) Exists(number int8) (bool, error) {
 		).Exist(Ctx)
 }
 
-func (*team_s) Create(number int8, name string) (*ent.Team, error) {
+func (*team_s) Create(number int8, name string, password string) (*ent.Team, error) {
 	exist, err := Team.Exists(number)
 	if err != nil {
 		return nil, err
@@ -106,10 +157,16 @@ func (*team_s) Create(number int8, name string) (*ent.Team, error) {
 		return Team.Get(number)
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
 	return Client.Team.
 		Create().
 		SetNumber(number).
 		SetName(name).
+		SetPassword(string(hashedPassword)).
 		Save(Ctx)
 }
 
@@ -118,6 +175,31 @@ func (*team_s) Update(team *ent.Team, number int8, name string) (*ent.Team, erro
 		SetNumber(number).
 		SetName(name).
 		Save(Ctx)
+}
+
+func (*team_s) UpdatePassword(team *ent.Team, password string) (*ent.Team, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	return team.Update().
+		SetPassword(string(hashedPassword)).
+		Save(Ctx)
+}
+
+func (*team_s) CheckPassword(team int8, password string) (bool, error) {
+	teamEnt, err := Team.Get(team)
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(teamEnt.Password), []byte(password))
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (*team_s) Delete(team *ent.Team) error {
