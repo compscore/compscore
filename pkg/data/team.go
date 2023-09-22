@@ -21,7 +21,7 @@ func (*team_s) Get(number int8) (*ent.Team, error) {
 	if !exists {
 		var teamName string
 
-		for _, team := range config.RunningConfig.Teams {
+		for _, team := range config.Teams {
 			if team.Number == number {
 				teamName = team.Name
 				break

@@ -30,10 +30,8 @@ func generateRun(cmd *cobra.Command, args []string) {
 
 	var releases = make(map[structs.Release_s]bool)
 
-	for _, team := range config.RunningConfig.Teams {
-		for _, check := range team.Checks {
-			releases[check.Release] = true
-		}
+	for _, check := range config.Checks {
+		releases[check.Release] = true
 	}
 
 	err := deleteImports("pkg/checks/imports")

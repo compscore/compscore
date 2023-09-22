@@ -14,7 +14,7 @@ import (
 
 // UnixSocketExists checks if the unix socket exists
 func UnixSocketExists() (bool, error) {
-	stat, err := os.Stat(config.RunningConfig.Engine.Socket)
+	stat, err := os.Stat(config.Engine.Socket)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil

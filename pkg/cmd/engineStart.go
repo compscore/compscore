@@ -64,7 +64,7 @@ func engineStartRun(cmd *cobra.Command, args []string) {
 			// Socket Exist and is Inactive
 			// Remove Socket and Spawn Engine
 
-			err := os.Remove(config.RunningConfig.Engine.Socket)
+			err := os.Remove(config.Engine.Socket)
 			if err != nil {
 				logrus.WithError(err).Fatal("Error removing unix socket")
 			}

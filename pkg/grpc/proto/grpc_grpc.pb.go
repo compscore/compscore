@@ -27,7 +27,6 @@ type CompscoreClient interface {
 	Start(ctx context.Context, in *StartRequest, opts ...grpc.CallOption) (*StartResponse, error)
 	Pause(ctx context.Context, in *PauseRequest, opts ...grpc.CallOption) (*PauseResponse, error)
 	Kill(ctx context.Context, in *KillRequest, opts ...grpc.CallOption) (*KillResponse, error)
-	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
 }
 
 type compscoreClient struct {
@@ -83,15 +82,6 @@ func (c *compscoreClient) Kill(ctx context.Context, in *KillRequest, opts ...grp
 	return out, nil
 }
 
-func (c *compscoreClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error) {
-	out := new(GetConfigResponse)
-	err := c.cc.Invoke(ctx, "/proto.Compscore/GetConfig", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // CompscoreServer is the server API for Compscore service.
 // All implementations must embed UnimplementedCompscoreServer
 // for forward compatibility
@@ -101,7 +91,6 @@ type CompscoreServer interface {
 	Start(context.Context, *StartRequest) (*StartResponse, error)
 	Pause(context.Context, *PauseRequest) (*PauseResponse, error)
 	Kill(context.Context, *KillRequest) (*KillResponse, error)
-	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
 	mustEmbedUnimplementedCompscoreServer()
 }
 
@@ -123,9 +112,6 @@ func (UnimplementedCompscoreServer) Pause(context.Context, *PauseRequest) (*Paus
 }
 func (UnimplementedCompscoreServer) Kill(context.Context, *KillRequest) (*KillResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Kill not implemented")
-}
-func (UnimplementedCompscoreServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
 }
 func (UnimplementedCompscoreServer) mustEmbedUnimplementedCompscoreServer() {}
 
@@ -230,24 +216,6 @@ func _Compscore_Kill_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Compscore_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CompscoreServer).GetConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Compscore/GetConfig",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CompscoreServer).GetConfig(ctx, req.(*GetConfigRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Compscore_ServiceDesc is the grpc.ServiceDesc for Compscore service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -274,10 +242,6 @@ var Compscore_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Kill",
 			Handler:    _Compscore_Kill_Handler,
-		},
-		{
-			MethodName: "GetConfig",
-			Handler:    _Compscore_GetConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

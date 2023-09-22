@@ -74,7 +74,7 @@ func Run() error {
 }
 
 func runEngine() {
-	interval := config.RunningConfig.Scoring.Interval
+	interval := config.Scoring.Interval
 	ticker := time.NewTicker(time.Duration(interval) * time.Second)
 	defer ticker.Stop()
 	defer runLock.Unlock()
@@ -85,9 +85,9 @@ func runEngine() {
 	for {
 		select {
 		case <-ticker.C:
-			if interval != config.RunningConfig.Scoring.Interval {
-				interval = config.RunningConfig.Scoring.Interval
-				ticker = time.NewTicker(time.Duration(config.RunningConfig.Scoring.Interval) * time.Second)
+			if interval != config.Scoring.Interval {
+				interval = config.Scoring.Interval
+				ticker = time.NewTicker(time.Duration(config.Scoring.Interval) * time.Second)
 			}
 
 			if Status != proto.StatusEnum_RUNNING {
@@ -127,8 +127,8 @@ func runRound(roundMutex *sync.Mutex) error {
 
 	checks := 0
 
-	for _, team := range config.RunningConfig.Teams {
-		for _, check := range team.Checks {
+	for _, team := range config.Teams {
+		for _, check := range config.Checks {
 			_, err := data.Status.Create(
 				round.Number,
 				check.Name,
@@ -149,8 +149,8 @@ func runRound(roundMutex *sync.Mutex) error {
 	resultsChan := make(chan checkResult)
 	defer close(resultsChan)
 
-	for _, team := range config.RunningConfig.Teams {
-		for _, check := range team.Checks {
+	for _, team := range config.Teams {
+		for _, check := range config.Checks {
 			go runScoreCheck(round.Number, check, team.Number, resultsChan, wgRound)
 		}
 	}
@@ -201,10 +201,10 @@ func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan
 		return
 	}
 
-	checkCtx, checkCancel := context.WithTimeout(context.Background(), time.Second*time.Duration(float64(config.RunningConfig.Scoring.Interval)*0.9))
+	checkCtx, checkCancel := context.WithTimeout(context.Background(), time.Second*time.Duration(float64(config.Scoring.Interval)*0.9))
 	defer checkCancel()
 
-	outerCtx, outerCancel := context.WithTimeout(context.Background(), time.Second*time.Duration(float64(config.RunningConfig.Scoring.Interval)*1))
+	outerCtx, outerCancel := context.WithTimeout(context.Background(), time.Second*time.Duration(float64(config.Scoring.Interval)))
 	defer outerCancel()
 
 	returnChan := make(chan checkResult)

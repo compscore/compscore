@@ -44,10 +44,9 @@ type Check_s struct {
 }
 
 type Team_s struct {
-	Name     string    `yaml:"name"`
-	Password string    `yaml:"password"`
-	Number   int8      `yaml:"number"`
-	Checks   []Check_s `yaml:"checks"`
+	Name     string `yaml:"name"`
+	Password string `yaml:"password"`
+	Number   int8   `yaml:"number"`
 }
 
 type Config_s struct {
