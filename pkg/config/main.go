@@ -23,6 +23,13 @@ var (
 func Init() {
 	viper.SetConfigFile(ConfigFile)
 
+	err := viper.ReadInConfig()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to read config file")
+	}
+
+	UpdateConfiguration()
+
 	viper.OnConfigChange(
 		func(e fsnotify.Event) {
 			if e.Op == fsnotify.Write {
