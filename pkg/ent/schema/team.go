@@ -23,6 +23,10 @@ func (Team) Fields() []ent.Field {
 			Comment("Team name").
 			NotEmpty().
 			Unique(),
+		field.String("password").
+			Comment("Team password").
+			Sensitive().
+			NotEmpty(),
 	}
 }
 
@@ -31,6 +35,14 @@ func (Team) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("status", Status.Type).
 			Comment("Check statuses").
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			).
+			Ref("team"),
+		edge.From("credential", Credential.Type).
+			Comment("Check credential").
 			Annotations(
 				entsql.Annotation{
 					OnDelete: entsql.Cascade,
