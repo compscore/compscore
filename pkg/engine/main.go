@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/compscore/compscore/pkg/checks"
+	"github.com/compscore/compscore/pkg/checks/imports"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/compscore/compscore/pkg/ent/status"
@@ -188,16 +188,16 @@ func runRound(roundMutex *sync.Mutex) error {
 func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan checkResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	runFunc, err := checks.GetCheckFunction(check.Release.Org, check.Release.Repo, check.Release.Tag)
-	if err != nil {
+	runFunc, ok := imports.Imports[check.Release.Org+"-"+check.Release.Repo]
+	if !ok {
 		resultsChan <- checkResult{
 			Success: false,
-			Message: err.Error(),
+			Message: fmt.Sprintf("check not found: %s", check.Release.Org+"-"+check.Release.Repo),
 			Team:    team,
 			Check:   check,
 		}
 
-		logrus.WithError(err).Errorf("Failed to get check function: %v", check)
+		logrus.Errorf("Failed to get check function: %v", check)
 		return
 	}
 
