@@ -146,6 +146,29 @@ func HasStatusWith(preds ...predicate.Status) predicate.Check {
 	})
 }
 
+// HasCredential applies the HasEdge predicate on the "credential" edge.
+func HasCredential() predicate.Check {
+	return predicate.Check(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CredentialTable, CredentialColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCredentialWith applies the HasEdge predicate on the "credential" edge with a given conditions (other predicates).
+func HasCredentialWith(preds ...predicate.Credential) predicate.Check {
+	return predicate.Check(func(s *sql.Selector) {
+		step := newCredentialStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Check) predicate.Check {
 	return predicate.Check(func(s *sql.Selector) {

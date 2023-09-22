@@ -9,6 +9,9 @@ import (
 // Check is the predicate function for check builders.
 type Check func(*sql.Selector)
 
+// Credential is the predicate function for credential builders.
+type Credential func(*sql.Selector)
+
 // Round is the predicate function for round builders.
 type Round func(*sql.Selector)
 

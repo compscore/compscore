@@ -16,8 +16,12 @@ const (
 	FieldNumber = "number"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldPassword holds the string denoting the password field in the database.
+	FieldPassword = "password"
 	// EdgeStatus holds the string denoting the status edge name in mutations.
 	EdgeStatus = "status"
+	// EdgeCredential holds the string denoting the credential edge name in mutations.
+	EdgeCredential = "credential"
 	// Table holds the table name of the team in the database.
 	Table = "teams"
 	// StatusTable is the table that holds the status relation/edge.
@@ -27,6 +31,13 @@ const (
 	StatusInverseTable = "status"
 	// StatusColumn is the table column denoting the status relation/edge.
 	StatusColumn = "status_team"
+	// CredentialTable is the table that holds the credential relation/edge.
+	CredentialTable = "credentials"
+	// CredentialInverseTable is the table name for the Credential entity.
+	// It exists in this package in order to avoid circular dependency with the "credential" package.
+	CredentialInverseTable = "credentials"
+	// CredentialColumn is the table column denoting the credential relation/edge.
+	CredentialColumn = "credential_team"
 )
 
 // Columns holds all SQL columns for team fields.
@@ -34,6 +45,7 @@ var Columns = []string{
 	FieldID,
 	FieldNumber,
 	FieldName,
+	FieldPassword,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -51,6 +63,8 @@ var (
 	NumberValidator func(int8) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	PasswordValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Team queries.
@@ -71,6 +85,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByPassword orders the results by the password field.
+func ByPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPassword, opts...).ToFunc()
+}
+
 // ByStatusCount orders the results by status count.
 func ByStatusCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -84,10 +103,31 @@ func ByStatus(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newStatusStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCredentialCount orders the results by credential count.
+func ByCredentialCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCredentialStep(), opts...)
+	}
+}
+
+// ByCredential orders the results by credential terms.
+func ByCredential(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCredentialStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newStatusStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StatusInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
+	)
+}
+func newCredentialStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CredentialInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CredentialTable, CredentialColumn),
 	)
 }

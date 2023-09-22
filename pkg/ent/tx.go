@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Check is the client for interacting with the Check builders.
 	Check *CheckClient
+	// Credential is the client for interacting with the Credential builders.
+	Credential *CredentialClient
 	// Round is the client for interacting with the Round builders.
 	Round *RoundClient
 	// Status is the client for interacting with the Status builders.
@@ -152,6 +154,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Check = NewCheckClient(tx.config)
+	tx.Credential = NewCredentialClient(tx.config)
 	tx.Round = NewRoundClient(tx.config)
 	tx.Status = NewStatusClient(tx.config)
 	tx.Team = NewTeamClient(tx.config)

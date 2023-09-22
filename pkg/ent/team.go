@@ -20,6 +20,8 @@ type Team struct {
 	Number int8 `json:"number,omitempty"`
 	// Team name
 	Name string `json:"name,omitempty"`
+	// Team password
+	Password string `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TeamQuery when eager-loading is set.
 	Edges        TeamEdges `json:"edges"`
@@ -30,9 +32,11 @@ type Team struct {
 type TeamEdges struct {
 	// Check statuses
 	Status []*Status `json:"status,omitempty"`
+	// Check credential
+	Credential []*Credential `json:"credential,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // StatusOrErr returns the Status value or an error if the edge
@@ -44,6 +48,15 @@ func (e TeamEdges) StatusOrErr() ([]*Status, error) {
 	return nil, &NotLoadedError{edge: "status"}
 }
 
+// CredentialOrErr returns the Credential value or an error if the edge
+// was not loaded in eager-loading.
+func (e TeamEdges) CredentialOrErr() ([]*Credential, error) {
+	if e.loadedTypes[1] {
+		return e.Credential, nil
+	}
+	return nil, &NotLoadedError{edge: "credential"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Team) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -51,7 +64,7 @@ func (*Team) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case team.FieldID, team.FieldNumber:
 			values[i] = new(sql.NullInt64)
-		case team.FieldName:
+		case team.FieldName, team.FieldPassword:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -86,6 +99,12 @@ func (t *Team) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.Name = value.String
 			}
+		case team.FieldPassword:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field password", values[i])
+			} else if value.Valid {
+				t.Password = value.String
+			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
 		}
@@ -102,6 +121,11 @@ func (t *Team) Value(name string) (ent.Value, error) {
 // QueryStatus queries the "status" edge of the Team entity.
 func (t *Team) QueryStatus() *StatusQuery {
 	return NewTeamClient(t.config).QueryStatus(t)
+}
+
+// QueryCredential queries the "credential" edge of the Team entity.
+func (t *Team) QueryCredential() *CredentialQuery {
+	return NewTeamClient(t.config).QueryCredential(t)
 }
 
 // Update returns a builder for updating this Team.
@@ -132,6 +156,8 @@ func (t *Team) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(t.Name)
+	builder.WriteString(", ")
+	builder.WriteString("password=<sensitive>")
 	builder.WriteByte(')')
 	return builder.String()
 }

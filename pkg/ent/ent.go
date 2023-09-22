@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/team"
@@ -76,10 +77,11 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			check.Table:  check.ValidColumn,
-			round.Table:  round.ValidColumn,
-			status.Table: status.ValidColumn,
-			team.Table:   team.ValidColumn,
+			check.Table:      check.ValidColumn,
+			credential.Table: credential.ValidColumn,
+			round.Table:      round.ValidColumn,
+			status.Table:     status.ValidColumn,
+			team.Table:       team.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)
