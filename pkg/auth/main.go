@@ -8,12 +8,12 @@ import (
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Claims struct {
 	Team string
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 type User struct {
 	Username   string
@@ -25,8 +25,8 @@ func GenerateJWT(team string) (string, int, error) {
 
 	claims := &Claims{
 		Team: team,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expiration.Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiration),
 		},
 	}
 
@@ -37,17 +37,11 @@ func GenerateJWT(team string) (string, int, error) {
 	return tokenStr, int(expiration.Unix()), err
 }
 
-func tokenParse(token *jwt.Token) (interface{}, error) {
-	_, ok := token.Method.(*jwt.SigningMethodHMAC)
-	if !ok {
-		return "", fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-	}
-	return []byte(config.Web.JWTKey), nil
-}
-
 func ParseJWT(tokenString string) (*jwt.Token, *Claims, error) {
 	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, tokenParse)
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		return []byte(config.Web.JWTKey), nil
+	})
 	return token, claims, err
 }
 
@@ -62,10 +56,5 @@ func Parse(ctx *gin.Context) (*ent.Team, error) {
 		return nil, err
 	}
 
-	team, err := data.Team.GetByName(claims.Team)
-	if err != nil {
-		return nil, err
-	}
-
-	return team, err
+	return data.Team.GetByName(claims.Team)
 }

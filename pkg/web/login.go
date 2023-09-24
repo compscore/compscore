@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/compscore/compscore/pkg/auth"
@@ -49,7 +50,7 @@ func login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("auth", token, expiration, "/", config.Web.Hostname, false, true)
+	ctx.SetCookie("auth", token, expiration, "/", fmt.Sprintf("%s:%d", config.Web.Hostname, config.Web.Port), false, true)
 	ctx.Status(http.StatusOK)
 	// ctx.Redirect(302, "/")
 }
