@@ -4,6 +4,8 @@ web:
   hostname: 127.0.0.1
   port: 8080
   apiPath: /api
+  jwtKey: REPLACE_ME
+  timeout: 6 # hours
 teams:
   amount: 15
   nameFormat: Team {{ .Team }}

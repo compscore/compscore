@@ -1,6 +1,10 @@
 package web
 
 import (
+	"net/http"
+
+	"github.com/compscore/compscore/pkg/auth"
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/gin-gonic/gin"
 )
@@ -8,7 +12,7 @@ import (
 func login(ctx *gin.Context) {
 	username := ctx.PostForm("username")
 	if username == "" {
-		ctx.JSON(200, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "No username provided",
 		})
 		return
@@ -16,7 +20,7 @@ func login(ctx *gin.Context) {
 
 	password := ctx.PostForm("password")
 	if password == "" {
-		ctx.JSON(200, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "No password provided",
 		})
 		return
@@ -24,19 +28,28 @@ func login(ctx *gin.Context) {
 
 	success, err := data.Team.CheckPasswordByName(username, password)
 	if err != nil {
-		ctx.JSON(200, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
 	if !success {
-		ctx.JSON(200, gin.H{
+		ctx.JSON(400, gin.H{
 			"error": "Invalid username or password",
 		})
 		return
-	} else {
-		ctx.SetCookie("username", username, 0, "/", "", false, true)
-		ctx.Redirect(302, "/")
 	}
+
+	token, expiration, err := auth.GenerateJWT(username)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.SetCookie("auth", token, expiration, "/", config.Web.Hostname, false, true)
+	ctx.Status(http.StatusOK)
+	// ctx.Redirect(302, "/")
 }

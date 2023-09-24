@@ -4,6 +4,8 @@ type Web_s struct {
 	Hostname string `yaml:"hostname"`
 	Port     int    `yaml:"port"`
 	APIPath  string `yaml:"apiPath"`
+	JWTKey   string `yaml:"jwtKey"`
+	Timeout  int    `yaml:"timeout"`
 }
 
 type Teams_s struct {

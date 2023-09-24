@@ -24,7 +24,8 @@ var serverCmd = &cobra.Command{
 func serverRun(cmd *cobra.Command, args []string) {
 	config.Init()
 	data.Init()
-	web.Init()
+
+	go web.Start()
 
 	sigChannel := make(chan os.Signal, 1)
 	signal.Notify(sigChannel, os.Interrupt, syscall.SIGTERM)

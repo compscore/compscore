@@ -12,12 +12,13 @@ var (
 	API    *gin.RouterGroup
 )
 
-func Init() {
-	// gim.SetMode(gin.ReleaseMode)
+func Start() {
+	// gin.SetMode(gin.ReleaseMode)
 
 	Router = gin.Default()
 
 	Router.SetTrustedProxies(nil)
+	fmt.Println(config.Web.APIPath)
 	API = Router.Group(config.Web.APIPath)
 
 	LoadRoutes()
