@@ -1,8 +1,10 @@
 package data
 
 import (
+	"bytes"
 	"context"
 	"log"
+	"text/template"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
@@ -27,17 +29,23 @@ func Init() {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
-	// Create teams if they do not exist
-	for _, team := range config.Teams {
-		exists, err := Team.Exists(team.Number)
-		if err != nil {
-			log.Fatalf("failed checking for team %d: %v", team.Number, err)
-		}
+	teamNameTemplate, err := template.New("Name Template").Parse(config.Teams.NameFormat)
+	if err != nil {
+		log.Fatalf("failed parsing team name template: %v", err)
+	}
 
+	// Create teams if they do not exist
+	for i := 1; i <= config.Teams.Amount; i++ {
+		exists, err := Team.Exists(int8(i))
+		if err != nil {
+			log.Fatalf("failed checking for team %d: %v", i, err)
+		}
+		output := bytes.NewBuffer([]byte{})
+		teamNameTemplate.Execute(output, struct{ Team int }{Team: i})
 		if !exists {
-			_, err := Team.Create(team.Number, team.Name, team.Password)
+			_, err := Team.Create(int8(i), output.String(), config.Teams.Password)
 			if err != nil {
-				log.Fatalf("failed creating team %d: %v", team.Number, err)
+				log.Fatalf("failed creating team %d: %v", i, err)
 			}
 		}
 	}
@@ -59,16 +67,16 @@ func Init() {
 
 	// Create credentials if they do not exist
 	for _, check := range config.Checks {
-		for _, team := range config.Teams {
-			exists, err := Credential.Exists(team.Number, check.Name)
+		for i := 1; i <= config.Teams.Amount; i++ {
+			exists, err := Credential.Exists(int8(i), check.Name)
 			if err != nil {
-				log.Fatalf("failed checking for credential %d:%s: %v", team.Number, check.Name, err)
+				log.Fatalf("failed checking for credential %d:%s: %v", i, check.Name, err)
 			}
 
 			if !exists {
-				_, err := Credential.Create(team.Number, check.Name, team.Password)
+				_, err := Credential.Create(int8(i), check.Name, check.Credentials.Password)
 				if err != nil {
-					log.Fatalf("failed creating credential %d:%s: %v", team.Number, check.Name, err)
+					log.Fatalf("failed creating credential %d:%s: %v", i, check.Name, err)
 				}
 			}
 		}

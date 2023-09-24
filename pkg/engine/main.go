@@ -127,12 +127,12 @@ func runRound(roundMutex *sync.Mutex) error {
 
 	checks := 0
 
-	for _, team := range config.Teams {
+	for i := 1; i <= config.Teams.Amount; i++ {
 		for _, check := range config.Checks {
 			_, err := data.Status.Create(
 				round.Number,
 				check.Name,
-				team.Number,
+				int8(i),
 				status.StatusUnknown,
 			)
 			if err != nil {
@@ -149,9 +149,9 @@ func runRound(roundMutex *sync.Mutex) error {
 	resultsChan := make(chan checkResult)
 	defer close(resultsChan)
 
-	for _, team := range config.Teams {
+	for i := 1; i <= config.Teams.Amount; i++ {
 		for _, check := range config.Checks {
-			go runScoreCheck(round.Number, check, team.Number, resultsChan, wgRound)
+			go runScoreCheck(round.Number, check, int8(i), resultsChan, wgRound)
 		}
 	}
 
