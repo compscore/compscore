@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/schema"
 	"github.com/compscore/compscore/pkg/ent/status"
@@ -22,6 +23,12 @@ func init() {
 	checkDescName := checkFields[0].Descriptor()
 	// check.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	check.NameValidator = checkDescName.Validators[0].(func(string) error)
+	credentialFields := schema.Credential{}.Fields()
+	_ = credentialFields
+	// credentialDescPassword is the schema descriptor for password field.
+	credentialDescPassword := credentialFields[0].Descriptor()
+	// credential.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	credential.PasswordValidator = credentialDescPassword.Validators[0].(func(string) error)
 	roundFields := schema.Round{}.Fields()
 	_ = roundFields
 	// roundDescNumber is the schema descriptor for number field.
@@ -44,4 +51,8 @@ func init() {
 	teamDescName := teamFields[1].Descriptor()
 	// team.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	team.NameValidator = teamDescName.Validators[0].(func(string) error)
+	// teamDescPassword is the schema descriptor for password field.
+	teamDescPassword := teamFields[2].Descriptor()
+	// team.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	team.PasswordValidator = teamDescPassword.Validators[0].(func(string) error)
 }

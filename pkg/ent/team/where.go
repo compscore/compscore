@@ -63,6 +63,11 @@ func Name(v string) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldName, v))
 }
 
+// Password applies equality check predicate on the "password" field. It's identical to PasswordEQ.
+func Password(v string) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldPassword, v))
+}
+
 // NumberEQ applies the EQ predicate on the "number" field.
 func NumberEQ(v int8) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldNumber, v))
@@ -168,6 +173,71 @@ func NameContainsFold(v string) predicate.Team {
 	return predicate.Team(sql.FieldContainsFold(FieldName, v))
 }
 
+// PasswordEQ applies the EQ predicate on the "password" field.
+func PasswordEQ(v string) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldPassword, v))
+}
+
+// PasswordNEQ applies the NEQ predicate on the "password" field.
+func PasswordNEQ(v string) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldPassword, v))
+}
+
+// PasswordIn applies the In predicate on the "password" field.
+func PasswordIn(vs ...string) predicate.Team {
+	return predicate.Team(sql.FieldIn(FieldPassword, vs...))
+}
+
+// PasswordNotIn applies the NotIn predicate on the "password" field.
+func PasswordNotIn(vs ...string) predicate.Team {
+	return predicate.Team(sql.FieldNotIn(FieldPassword, vs...))
+}
+
+// PasswordGT applies the GT predicate on the "password" field.
+func PasswordGT(v string) predicate.Team {
+	return predicate.Team(sql.FieldGT(FieldPassword, v))
+}
+
+// PasswordGTE applies the GTE predicate on the "password" field.
+func PasswordGTE(v string) predicate.Team {
+	return predicate.Team(sql.FieldGTE(FieldPassword, v))
+}
+
+// PasswordLT applies the LT predicate on the "password" field.
+func PasswordLT(v string) predicate.Team {
+	return predicate.Team(sql.FieldLT(FieldPassword, v))
+}
+
+// PasswordLTE applies the LTE predicate on the "password" field.
+func PasswordLTE(v string) predicate.Team {
+	return predicate.Team(sql.FieldLTE(FieldPassword, v))
+}
+
+// PasswordContains applies the Contains predicate on the "password" field.
+func PasswordContains(v string) predicate.Team {
+	return predicate.Team(sql.FieldContains(FieldPassword, v))
+}
+
+// PasswordHasPrefix applies the HasPrefix predicate on the "password" field.
+func PasswordHasPrefix(v string) predicate.Team {
+	return predicate.Team(sql.FieldHasPrefix(FieldPassword, v))
+}
+
+// PasswordHasSuffix applies the HasSuffix predicate on the "password" field.
+func PasswordHasSuffix(v string) predicate.Team {
+	return predicate.Team(sql.FieldHasSuffix(FieldPassword, v))
+}
+
+// PasswordEqualFold applies the EqualFold predicate on the "password" field.
+func PasswordEqualFold(v string) predicate.Team {
+	return predicate.Team(sql.FieldEqualFold(FieldPassword, v))
+}
+
+// PasswordContainsFold applies the ContainsFold predicate on the "password" field.
+func PasswordContainsFold(v string) predicate.Team {
+	return predicate.Team(sql.FieldContainsFold(FieldPassword, v))
+}
+
 // HasStatus applies the HasEdge predicate on the "status" edge.
 func HasStatus() predicate.Team {
 	return predicate.Team(func(s *sql.Selector) {
@@ -183,6 +253,29 @@ func HasStatus() predicate.Team {
 func HasStatusWith(preds ...predicate.Status) predicate.Team {
 	return predicate.Team(func(s *sql.Selector) {
 		step := newStatusStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCredential applies the HasEdge predicate on the "credential" edge.
+func HasCredential() predicate.Team {
+	return predicate.Team(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CredentialTable, CredentialColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCredentialWith applies the HasEdge predicate on the "credential" edge with a given conditions (other predicates).
+func HasCredentialWith(preds ...predicate.Credential) predicate.Team {
+	return predicate.Team(func(s *sql.Selector) {
+		step := newCredentialStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

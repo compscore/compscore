@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/team"
 )
@@ -32,6 +33,12 @@ func (tc *TeamCreate) SetName(s string) *TeamCreate {
 	return tc
 }
 
+// SetPassword sets the "password" field.
+func (tc *TeamCreate) SetPassword(s string) *TeamCreate {
+	tc.mutation.SetPassword(s)
+	return tc
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (tc *TeamCreate) AddStatuIDs(ids ...int) *TeamCreate {
 	tc.mutation.AddStatuIDs(ids...)
@@ -45,6 +52,21 @@ func (tc *TeamCreate) AddStatus(s ...*Status) *TeamCreate {
 		ids[i] = s[i].ID
 	}
 	return tc.AddStatuIDs(ids...)
+}
+
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (tc *TeamCreate) AddCredentialIDs(ids ...int) *TeamCreate {
+	tc.mutation.AddCredentialIDs(ids...)
+	return tc
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (tc *TeamCreate) AddCredential(c ...*Credential) *TeamCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tc.AddCredentialIDs(ids...)
 }
 
 // Mutation returns the TeamMutation object of the builder.
@@ -97,6 +119,14 @@ func (tc *TeamCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Team.name": %w`, err)}
 		}
 	}
+	if _, ok := tc.mutation.Password(); !ok {
+		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Team.password"`)}
+	}
+	if v, ok := tc.mutation.Password(); ok {
+		if err := team.PasswordValidator(v); err != nil {
+			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Team.password": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -131,6 +161,10 @@ func (tc *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 		_spec.SetField(team.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := tc.mutation.Password(); ok {
+		_spec.SetField(team.FieldPassword, field.TypeString, value)
+		_node.Password = value
+	}
 	if nodes := tc.mutation.StatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -140,6 +174,22 @@ func (tc *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -1,3 +1,3 @@
 package main
 
-//go:generate go run -trimpath main.go generate
+//go:generate go run main.go generate

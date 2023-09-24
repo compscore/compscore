@@ -19,6 +19,33 @@ var (
 		Columns:    ChecksColumns,
 		PrimaryKey: []*schema.Column{ChecksColumns[0]},
 	}
+	// CredentialsColumns holds the columns for the "credentials" table.
+	CredentialsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "password", Type: field.TypeString},
+		{Name: "credential_check", Type: field.TypeInt},
+		{Name: "credential_team", Type: field.TypeInt},
+	}
+	// CredentialsTable holds the schema information for the "credentials" table.
+	CredentialsTable = &schema.Table{
+		Name:       "credentials",
+		Columns:    CredentialsColumns,
+		PrimaryKey: []*schema.Column{CredentialsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "credentials_checks_check",
+				Columns:    []*schema.Column{CredentialsColumns[2]},
+				RefColumns: []*schema.Column{ChecksColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "credentials_teams_team",
+				Columns:    []*schema.Column{CredentialsColumns[3]},
+				RefColumns: []*schema.Column{TeamsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// RoundsColumns holds the columns for the "rounds" table.
 	RoundsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -71,6 +98,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "number", Type: field.TypeInt8, Unique: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "password", Type: field.TypeString},
 	}
 	// TeamsTable holds the schema information for the "teams" table.
 	TeamsTable = &schema.Table{
@@ -81,6 +109,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ChecksTable,
+		CredentialsTable,
 		RoundsTable,
 		StatusTable,
 		TeamsTable,
@@ -88,6 +117,8 @@ var (
 )
 
 func init() {
+	CredentialsTable.ForeignKeys[0].RefTable = ChecksTable
+	CredentialsTable.ForeignKeys[1].RefTable = TeamsTable
 	StatusTable.ForeignKeys[0].RefTable = ChecksTable
 	StatusTable.ForeignKeys[1].RefTable = TeamsTable
 	StatusTable.ForeignKeys[2].RefTable = RoundsTable

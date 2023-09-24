@@ -24,12 +24,12 @@ var (
 )
 
 func Serve() {
-	err := os.Remove(config.RunningConfig.Engine.Socket)
+	err := os.Remove(config.Engine.Socket)
 	if err != nil && !os.IsNotExist(err) {
 		logrus.WithError(err).Fatal("Failed to remove existing socket")
 	}
 
-	_lis, err := net.Listen("unix", config.RunningConfig.Engine.Socket)
+	_lis, err := net.Listen("unix", config.Engine.Socket)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to listen on socket")
 	}
@@ -66,7 +66,7 @@ func handleClose(closed chan struct{}) {
 	grpcServer.GracefulStop()
 
 	// Force Close
-	time.Sleep(time.Duration(config.RunningConfig.Scoring.Interval) + 1)
+	time.Sleep(time.Duration(config.Scoring.Interval) + 1)
 
 	if grpcServer != nil {
 		grpcServer.Stop()
@@ -76,7 +76,7 @@ func handleClose(closed chan struct{}) {
 	}
 
 	// Force Exit
-	time.Sleep(time.Duration(config.RunningConfig.Scoring.Interval) + 1)
+	time.Sleep(time.Duration(config.Scoring.Interval) + 1)
 
 	os.Exit(1)
 }

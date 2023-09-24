@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -14,57 +13,58 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
-	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/compscore/compscore/pkg/ent/team"
 )
 
-// CheckQuery is the builder for querying Check entities.
-type CheckQuery struct {
+// CredentialQuery is the builder for querying Credential entities.
+type CredentialQuery struct {
 	config
-	ctx            *QueryContext
-	order          []check.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Check
-	withStatus     *StatusQuery
-	withCredential *CredentialQuery
+	ctx        *QueryContext
+	order      []credential.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Credential
+	withCheck  *CheckQuery
+	withTeam   *TeamQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the CheckQuery builder.
-func (cq *CheckQuery) Where(ps ...predicate.Check) *CheckQuery {
+// Where adds a new predicate for the CredentialQuery builder.
+func (cq *CredentialQuery) Where(ps ...predicate.Credential) *CredentialQuery {
 	cq.predicates = append(cq.predicates, ps...)
 	return cq
 }
 
 // Limit the number of records to be returned by this query.
-func (cq *CheckQuery) Limit(limit int) *CheckQuery {
+func (cq *CredentialQuery) Limit(limit int) *CredentialQuery {
 	cq.ctx.Limit = &limit
 	return cq
 }
 
 // Offset to start from.
-func (cq *CheckQuery) Offset(offset int) *CheckQuery {
+func (cq *CredentialQuery) Offset(offset int) *CredentialQuery {
 	cq.ctx.Offset = &offset
 	return cq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (cq *CheckQuery) Unique(unique bool) *CheckQuery {
+func (cq *CredentialQuery) Unique(unique bool) *CredentialQuery {
 	cq.ctx.Unique = &unique
 	return cq
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CheckQuery) Order(o ...check.OrderOption) *CheckQuery {
+func (cq *CredentialQuery) Order(o ...credential.OrderOption) *CredentialQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
 
-// QueryStatus chains the current query on the "status" edge.
-func (cq *CheckQuery) QueryStatus() *StatusQuery {
-	query := (&StatusClient{config: cq.config}).Query()
+// QueryCheck chains the current query on the "check" edge.
+func (cq *CredentialQuery) QueryCheck() *CheckQuery {
+	query := (&CheckClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -74,9 +74,9 @@ func (cq *CheckQuery) QueryStatus() *StatusQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(check.Table, check.FieldID, selector),
-			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusTable, check.StatusColumn),
+			sqlgraph.From(credential.Table, credential.FieldID, selector),
+			sqlgraph.To(check.Table, check.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, credential.CheckTable, credential.CheckColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -84,9 +84,9 @@ func (cq *CheckQuery) QueryStatus() *StatusQuery {
 	return query
 }
 
-// QueryCredential chains the current query on the "credential" edge.
-func (cq *CheckQuery) QueryCredential() *CredentialQuery {
-	query := (&CredentialClient{config: cq.config}).Query()
+// QueryTeam chains the current query on the "team" edge.
+func (cq *CredentialQuery) QueryTeam() *TeamQuery {
+	query := (&TeamClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -96,9 +96,9 @@ func (cq *CheckQuery) QueryCredential() *CredentialQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(check.Table, check.FieldID, selector),
-			sqlgraph.To(credential.Table, credential.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, check.CredentialTable, check.CredentialColumn),
+			sqlgraph.From(credential.Table, credential.FieldID, selector),
+			sqlgraph.To(team.Table, team.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, credential.TeamTable, credential.TeamColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -106,21 +106,21 @@ func (cq *CheckQuery) QueryCredential() *CredentialQuery {
 	return query
 }
 
-// First returns the first Check entity from the query.
-// Returns a *NotFoundError when no Check was found.
-func (cq *CheckQuery) First(ctx context.Context) (*Check, error) {
+// First returns the first Credential entity from the query.
+// Returns a *NotFoundError when no Credential was found.
+func (cq *CredentialQuery) First(ctx context.Context) (*Credential, error) {
 	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{check.Label}
+		return nil, &NotFoundError{credential.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (cq *CheckQuery) FirstX(ctx context.Context) *Check {
+func (cq *CredentialQuery) FirstX(ctx context.Context) *Credential {
 	node, err := cq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -128,22 +128,22 @@ func (cq *CheckQuery) FirstX(ctx context.Context) *Check {
 	return node
 }
 
-// FirstID returns the first Check ID from the query.
-// Returns a *NotFoundError when no Check ID was found.
-func (cq *CheckQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first Credential ID from the query.
+// Returns a *NotFoundError when no Credential ID was found.
+func (cq *CredentialQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{check.Label}
+		err = &NotFoundError{credential.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CheckQuery) FirstIDX(ctx context.Context) int {
+func (cq *CredentialQuery) FirstIDX(ctx context.Context) int {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -151,10 +151,10 @@ func (cq *CheckQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Check entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Check entity is found.
-// Returns a *NotFoundError when no Check entities are found.
-func (cq *CheckQuery) Only(ctx context.Context) (*Check, error) {
+// Only returns a single Credential entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Credential entity is found.
+// Returns a *NotFoundError when no Credential entities are found.
+func (cq *CredentialQuery) Only(ctx context.Context) (*Credential, error) {
 	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -163,14 +163,14 @@ func (cq *CheckQuery) Only(ctx context.Context) (*Check, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{check.Label}
+		return nil, &NotFoundError{credential.Label}
 	default:
-		return nil, &NotSingularError{check.Label}
+		return nil, &NotSingularError{credential.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (cq *CheckQuery) OnlyX(ctx context.Context) *Check {
+func (cq *CredentialQuery) OnlyX(ctx context.Context) *Credential {
 	node, err := cq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -178,10 +178,10 @@ func (cq *CheckQuery) OnlyX(ctx context.Context) *Check {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Check ID in the query.
-// Returns a *NotSingularError when more than one Check ID is found.
+// OnlyID is like Only, but returns the only Credential ID in the query.
+// Returns a *NotSingularError when more than one Credential ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CheckQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (cq *CredentialQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
@@ -190,15 +190,15 @@ func (cq *CheckQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{check.Label}
+		err = &NotFoundError{credential.Label}
 	default:
-		err = &NotSingularError{check.Label}
+		err = &NotSingularError{credential.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CheckQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CredentialQuery) OnlyIDX(ctx context.Context) int {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -206,18 +206,18 @@ func (cq *CheckQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of Checks.
-func (cq *CheckQuery) All(ctx context.Context) ([]*Check, error) {
+// All executes the query and returns a list of Credentials.
+func (cq *CredentialQuery) All(ctx context.Context) ([]*Credential, error) {
 	ctx = setContextOp(ctx, cq.ctx, "All")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Check, *CheckQuery]()
-	return withInterceptors[[]*Check](ctx, cq, qr, cq.inters)
+	qr := querierAll[[]*Credential, *CredentialQuery]()
+	return withInterceptors[[]*Credential](ctx, cq, qr, cq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (cq *CheckQuery) AllX(ctx context.Context) []*Check {
+func (cq *CredentialQuery) AllX(ctx context.Context) []*Credential {
 	nodes, err := cq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -225,20 +225,20 @@ func (cq *CheckQuery) AllX(ctx context.Context) []*Check {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Check IDs.
-func (cq *CheckQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of Credential IDs.
+func (cq *CredentialQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
 	ctx = setContextOp(ctx, cq.ctx, "IDs")
-	if err = cq.Select(check.FieldID).Scan(ctx, &ids); err != nil {
+	if err = cq.Select(credential.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CheckQuery) IDsX(ctx context.Context) []int {
+func (cq *CredentialQuery) IDsX(ctx context.Context) []int {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -247,16 +247,16 @@ func (cq *CheckQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (cq *CheckQuery) Count(ctx context.Context) (int, error) {
+func (cq *CredentialQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, cq.ctx, "Count")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, cq, querierCount[*CheckQuery](), cq.inters)
+	return withInterceptors[int](ctx, cq, querierCount[*CredentialQuery](), cq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (cq *CheckQuery) CountX(ctx context.Context) int {
+func (cq *CredentialQuery) CountX(ctx context.Context) int {
 	count, err := cq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -265,7 +265,7 @@ func (cq *CheckQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (cq *CheckQuery) Exist(ctx context.Context) (bool, error) {
+func (cq *CredentialQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, cq.ctx, "Exist")
 	switch _, err := cq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -278,7 +278,7 @@ func (cq *CheckQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (cq *CheckQuery) ExistX(ctx context.Context) bool {
+func (cq *CredentialQuery) ExistX(ctx context.Context) bool {
 	exist, err := cq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -286,45 +286,45 @@ func (cq *CheckQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the CheckQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the CredentialQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (cq *CheckQuery) Clone() *CheckQuery {
+func (cq *CredentialQuery) Clone() *CredentialQuery {
 	if cq == nil {
 		return nil
 	}
-	return &CheckQuery{
-		config:         cq.config,
-		ctx:            cq.ctx.Clone(),
-		order:          append([]check.OrderOption{}, cq.order...),
-		inters:         append([]Interceptor{}, cq.inters...),
-		predicates:     append([]predicate.Check{}, cq.predicates...),
-		withStatus:     cq.withStatus.Clone(),
-		withCredential: cq.withCredential.Clone(),
+	return &CredentialQuery{
+		config:     cq.config,
+		ctx:        cq.ctx.Clone(),
+		order:      append([]credential.OrderOption{}, cq.order...),
+		inters:     append([]Interceptor{}, cq.inters...),
+		predicates: append([]predicate.Credential{}, cq.predicates...),
+		withCheck:  cq.withCheck.Clone(),
+		withTeam:   cq.withTeam.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
 }
 
-// WithStatus tells the query-builder to eager-load the nodes that are connected to
-// the "status" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CheckQuery) WithStatus(opts ...func(*StatusQuery)) *CheckQuery {
-	query := (&StatusClient{config: cq.config}).Query()
+// WithCheck tells the query-builder to eager-load the nodes that are connected to
+// the "check" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CredentialQuery) WithCheck(opts ...func(*CheckQuery)) *CredentialQuery {
+	query := (&CheckClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withStatus = query
+	cq.withCheck = query
 	return cq
 }
 
-// WithCredential tells the query-builder to eager-load the nodes that are connected to
-// the "credential" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CheckQuery) WithCredential(opts ...func(*CredentialQuery)) *CheckQuery {
-	query := (&CredentialClient{config: cq.config}).Query()
+// WithTeam tells the query-builder to eager-load the nodes that are connected to
+// the "team" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CredentialQuery) WithTeam(opts ...func(*TeamQuery)) *CredentialQuery {
+	query := (&TeamClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withCredential = query
+	cq.withTeam = query
 	return cq
 }
 
@@ -334,19 +334,19 @@ func (cq *CheckQuery) WithCredential(opts ...func(*CredentialQuery)) *CheckQuery
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Password string `json:"password,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Check.Query().
-//		GroupBy(check.FieldName).
+//	client.Credential.Query().
+//		GroupBy(credential.FieldPassword).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (cq *CheckQuery) GroupBy(field string, fields ...string) *CheckGroupBy {
+func (cq *CredentialQuery) GroupBy(field string, fields ...string) *CredentialGroupBy {
 	cq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &CheckGroupBy{build: cq}
+	grbuild := &CredentialGroupBy{build: cq}
 	grbuild.flds = &cq.ctx.Fields
-	grbuild.label = check.Label
+	grbuild.label = credential.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -357,26 +357,26 @@ func (cq *CheckQuery) GroupBy(field string, fields ...string) *CheckGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Password string `json:"password,omitempty"`
 //	}
 //
-//	client.Check.Query().
-//		Select(check.FieldName).
+//	client.Credential.Query().
+//		Select(credential.FieldPassword).
 //		Scan(ctx, &v)
-func (cq *CheckQuery) Select(fields ...string) *CheckSelect {
+func (cq *CredentialQuery) Select(fields ...string) *CredentialSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
-	sbuild := &CheckSelect{CheckQuery: cq}
-	sbuild.label = check.Label
+	sbuild := &CredentialSelect{CredentialQuery: cq}
+	sbuild.label = credential.Label
 	sbuild.flds, sbuild.scan = &cq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a CheckSelect configured with the given aggregations.
-func (cq *CheckQuery) Aggregate(fns ...AggregateFunc) *CheckSelect {
+// Aggregate returns a CredentialSelect configured with the given aggregations.
+func (cq *CredentialQuery) Aggregate(fns ...AggregateFunc) *CredentialSelect {
 	return cq.Select().Aggregate(fns...)
 }
 
-func (cq *CheckQuery) prepareQuery(ctx context.Context) error {
+func (cq *CredentialQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range cq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -388,7 +388,7 @@ func (cq *CheckQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range cq.ctx.Fields {
-		if !check.ValidColumn(f) {
+		if !credential.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -402,20 +402,27 @@ func (cq *CheckQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check, error) {
+func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Credential, error) {
 	var (
-		nodes       = []*Check{}
+		nodes       = []*Credential{}
+		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
-			cq.withStatus != nil,
-			cq.withCredential != nil,
+			cq.withCheck != nil,
+			cq.withTeam != nil,
 		}
 	)
+	if cq.withCheck != nil || cq.withTeam != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, credential.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Check).scanValues(nil, columns)
+		return (*Credential).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Check{config: cq.config}
+		node := &Credential{config: cq.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -429,87 +436,87 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withStatus; query != nil {
-		if err := cq.loadStatus(ctx, query, nodes,
-			func(n *Check) { n.Edges.Status = []*Status{} },
-			func(n *Check, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+	if query := cq.withCheck; query != nil {
+		if err := cq.loadCheck(ctx, query, nodes, nil,
+			func(n *Credential, e *Check) { n.Edges.Check = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withCredential; query != nil {
-		if err := cq.loadCredential(ctx, query, nodes,
-			func(n *Check) { n.Edges.Credential = []*Credential{} },
-			func(n *Check, e *Credential) { n.Edges.Credential = append(n.Edges.Credential, e) }); err != nil {
+	if query := cq.withTeam; query != nil {
+		if err := cq.loadTeam(ctx, query, nodes, nil,
+			func(n *Credential, e *Team) { n.Edges.Team = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cq *CheckQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes []*Check, init func(*Check), assign func(*Check, *Status)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Check)
+func (cq *CredentialQuery) loadCheck(ctx context.Context, query *CheckQuery, nodes []*Credential, init func(*Credential), assign func(*Credential, *Check)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Credential)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].credential_check == nil {
+			continue
 		}
+		fk := *nodes[i].credential_check
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Status(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(check.StatusColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(check.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.status_check
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "status_check" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "status_check" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "credential_check" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
-func (cq *CheckQuery) loadCredential(ctx context.Context, query *CredentialQuery, nodes []*Check, init func(*Check), assign func(*Check, *Credential)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Check)
+func (cq *CredentialQuery) loadTeam(ctx context.Context, query *TeamQuery, nodes []*Credential, init func(*Credential), assign func(*Credential, *Team)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Credential)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].credential_team == nil {
+			continue
 		}
+		fk := *nodes[i].credential_team
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Credential(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(check.CredentialColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(team.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.credential_check
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "credential_check" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "credential_check" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "credential_team" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
 
-func (cq *CheckQuery) sqlCount(ctx context.Context) (int, error) {
+func (cq *CredentialQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
 	_spec.Node.Columns = cq.ctx.Fields
 	if len(cq.ctx.Fields) > 0 {
@@ -518,8 +525,8 @@ func (cq *CheckQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, cq.driver, _spec)
 }
 
-func (cq *CheckQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(check.Table, check.Columns, sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt))
+func (cq *CredentialQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -528,9 +535,9 @@ func (cq *CheckQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := cq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, check.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, credential.FieldID)
 		for i := range fields {
-			if fields[i] != check.FieldID {
+			if fields[i] != credential.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -558,12 +565,12 @@ func (cq *CheckQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (cq *CheckQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (cq *CredentialQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(cq.driver.Dialect())
-	t1 := builder.Table(check.Table)
+	t1 := builder.Table(credential.Table)
 	columns := cq.ctx.Fields
 	if len(columns) == 0 {
-		columns = check.Columns
+		columns = credential.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if cq.sql != nil {
@@ -590,28 +597,28 @@ func (cq *CheckQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// CheckGroupBy is the group-by builder for Check entities.
-type CheckGroupBy struct {
+// CredentialGroupBy is the group-by builder for Credential entities.
+type CredentialGroupBy struct {
 	selector
-	build *CheckQuery
+	build *CredentialQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (cgb *CheckGroupBy) Aggregate(fns ...AggregateFunc) *CheckGroupBy {
+func (cgb *CredentialGroupBy) Aggregate(fns ...AggregateFunc) *CredentialGroupBy {
 	cgb.fns = append(cgb.fns, fns...)
 	return cgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cgb *CheckGroupBy) Scan(ctx context.Context, v any) error {
+func (cgb *CredentialGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
 	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CheckQuery, *CheckGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
+	return scanWithInterceptors[*CredentialQuery, *CredentialGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
 }
 
-func (cgb *CheckGroupBy) sqlScan(ctx context.Context, root *CheckQuery, v any) error {
+func (cgb *CredentialGroupBy) sqlScan(ctx context.Context, root *CredentialQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(cgb.fns))
 	for _, fn := range cgb.fns {
@@ -638,28 +645,28 @@ func (cgb *CheckGroupBy) sqlScan(ctx context.Context, root *CheckQuery, v any) e
 	return sql.ScanSlice(rows, v)
 }
 
-// CheckSelect is the builder for selecting fields of Check entities.
-type CheckSelect struct {
-	*CheckQuery
+// CredentialSelect is the builder for selecting fields of Credential entities.
+type CredentialSelect struct {
+	*CredentialQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (cs *CheckSelect) Aggregate(fns ...AggregateFunc) *CheckSelect {
+func (cs *CredentialSelect) Aggregate(fns ...AggregateFunc) *CredentialSelect {
 	cs.fns = append(cs.fns, fns...)
 	return cs
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cs *CheckSelect) Scan(ctx context.Context, v any) error {
+func (cs *CredentialSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, cs.ctx, "Select")
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CheckQuery, *CheckSelect](ctx, cs.CheckQuery, cs, cs.inters, v)
+	return scanWithInterceptors[*CredentialQuery, *CredentialSelect](ctx, cs.CredentialQuery, cs, cs.inters, v)
 }
 
-func (cs *CheckSelect) sqlScan(ctx context.Context, root *CheckQuery, v any) error {
+func (cs *CredentialSelect) sqlScan(ctx context.Context, root *CredentialQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(cs.fns))
 	for _, fn := range cs.fns {

@@ -21,7 +21,7 @@ var (
 func Open() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 
-	_conn, err := grpc.DialContext(ctx, "unix:"+config.RunningConfig.Engine.Socket, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	_conn, err := grpc.DialContext(ctx, "unix:"+config.Engine.Socket, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to connect to gRPC server")
 	}

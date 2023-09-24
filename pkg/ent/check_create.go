@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/status"
 )
 
@@ -39,6 +40,21 @@ func (cc *CheckCreate) AddStatus(s ...*Status) *CheckCreate {
 		ids[i] = s[i].ID
 	}
 	return cc.AddStatuIDs(ids...)
+}
+
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (cc *CheckCreate) AddCredentialIDs(ids ...int) *CheckCreate {
+	cc.mutation.AddCredentialIDs(ids...)
+	return cc
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (cc *CheckCreate) AddCredential(c ...*Credential) *CheckCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCredentialIDs(ids...)
 }
 
 // Mutation returns the CheckMutation object of the builder.
@@ -122,6 +138,22 @@ func (cc *CheckCreate) createSpec() (*Check, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

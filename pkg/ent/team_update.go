@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/team"
@@ -47,6 +48,12 @@ func (tu *TeamUpdate) SetName(s string) *TeamUpdate {
 	return tu
 }
 
+// SetPassword sets the "password" field.
+func (tu *TeamUpdate) SetPassword(s string) *TeamUpdate {
+	tu.mutation.SetPassword(s)
+	return tu
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (tu *TeamUpdate) AddStatuIDs(ids ...int) *TeamUpdate {
 	tu.mutation.AddStatuIDs(ids...)
@@ -60,6 +67,21 @@ func (tu *TeamUpdate) AddStatus(s ...*Status) *TeamUpdate {
 		ids[i] = s[i].ID
 	}
 	return tu.AddStatuIDs(ids...)
+}
+
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (tu *TeamUpdate) AddCredentialIDs(ids ...int) *TeamUpdate {
+	tu.mutation.AddCredentialIDs(ids...)
+	return tu
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (tu *TeamUpdate) AddCredential(c ...*Credential) *TeamUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tu.AddCredentialIDs(ids...)
 }
 
 // Mutation returns the TeamMutation object of the builder.
@@ -86,6 +108,27 @@ func (tu *TeamUpdate) RemoveStatus(s ...*Status) *TeamUpdate {
 		ids[i] = s[i].ID
 	}
 	return tu.RemoveStatuIDs(ids...)
+}
+
+// ClearCredential clears all "credential" edges to the Credential entity.
+func (tu *TeamUpdate) ClearCredential() *TeamUpdate {
+	tu.mutation.ClearCredential()
+	return tu
+}
+
+// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+func (tu *TeamUpdate) RemoveCredentialIDs(ids ...int) *TeamUpdate {
+	tu.mutation.RemoveCredentialIDs(ids...)
+	return tu
+}
+
+// RemoveCredential removes "credential" edges to Credential entities.
+func (tu *TeamUpdate) RemoveCredential(c ...*Credential) *TeamUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tu.RemoveCredentialIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -127,6 +170,11 @@ func (tu *TeamUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Team.name": %w`, err)}
 		}
 	}
+	if v, ok := tu.mutation.Password(); ok {
+		if err := team.PasswordValidator(v); err != nil {
+			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Team.password": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -150,6 +198,9 @@ func (tu *TeamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.Name(); ok {
 		_spec.SetField(team.FieldName, field.TypeString, value)
+	}
+	if value, ok := tu.mutation.Password(); ok {
+		_spec.SetField(team.FieldPassword, field.TypeString, value)
 	}
 	if tu.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -196,6 +247,51 @@ func (tu *TeamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if tu.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !tu.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{team.Label}
@@ -235,6 +331,12 @@ func (tuo *TeamUpdateOne) SetName(s string) *TeamUpdateOne {
 	return tuo
 }
 
+// SetPassword sets the "password" field.
+func (tuo *TeamUpdateOne) SetPassword(s string) *TeamUpdateOne {
+	tuo.mutation.SetPassword(s)
+	return tuo
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (tuo *TeamUpdateOne) AddStatuIDs(ids ...int) *TeamUpdateOne {
 	tuo.mutation.AddStatuIDs(ids...)
@@ -248,6 +350,21 @@ func (tuo *TeamUpdateOne) AddStatus(s ...*Status) *TeamUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return tuo.AddStatuIDs(ids...)
+}
+
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (tuo *TeamUpdateOne) AddCredentialIDs(ids ...int) *TeamUpdateOne {
+	tuo.mutation.AddCredentialIDs(ids...)
+	return tuo
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (tuo *TeamUpdateOne) AddCredential(c ...*Credential) *TeamUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tuo.AddCredentialIDs(ids...)
 }
 
 // Mutation returns the TeamMutation object of the builder.
@@ -274,6 +391,27 @@ func (tuo *TeamUpdateOne) RemoveStatus(s ...*Status) *TeamUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return tuo.RemoveStatuIDs(ids...)
+}
+
+// ClearCredential clears all "credential" edges to the Credential entity.
+func (tuo *TeamUpdateOne) ClearCredential() *TeamUpdateOne {
+	tuo.mutation.ClearCredential()
+	return tuo
+}
+
+// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+func (tuo *TeamUpdateOne) RemoveCredentialIDs(ids ...int) *TeamUpdateOne {
+	tuo.mutation.RemoveCredentialIDs(ids...)
+	return tuo
+}
+
+// RemoveCredential removes "credential" edges to Credential entities.
+func (tuo *TeamUpdateOne) RemoveCredential(c ...*Credential) *TeamUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return tuo.RemoveCredentialIDs(ids...)
 }
 
 // Where appends a list predicates to the TeamUpdate builder.
@@ -328,6 +466,11 @@ func (tuo *TeamUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Team.name": %w`, err)}
 		}
 	}
+	if v, ok := tuo.mutation.Password(); ok {
+		if err := team.PasswordValidator(v); err != nil {
+			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Team.password": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -369,6 +512,9 @@ func (tuo *TeamUpdateOne) sqlSave(ctx context.Context) (_node *Team, err error) 
 	if value, ok := tuo.mutation.Name(); ok {
 		_spec.SetField(team.FieldName, field.TypeString, value)
 	}
+	if value, ok := tuo.mutation.Password(); ok {
+		_spec.SetField(team.FieldPassword, field.TypeString, value)
+	}
 	if tuo.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -407,6 +553,51 @@ func (tuo *TeamUpdateOne) sqlSave(ctx context.Context) (_node *Team, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tuo.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !tuo.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   team.CredentialTable,
+			Columns: []string{team.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/status"
 )
@@ -49,6 +50,21 @@ func (cu *CheckUpdate) AddStatus(s ...*Status) *CheckUpdate {
 	return cu.AddStatuIDs(ids...)
 }
 
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (cu *CheckUpdate) AddCredentialIDs(ids ...int) *CheckUpdate {
+	cu.mutation.AddCredentialIDs(ids...)
+	return cu
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (cu *CheckUpdate) AddCredential(c ...*Credential) *CheckUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddCredentialIDs(ids...)
+}
+
 // Mutation returns the CheckMutation object of the builder.
 func (cu *CheckUpdate) Mutation() *CheckMutation {
 	return cu.mutation
@@ -73,6 +89,27 @@ func (cu *CheckUpdate) RemoveStatus(s ...*Status) *CheckUpdate {
 		ids[i] = s[i].ID
 	}
 	return cu.RemoveStatuIDs(ids...)
+}
+
+// ClearCredential clears all "credential" edges to the Credential entity.
+func (cu *CheckUpdate) ClearCredential() *CheckUpdate {
+	cu.mutation.ClearCredential()
+	return cu
+}
+
+// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+func (cu *CheckUpdate) RemoveCredentialIDs(ids ...int) *CheckUpdate {
+	cu.mutation.RemoveCredentialIDs(ids...)
+	return cu
+}
+
+// RemoveCredential removes "credential" edges to Credential entities.
+func (cu *CheckUpdate) RemoveCredential(c ...*Credential) *CheckUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveCredentialIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -172,6 +209,51 @@ func (cu *CheckUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !cu.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{check.Label}
@@ -213,6 +295,21 @@ func (cuo *CheckUpdateOne) AddStatus(s ...*Status) *CheckUpdateOne {
 	return cuo.AddStatuIDs(ids...)
 }
 
+// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+func (cuo *CheckUpdateOne) AddCredentialIDs(ids ...int) *CheckUpdateOne {
+	cuo.mutation.AddCredentialIDs(ids...)
+	return cuo
+}
+
+// AddCredential adds the "credential" edges to the Credential entity.
+func (cuo *CheckUpdateOne) AddCredential(c ...*Credential) *CheckUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddCredentialIDs(ids...)
+}
+
 // Mutation returns the CheckMutation object of the builder.
 func (cuo *CheckUpdateOne) Mutation() *CheckMutation {
 	return cuo.mutation
@@ -237,6 +334,27 @@ func (cuo *CheckUpdateOne) RemoveStatus(s ...*Status) *CheckUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return cuo.RemoveStatuIDs(ids...)
+}
+
+// ClearCredential clears all "credential" edges to the Credential entity.
+func (cuo *CheckUpdateOne) ClearCredential() *CheckUpdateOne {
+	cuo.mutation.ClearCredential()
+	return cuo
+}
+
+// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+func (cuo *CheckUpdateOne) RemoveCredentialIDs(ids ...int) *CheckUpdateOne {
+	cuo.mutation.RemoveCredentialIDs(ids...)
+	return cuo
+}
+
+// RemoveCredential removes "credential" edges to Credential entities.
+func (cuo *CheckUpdateOne) RemoveCredential(c ...*Credential) *CheckUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveCredentialIDs(ids...)
 }
 
 // Where appends a list predicates to the CheckUpdate builder.
@@ -359,6 +477,51 @@ func (cuo *CheckUpdateOne) sqlSave(ctx context.Context) (_node *Check, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !cuo.mutation.CredentialCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CredentialIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.CredentialTable,
+			Columns: []string{check.CredentialColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

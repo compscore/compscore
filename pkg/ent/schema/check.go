@@ -33,5 +33,13 @@ func (Check) Edges() []ent.Edge {
 				},
 			).
 			Ref("check"),
+		edge.From("credential", Credential.Type).
+			Comment("Check credential").
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			).
+			Ref("check"),
 	}
 }

@@ -28,9 +28,11 @@ type Check struct {
 type CheckEdges struct {
 	// Check statuses
 	Status []*Status `json:"status,omitempty"`
+	// Check credential
+	Credential []*Credential `json:"credential,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // StatusOrErr returns the Status value or an error if the edge
@@ -40,6 +42,15 @@ func (e CheckEdges) StatusOrErr() ([]*Status, error) {
 		return e.Status, nil
 	}
 	return nil, &NotLoadedError{edge: "status"}
+}
+
+// CredentialOrErr returns the Credential value or an error if the edge
+// was not loaded in eager-loading.
+func (e CheckEdges) CredentialOrErr() ([]*Credential, error) {
+	if e.loadedTypes[1] {
+		return e.Credential, nil
+	}
+	return nil, &NotLoadedError{edge: "credential"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -94,6 +105,11 @@ func (c *Check) Value(name string) (ent.Value, error) {
 // QueryStatus queries the "status" edge of the Check entity.
 func (c *Check) QueryStatus() *StatusQuery {
 	return NewCheckClient(c.config).QueryStatus(c)
+}
+
+// QueryCredential queries the "credential" edge of the Check entity.
+func (c *Check) QueryCredential() *CredentialQuery {
+	return NewCheckClient(c.config).QueryCredential(c)
 }
 
 // Update returns a builder for updating this Check.
