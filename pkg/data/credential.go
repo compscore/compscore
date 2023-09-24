@@ -152,3 +152,52 @@ func (*credential_s) UpdatePassword(team_id int8, check_name string, password st
 		SetPassword(password).
 		Save(Ctx)
 }
+
+func (*credential_s) Update(entCredential *ent.Credential, password string) (*ent.Credential, error) {
+	return entCredential.Update().
+		SetPassword(password).
+		Save(Ctx)
+}
+
+func (*credential_s) Delete(entCredential *ent.Credential) error {
+	return Client.Credential.
+		DeleteOne(entCredential).
+		Exec(Ctx)
+}
+
+func (*credential_s) DeleteComplex(entTeam *ent.Team, entCheck *ent.Check) error {
+	entCredential, err := Credential.GetComplex(entTeam, entCheck)
+	if err != nil {
+		return err
+	}
+
+	return Client.Credential.
+		DeleteOne(entCredential).
+		Exec(Ctx)
+}
+
+func (*credential_s) Exists(team_id int8, check_name string) (bool, error) {
+	return Client.Credential.
+		Query().
+		Where(
+			credential.HasTeamWith(
+				team.NumberEQ(team_id),
+			),
+			credential.HasCheckWith(
+				check.NameEQ(check_name),
+			),
+		).Exist(Ctx)
+}
+
+func (*credential_s) ExistsComplex(entTeam *ent.Team, entCheck *ent.Check) (bool, error) {
+	return Client.Credential.
+		Query().
+		Where(
+			credential.HasTeamWith(
+				team.IDEQ(entTeam.ID),
+			),
+			credential.HasCheckWith(
+				check.IDEQ(entCheck.ID),
+			),
+		).Exist(Ctx)
+}
