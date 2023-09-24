@@ -103,11 +103,6 @@ func (cu *CredentialUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CredentialUpdate) check() error {
-	if v, ok := cu.mutation.Password(); ok {
-		if err := credential.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Credential.password": %w`, err)}
-		}
-	}
 	if _, ok := cu.mutation.CheckID(); cu.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Credential.check"`)
 	}
@@ -297,11 +292,6 @@ func (cuo *CredentialUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CredentialUpdateOne) check() error {
-	if v, ok := cuo.mutation.Password(); ok {
-		if err := credential.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Credential.password": %w`, err)}
-		}
-	}
 	if _, ok := cuo.mutation.CheckID(); cuo.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Credential.check"`)
 	}
