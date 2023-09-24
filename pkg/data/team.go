@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/team"
@@ -203,6 +204,7 @@ func (*team_s) CheckPassword(team int8, password string) (bool, error) {
 }
 
 func (*team_s) CheckPasswordByName(team_name string, password string) (bool, error) {
+	team_name = strings.Replace(team_name, "_", " ", -1)
 	teamEnt, err := Team.GetByName(team_name)
 	if err != nil {
 		return false, err
@@ -210,7 +212,7 @@ func (*team_s) CheckPasswordByName(team_name string, password string) (bool, err
 
 	err = bcrypt.CompareHashAndPassword([]byte(teamEnt.Password), []byte(password))
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 
 	return true, nil
