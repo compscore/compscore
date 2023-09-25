@@ -404,8 +404,27 @@ func (*status_s) Create(roundNumber int, checkName string, teamNumber int8, stat
 		Save(Ctx)
 }
 
-func (*status_s) Update(entStatus *ent.Status, statusEnum status.Status, message string) (*ent.Status, error) {
+func (*status_s) UpdateComplex(entStatus *ent.Status, statusEnum status.Status, message string) (*ent.Status, error) {
 	return entStatus.Update().
+		SetStatus(statusEnum).
+		SetError(message).
+		SetTime(time.Now()).
+		Save(Ctx)
+}
+
+func (*status_s) Update(teamNumber int8, roundNumber int, checkName string, statusEnum status.Status, message string) (int, error) {
+	return Client.Status.Update().
+		Where(
+			status.HasRoundWith(
+				round.NumberEQ(roundNumber),
+			),
+			status.HasTeamWith(
+				team.NumberEQ(teamNumber),
+			),
+			status.HasCheckWith(
+				check.NameEQ(checkName),
+			),
+		).
 		SetStatus(statusEnum).
 		SetError(message).
 		SetTime(time.Now()).
