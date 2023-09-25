@@ -4,6 +4,8 @@ web:
   hostname: 127.0.0.1
   port: 8080
   apiPath: /api
+  jwtKey: REPLACE_ME
+  timeout: 6 # hours
 teams:
   amount: 15
   nameFormat: Team {{ .Team }}
@@ -80,7 +82,7 @@ checks:
     command: readme.txt
     options:
       exists:
-      sha256: 01cbe49fd2fbb312408dc5e03a35c9f0374204131652591cad8f0beb21304c3a
+      sha256: b004de45d8a133e9713a369f9c912237e8ad35dd9140c0279d27bada067797f4
   - name: host_c-ldap
     release:
       org: compscore

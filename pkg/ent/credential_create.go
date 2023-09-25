@@ -86,11 +86,6 @@ func (cc *CredentialCreate) check() error {
 	if _, ok := cc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Credential.password"`)}
 	}
-	if v, ok := cc.mutation.Password(); ok {
-		if err := credential.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Credential.password": %w`, err)}
-		}
-	}
 	if _, ok := cc.mutation.CheckID(); !ok {
 		return &ValidationError{Name: "check", err: errors.New(`ent: missing required edge "Credential.check"`)}
 	}

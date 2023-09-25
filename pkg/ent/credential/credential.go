@@ -64,11 +64,6 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	PasswordValidator func(string) error
-)
-
 // OrderOption defines the ordering options for the Credential queries.
 type OrderOption func(*sql.Selector)
 

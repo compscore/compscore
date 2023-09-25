@@ -1,9 +1,11 @@
 package engine
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"sync"
+	"text/template"
 	"time"
 
 	"github.com/compscore/compscore/pkg/checks/imports"
@@ -94,6 +96,20 @@ func runEngine() {
 				return
 			}
 
+			roundCount, err := data.Round.Count()
+			if err != nil {
+				logrus.WithError(err).Error("Failed to get round count")
+				return
+			}
+
+			if roundCount == 0 {
+				_, err = data.Round.Create(1)
+				if err != nil {
+					logrus.WithError(err).Error("Failed to create first round")
+					return
+				}
+			}
+
 			entRound, err := data.Round.GetLastRound()
 			if err != nil {
 				logrus.WithError(err).Error("Failed to get last round")
@@ -127,12 +143,12 @@ func runRound(roundMutex *sync.Mutex) error {
 
 	checks := 0
 
-	for _, team := range config.Teams {
+	for i := 1; i <= config.Teams.Amount; i++ {
 		for _, check := range config.Checks {
 			_, err := data.Status.Create(
 				round.Number,
 				check.Name,
-				team.Number,
+				int8(i),
 				status.StatusUnknown,
 			)
 			if err != nil {
@@ -149,22 +165,65 @@ func runRound(roundMutex *sync.Mutex) error {
 	resultsChan := make(chan checkResult)
 	defer close(resultsChan)
 
-	for _, team := range config.Teams {
-		for _, check := range config.Checks {
-			go runScoreCheck(round.Number, check, team.Number, resultsChan, wgRound)
+	for _, check := range config.Checks {
+		targetTemplate, err := template.New(check.Name).Parse(check.Target)
+		if err != nil {
+			for i := 1; i <= config.Teams.Amount; i++ {
+				_, err = data.Status.Update(
+					int8(i),
+					round.Number,
+					check.Name,
+					status.StatusDown,
+					fmt.Sprintf("failed to parse target template: %v", err),
+				)
+				if err != nil {
+					logrus.WithError(err).Errorf("Failed to update status for check: %v", check)
+				}
+				continue
+			}
+		}
+		for i := 1; i <= config.Teams.Amount; i++ {
+			target := bytes.NewBuffer([]byte{})
+			err = targetTemplate.Execute(target, struct{ Team int8 }{Team: int8(i)})
+			if err != nil {
+				_, err = data.Status.Update(
+					int8(i),
+					round.Number,
+					check.Name,
+					status.StatusDown,
+					fmt.Sprintf("failed to parse target template: %v", err),
+				)
+				if err != nil {
+					logrus.WithError(err).Errorf("Failed to update status for check: %v", check)
+				}
+				continue
+			}
+
+			entCredential, err := data.Credential.Get(int8(i), check.Name)
+			if err != nil {
+				_, err = data.Status.Update(
+					int8(i),
+					round.Number,
+					check.Name,
+					status.StatusDown,
+					fmt.Sprintf("failed to get credential: %v", err),
+				)
+				if err != nil {
+					logrus.WithError(err).Errorf("Failed to update status for check: %v", check)
+				}
+				continue
+			}
+
+			go runScoreCheck(round.Number, check, int8(i), target.String(), entCredential.Password, resultsChan, wgRound)
 		}
 	}
 
 	go func() {
 		for result := range resultsChan {
-			entStatus, err := data.Status.Get(round.Number, result.Check.Name, result.Team)
-			if err != nil {
-				logrus.WithError(err).Errorf("Failed to get status for check: %v", result.Check)
-				continue
-			}
-
 			_, err = data.Status.Update(
-				entStatus,
+				result.Team,
+				round.Number,
+				result.Check.Name,
 				func() status.Status {
 					if result.Success {
 						return status.StatusUp
@@ -185,10 +244,10 @@ func runRound(roundMutex *sync.Mutex) error {
 	return nil
 }
 
-func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan checkResult, wg *sync.WaitGroup) {
+func runScoreCheck(round int, check structs.Check_s, team int8, target string, password string, resultsChan chan checkResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	runFunc, ok := imports.Imports[check.Release.Org+"-"+check.Release.Repo]
+	runFunc, ok := imports.Imports[check.Release.Org+"/"+check.Release.Repo]
 	if !ok {
 		resultsChan <- checkResult{
 			Success: false,
@@ -210,7 +269,7 @@ func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan
 	returnChan := make(chan checkResult)
 
 	go func() {
-		success, message := runFunc(checkCtx, check.Target, check.Command, check.ExpectedOutput, check.Credentials.Username, check.Credentials.Password, check.Options)
+		success, message := runFunc(checkCtx, target, check.Command, check.ExpectedOutput, check.Credentials.Username, password, check.Options)
 		err := recover()
 		if err != nil {
 			logrus.WithError(err.(error)).Errorf("Failed to run check: %v, due to panic: %v", check, err)

@@ -155,6 +155,12 @@ func (*round_s) CreateNextRound() (*ent.Round, error) {
 	return Round.Create(lastRound.Number + 1)
 }
 
+func (*round_s) Count() (int, error) {
+	return Client.Round.
+		Query().
+		Count(Ctx)
+}
+
 func (*round_s) Update(round *ent.Round, number int) (*ent.Round, error) {
 	return round.Update().
 		SetNumber(number).

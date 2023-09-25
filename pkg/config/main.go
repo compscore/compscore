@@ -15,7 +15,7 @@ var (
 	Name    string
 	Engine  structs.Engine_s
 	Web     structs.Web_s
-	Teams   []structs.Team_s
+	Teams   structs.Teams_s
 	Scoring structs.Scoring_s
 	Checks  []structs.Check_s
 )

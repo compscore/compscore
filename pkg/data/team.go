@@ -202,6 +202,20 @@ func (*team_s) CheckPassword(team int8, password string) (bool, error) {
 	return true, nil
 }
 
+func (*team_s) CheckPasswordByName(team_name string, password string) (bool, error) {
+	teamEnt, err := Team.GetByName(team_name)
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(teamEnt.Password), []byte(password))
+	if err != nil {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (*team_s) Delete(team *ent.Team) error {
 	return Client.Team.
 		DeleteOne(team).

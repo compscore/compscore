@@ -15,8 +15,7 @@ type Credential struct {
 func (Credential) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("password").
-			Comment("Password of Check").
-			NotEmpty(),
+			Comment("Password of Check"),
 	}
 }
 
