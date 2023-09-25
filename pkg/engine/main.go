@@ -94,6 +94,20 @@ func runEngine() {
 				return
 			}
 
+			roundCount, err := data.Round.Count()
+			if err != nil {
+				logrus.WithError(err).Error("Failed to get round count")
+				return
+			}
+
+			if roundCount == 0 {
+				_, err = data.Round.Create(1)
+				if err != nil {
+					logrus.WithError(err).Error("Failed to create first round")
+					return
+				}
+			}
+
 			entRound, err := data.Round.GetLastRound()
 			if err != nil {
 				logrus.WithError(err).Error("Failed to get last round")
@@ -188,7 +202,7 @@ func runRound(roundMutex *sync.Mutex) error {
 func runScoreCheck(round int, check structs.Check_s, team int8, resultsChan chan checkResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	runFunc, ok := imports.Imports[check.Release.Org+"-"+check.Release.Repo]
+	runFunc, ok := imports.Imports[check.Release.Org+"/"+check.Release.Repo]
 	if !ok {
 		resultsChan <- checkResult{
 			Success: false,
