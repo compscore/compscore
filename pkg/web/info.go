@@ -9,6 +9,7 @@ import (
 
 func info(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
