@@ -18,11 +18,7 @@ func Start() {
 	// gin.SetMode(gin.ReleaseMode)
 
 	Router = gin.Default()
-
 	Router.SetTrustedProxies(nil)
-	Router.Use(auth.JWTMiddleware)
-
-	API = Router.Group(config.Web.APIPath)
 
 	cors_urls := []string{
 		fmt.Sprintf("http://%s:%d", config.Web.Hostname, config.Web.Port),
@@ -33,10 +29,14 @@ func Start() {
 
 	Router.Use(cors.New(cors.Config{
 		AllowOrigins:     cors_urls,
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowMethods:     []string{"GET", "PUT", "PATCH"},
 		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"},
 		AllowCredentials: true,
 	}))
+
+	Router.Use(auth.JWTMiddleware)
+
+	API = Router.Group(config.Web.APIPath)
 
 	LoadRoutes()
 

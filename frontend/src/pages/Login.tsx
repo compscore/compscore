@@ -3,22 +3,28 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
 
 export default function Login() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/login",
-        data
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    const data = JSON.stringify({
+      username: event.currentTarget.username.value,
+      password: event.currentTarget.password.value,
+    });
+
+    console.log(data);
+
+    let response = await fetch("http://localhost:8080/api/login", {
+      method: "POST",
+      body: data,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err));
   };
 
   return (
