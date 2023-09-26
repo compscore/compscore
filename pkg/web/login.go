@@ -49,7 +49,16 @@ func login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("auth", token, expiration, "/", config.Web.Hostname, false, true)
-	ctx.Status(http.StatusOK)
-	// ctx.Redirect(302, "/")
+	ctx.JSON(
+		http.StatusOK,
+		gin.H{
+			"name":       "auth",
+			"token":      token,
+			"expiration": expiration,
+			"path":       "/",
+			"domain":     config.Web.Hostname,
+			"secure":     false,
+			"httponly":   true,
+		},
+	)
 }
