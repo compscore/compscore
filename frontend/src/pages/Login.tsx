@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { enqueueSnackbar } from "notistack";
 
 export default function Login() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -13,8 +14,6 @@ export default function Login() {
       password: event.currentTarget.password.value,
     });
 
-    console.log(data);
-
     let response = await fetch("http://localhost:8080/api/login", {
       method: "POST",
       body: data,
@@ -22,9 +21,18 @@ export default function Login() {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        if (res.status == 200) {
+          enqueueSnackbar("Logged in", { variant: "success" });
+        } else {
+          enqueueSnackbar("Invalid username or password", { variant: "error" });
+        }
+        return res.json();
+      })
+      .catch((err) => {
+        enqueueSnackbar("Encountered an error", { variant: "error" });
+        console.log(err);
+      });
   };
 
   return (
