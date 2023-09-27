@@ -452,7 +452,6 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 		return nil, err
 	}
 
-	// second to last round
 	scoreboard.Round = entRound.Number
 
 	for _, configCheck := range config.Checks {
