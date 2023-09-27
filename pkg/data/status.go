@@ -3,6 +3,7 @@ package data
 import (
 	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/check"
@@ -447,18 +448,19 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 			ent.Desc(round.FieldNumber),
 		).
 		Offset(1).
-		Only(Ctx)
+		All(Ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	scoreboard.Round = entRound.Number
+	scoreboard.Round = entRound[0].Number
 
 	for _, configCheck := range config.Checks {
 		scoreboardCheck := structs.Check{}
 		scoreboardCheck.Name = configCheck.Name
 
 		entStatus, err := Client.Status.Query().
+			WithRound().
 			Where(
 				status.HasRoundWith(
 					round.NumberEQ(scoreboard.Round),
@@ -468,8 +470,10 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 				),
 			).
 			Order(
-
-				ent.Asc(team.FieldNumber),
+				status.ByRoundField(
+					round.FieldNumber,
+					sql.OrderAsc(),
+				),
 			).
 			All(Ctx)
 		if err != nil {
