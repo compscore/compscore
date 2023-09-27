@@ -3,11 +3,13 @@ package data
 import (
 	"time"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/structs"
 )
 
 type status_s struct{}
@@ -435,4 +437,59 @@ func (*status_s) Delete(entStatus *ent.Status) error {
 	return Client.Status.
 		DeleteOne(entStatus).
 		Exec(Ctx)
+}
+
+func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
+	scoreboard := structs.Scoreboard{}
+
+	entRound, err := Client.Round.Query().
+		Order(
+			ent.Desc(round.FieldNumber),
+		).
+		Limit(2).
+		All(Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// second to last round
+	scoreboard.Round = entRound[len(entRound)-1].Number
+
+	for _, configCheck := range config.Checks {
+		scoreboardCheck := structs.Check{}
+		scoreboardCheck.Name = configCheck.Name
+
+		entStatus, err := Client.Status.Query().
+			Where(
+				status.HasRoundWith(
+					round.NumberEQ(scoreboard.Round),
+				),
+				status.HasCheckWith(
+					check.NameEQ(configCheck.Name),
+				),
+			).
+			Order(
+				ent.Asc(team.FieldNumber),
+			).
+			All(Ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		statuses := make([]int, config.Teams.Amount)
+		for i, entStat := range entStatus {
+			switch entStat.Status {
+			case status.StatusDown:
+				statuses[i] = 0
+			case status.StatusUp:
+				statuses[i] = 1
+			case status.StatusUnknown:
+				statuses[i] = 2
+			}
+		}
+
+		scoreboard.Checks = append(scoreboard.Checks, scoreboardCheck)
+	}
+
+	return &scoreboard, nil
 }
