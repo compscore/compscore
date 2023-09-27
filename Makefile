@@ -14,3 +14,6 @@ build:
 
 install: build
 	sudo cp $(OUT_FILE) $(GOPATH)/bin/$(BINARY_NAME)
+
+cloc:
+	cloc --exclude-dir=assets,node_modules --exclude-ext=json .
