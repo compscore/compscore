@@ -4,8 +4,18 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { enqueueSnackbar } from "notistack";
+import { LoginSuccess, LoginFailure } from "../models/Login";
+import { CookieSetOptions } from "universal-cookie";
 
-export default function Login() {
+type Props = {
+  setCookie: (
+    name: "auth",
+    value: any,
+    options?: CookieSetOptions | undefined
+  ) => void;
+};
+
+export default function Login({ setCookie }: Props) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -14,23 +24,38 @@ export default function Login() {
       password: event.currentTarget.password.value,
     });
 
-    let response = await fetch("http://localhost:8080/api/login", {
+    fetch("http://localhost:8080/api/login", {
       method: "POST",
       body: data,
       headers: {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => {
-        if (res.status == 200) {
+      .then(async (res) => {
+        let response = await res.json();
+        if (res.status === 200) {
           enqueueSnackbar("Logged in", { variant: "success" });
+
+          response = response as LoginSuccess;
+
+          setCookie("auth", response.token, {
+            path: response.path,
+            domain: response.domain,
+            secure: response.secure,
+            httpOnly: response.httpOnly,
+            expires: response.expires,
+          });
+
+          window.location.href = "/";
         } else {
-          enqueueSnackbar("Invalid username or password", { variant: "error" });
+          response = response as LoginFailure;
+
+          enqueueSnackbar(response.error, { variant: "error" });
         }
         return res.json();
       })
       .catch((err) => {
-        enqueueSnackbar("Encountered an error", { variant: "error" });
+        enqueueSnackbar("Encountered an error" + err, { variant: "error" });
         console.log(err);
       });
   };
