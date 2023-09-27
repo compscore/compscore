@@ -446,14 +446,14 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 		Order(
 			ent.Desc(round.FieldNumber),
 		).
-		Limit(2).
-		All(Ctx)
+		Offset(1).
+		Only(Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// second to last round
-	scoreboard.Round = entRound[len(entRound)-1].Number
+	scoreboard.Round = entRound.Number
 
 	for _, configCheck := range config.Checks {
 		scoreboardCheck := structs.Check{}
@@ -469,6 +469,7 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 				),
 			).
 			Order(
+
 				ent.Asc(team.FieldNumber),
 			).
 			All(Ctx)
