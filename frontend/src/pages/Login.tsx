@@ -3,22 +3,61 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import axios from "axios";
+import { enqueueSnackbar } from "notistack";
+import { LoginSuccess, LoginFailure } from "../models/Login";
+import { CookieSetOptions } from "universal-cookie";
 
-export default function Login() {
+type Props = {
+  setCookie: (
+    name: "auth",
+    value: any,
+    options?: CookieSetOptions | undefined
+  ) => void;
+};
+
+export default function Login({ setCookie }: Props) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/login",
-        data
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    const data = JSON.stringify({
+      username: event.currentTarget.username.value,
+      password: event.currentTarget.password.value,
+    });
+
+    fetch("http://localhost:8080/api/login", {
+      method: "POST",
+      body: data,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (res) => {
+        let response = await res.json();
+        if (res.status === 200) {
+          enqueueSnackbar("Logged in", { variant: "success" });
+
+          response = response as LoginSuccess;
+
+          setCookie("auth", response.token, {
+            path: response.path,
+            domain: response.domain,
+            secure: response.secure,
+            httpOnly: response.httpOnly,
+            expires: response.expires,
+          });
+
+          window.location.href = "/";
+        } else {
+          response = response as LoginFailure;
+
+          enqueueSnackbar(response.error, { variant: "error" });
+        }
+        return res.json();
+      })
+      .catch((err) => {
+        enqueueSnackbar("Encountered an error" + err, { variant: "error" });
+        console.log(err);
+      });
   };
 
   return (

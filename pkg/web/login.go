@@ -1,6 +1,8 @@
 package web
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/compscore/compscore/pkg/auth"
@@ -9,24 +11,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type login_s struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func login(ctx *gin.Context) {
-	username := ctx.PostForm("username")
-	if username == "" {
+	var body login_s
+
+	body_bytes, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	json.Unmarshal(body_bytes, &body)
+
+	if body.Username == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "No username provided",
 		})
 		return
 	}
 
-	password := ctx.PostForm("password")
-	if password == "" {
+	if body.Password == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "No password provided",
 		})
 		return
 	}
 
-	success, err := data.Team.CheckPasswordByName(username, password)
+	success, err := data.Team.CheckPasswordByName(body.Username, body.Password)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -41,7 +58,7 @@ func login(ctx *gin.Context) {
 		return
 	}
 
-	token, expiration, err := auth.GenerateJWT(username)
+	token, expiration, err := auth.GenerateJWT(body.Username)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),

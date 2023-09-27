@@ -8,19 +8,22 @@ import { Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Login from './pages/Login';
 import NavBar from './components/NavBar';
+import { useCookies } from "react-cookie";
 
 
 export default function App() {
+  const [cookies, setCookie] = useCookies(["auth"]);
+
   return (
     <ThemeProvider theme={useSystemTheme()}>
       <CssBaseline />
-      <NavBar/>
+      <NavBar cookies={cookies} setCookie={setCookie}/>
       <Container component='main' maxWidth='xs'>
         <BrowserRouter>
           <SnackbarProvider maxSnack={3}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/login" element={<Login setCookie={setCookie}/>} />
             </Routes>
           </SnackbarProvider>
         </BrowserRouter>
