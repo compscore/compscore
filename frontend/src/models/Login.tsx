@@ -1,4 +1,4 @@
-export class LoginSuccess {
+export type LoginSuccess = {
   name: string;
   token: string;
   expires: Date;
@@ -6,29 +6,8 @@ export class LoginSuccess {
   domain: string;
   secure: boolean;
   httpOnly: boolean;
+};
 
-  constructor(
-    name: string,
-    token: string,
-    expires: number,
-    path: string,
-    domain: string,
-    secure: boolean,
-    httpOnly: boolean
-  ) {
-    this.name = name;
-    this.token = token;
-    this.expires = new Date(expires);
-    this.path = path;
-    this.domain = domain;
-    this.secure = secure;
-    this.httpOnly = httpOnly;
-  }
-}
-
-export class LoginFailure {
+export type LoginFailure = {
   error: string;
-  constructor(error: string) {
-    this.error = error;
-  }
-}
+};
