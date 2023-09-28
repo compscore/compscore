@@ -1,9 +1,9 @@
-export type Status = {
+export type Check = {
   name: string;
-  checks: [number];
+  teams: [number];
 };
 
 export type Scoreboard = {
   round: number;
-  checks: [Status];
+  checks: [Check];
 };

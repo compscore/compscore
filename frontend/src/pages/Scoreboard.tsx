@@ -1,7 +1,7 @@
-import { Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Scoreboard } from "../models/Scoreboard";
 import { enqueueSnackbar } from "notistack";
+import { Box, Typography } from "@mui/material";
 
 export default function ScoreBoard() {
   const [data, setData] = useState<Scoreboard>();
@@ -39,8 +39,39 @@ export default function ScoreBoard() {
         alignItems: "center",
       }}
     >
-      <h1>Scoreboard</h1>
-      <h2>Round {data?.round}</h2>
+      <Typography
+        component='h1'
+        variant='h3'
+        fontWeight={700}
+        sx={{
+          marginTop: 5,
+        }}
+      >
+        Scoreboard
+      </Typography>
+      <Typography component='h1' variant='h5'>
+        Round {data?.round}
+      </Typography>
+      {data?.checks.map((check) => (
+        <>
+          <Typography component='h1' variant='h5'>
+            {check.name}
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {check.teams.map((team) => (
+              <Typography component='h1' variant='h5'>
+                {team}
+              </Typography>
+            ))}
+          </Box>
+        </>
+      ))}
     </Box>
   );
 }
