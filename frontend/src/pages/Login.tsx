@@ -52,7 +52,6 @@ export default function Login({ setCookie }: Props) {
 
           enqueueSnackbar(response.error, { variant: "error" });
         }
-        return res.json();
       })
       .catch((err) => {
         enqueueSnackbar("Encountered an error" + err, { variant: "error" });
