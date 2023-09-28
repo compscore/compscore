@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -481,8 +480,6 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 			return nil, err
 		}
 
-		fmt.Println(entStatus)
-
 		statuses := make([]int, config.Teams.Amount)
 		for i, entStat := range entStatus {
 			switch entStat.Status {
@@ -494,7 +491,7 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 				statuses[i] = 2
 			}
 		}
-		scoreboardCheck.Teams = statuses
+		scoreboardCheck.Statuses = statuses
 		scoreboard.Checks = append(scoreboard.Checks, scoreboardCheck)
 	}
 
