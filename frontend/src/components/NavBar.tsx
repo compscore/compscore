@@ -18,7 +18,7 @@ type Props = {
   ) => void;
 };
 
-export default function ButtonAppBar({ cookies, setCookie }: Props) {
+export default function NavBar({ cookies, setCookie }: Props) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static'>
