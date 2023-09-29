@@ -25,6 +25,8 @@ func Start() {
 		fmt.Sprintf("https://%s:%d", config.Web.Hostname, config.Web.Port),
 		fmt.Sprintf("http://%s:3000", config.Web.Hostname),
 		fmt.Sprintf("https://%s:3000", config.Web.Hostname),
+		fmt.Sprintf("http://%s:5173", config.Web.Hostname),
+		fmt.Sprintf("https://%s:5173", config.Web.Hostname),
 	}
 
 	Router.Use(cors.New(cors.Config{
