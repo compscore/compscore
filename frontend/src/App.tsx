@@ -20,7 +20,7 @@ export default function App() {
     <ThemeProvider theme={useSystemTheme()}>
       <CssBaseline />
       <NavBar cookies={cookies} setCookie={setCookie} />
-      <Container component='main' maxWidth='xs'>
+      <Container component='main'>
         <BrowserRouter>
           <SnackbarProvider maxSnack={3}>
             <Routes>
