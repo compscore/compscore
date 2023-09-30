@@ -103,19 +103,23 @@ export default function ScoreBoard() {
               <TableCell size='small'>
                 <Typography variant='subtitle2'>Team</Typography>
               </TableCell>
-              {data?.checks[0].teams.map((_, index) => (
+              {data?.checks[0].teams.map((_, team) => (
                 <TableCell
-                  key={index + 1}
+                  key={team + 1}
                   align='center'
                   size='small'
                   onMouseEnter={() => {
-                    setHighlightedTeam(index + 1);
+                    setHighlightedTeam(team + 1);
                   }}
                   onMouseLeave={() => {
                     setHighlightedTeam(null);
                   }}
+                  sx={{
+                    backgroundColor:
+                      highlightedTeam === team + 1 ? "#343434" : "transparent",
+                  }}
                 >
-                  <Typography variant='subtitle2'>{index + 1}</Typography>
+                  <Typography variant='subtitle2'>{team + 1}</Typography>
                 </TableCell>
               ))}
             </TableRow>
@@ -131,6 +135,12 @@ export default function ScoreBoard() {
                   }}
                   onMouseLeave={() => {
                     setHighlightedCheck(null);
+                  }}
+                  sx={{
+                    backgroundColor:
+                      highlightedCheck === check.name
+                        ? "#343434"
+                        : "transparent",
                   }}
                 >
                   {check.name}
@@ -164,6 +174,7 @@ export default function ScoreBoard() {
               </TableCell>
               {data?.scores.map((score, team) => (
                 <TableCell
+                  key={"score" + team + 1}
                   size='small'
                   align='center'
                   onMouseEnter={() => {
@@ -171,6 +182,10 @@ export default function ScoreBoard() {
                   }}
                   onMouseLeave={() => {
                     setHighlightedTeam(null);
+                  }}
+                  sx={{
+                    backgroundColor:
+                      highlightedTeam === team + 1 ? "#343434" : "transparent",
                   }}
                 >
                   <Typography variant='subtitle2'>{score}</Typography>
