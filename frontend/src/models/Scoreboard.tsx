@@ -1,9 +1,10 @@
-export type Check = {
-  name: string;
-  teams: [number];
-};
-
 export type Scoreboard = {
   round: number;
-  checks: [Check];
+  scores: [number];
+  checks: [
+    {
+      name: string;
+      teams: [number];
+    }
+  ];
 };
