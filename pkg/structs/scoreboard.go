@@ -7,5 +7,6 @@ type Check struct {
 
 type Scoreboard struct {
 	Round  int     `json:"round"`
+	Scores []int   `json:"scores"`
 	Checks []Check `json:"checks"`
 }
