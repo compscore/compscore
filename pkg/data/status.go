@@ -442,6 +442,7 @@ func (*status_s) Delete(entStatus *ent.Status) error {
 
 func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 	scoreboard := structs.Scoreboard{}
+	scoreboard.Scores = make([]int, config.Teams.Amount)
 
 	entRound, err := Client.Round.Query().
 		Order(
@@ -493,6 +494,14 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 		}
 		scoreboardCheck.Statuses = statuses
 		scoreboard.Checks = append(scoreboard.Checks, scoreboardCheck)
+	}
+
+	for i := 0; i < config.Teams.Amount; i++ {
+		score, err := Team.GetScore(int8(i + 1))
+		if err != nil {
+			return nil, err
+		}
+		scoreboard.Scores[i] = score
 	}
 
 	return &scoreboard, nil
