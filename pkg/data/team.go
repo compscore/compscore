@@ -3,7 +3,10 @@ package data
 import (
 	"fmt"
 
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/team"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -220,4 +223,28 @@ func (*team_s) Delete(team *ent.Team) error {
 	return Client.Team.
 		DeleteOne(team).
 		Exec(Ctx)
+}
+
+func (*team_s) GetScore(team_number int8) (score int, err error) {
+	for _, configCheck := range config.Checks {
+		count, err := Client.Status.
+			Query().
+			Where(
+				status.HasCheckWith(
+					check.NameEQ(configCheck.Name),
+				),
+				status.HasTeamWith(
+					team.NumberEQ(team_number),
+				),
+				status.StatusEQ(status.StatusUp),
+			).
+			Count(Ctx)
+		if err != nil {
+			return 0, err
+		}
+
+		score += count * configCheck.Weight
+	}
+
+	return score, nil
 }
