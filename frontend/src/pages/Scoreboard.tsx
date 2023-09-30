@@ -158,6 +158,25 @@ export default function ScoreBoard() {
                 ))}
               </TableRow>
             ))}
+            <TableRow>
+              <TableCell size='small'>
+                <Typography variant='subtitle2'>Score</Typography>
+              </TableCell>
+              {data?.scores.map((score, team) => (
+                <TableCell
+                  size='small'
+                  align='center'
+                  onMouseEnter={() => {
+                    setHighlightedTeam(team + 1);
+                  }}
+                  onMouseLeave={() => {
+                    setHighlightedTeam(null);
+                  }}
+                >
+                  <Typography variant='subtitle2'>{score}</Typography>
+                </TableCell>
+              ))}
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
