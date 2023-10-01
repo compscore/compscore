@@ -506,3 +506,47 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 
 	return &scoreboard, nil
 }
+
+func (*status_s) TeamScoreboard(team_number int8, rounds int) (*structs.TeamScoreboard, error) {
+	teamScoreboard := structs.TeamScoreboard{}
+	teamScoreboard.Checks = make([]structs.TeamCheck, len(config.Checks))
+
+	for i, configCheck := range config.Checks {
+		teamScoreboard.Checks[i].Name = configCheck.Name
+		teamScoreboard.Checks[i].Status = make([]int, rounds)
+
+		entStatuses, err := Client.Status.Query().
+			Where(
+				status.HasCheckWith(
+					check.NameEQ(configCheck.Name),
+				),
+				status.HasTeamWith(
+					team.NumberEQ(team_number),
+				),
+			).
+			Order(
+				status.ByRoundField(
+					round.FieldNumber,
+					sql.OrderDesc(),
+				),
+			).
+			Limit(rounds).
+			All(Ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for j, entStatus := range entStatuses {
+			switch entStatus.Status {
+			case status.StatusDown:
+				teamScoreboard.Checks[i].Status[j] = 0
+			case status.StatusUp:
+				teamScoreboard.Checks[i].Status[j] = 1
+			case status.StatusUnknown:
+				teamScoreboard.Checks[i].Status[j] = 2
+			}
+		}
+	}
+
+	return &teamScoreboard, nil
+}
