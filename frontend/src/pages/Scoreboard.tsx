@@ -27,7 +27,6 @@ export default function ScoreBoard() {
         .then(async (res) => {
           let response = (await res.json()) as Scoreboard;
           if (res.status === 200) {
-            console.log(response);
             setData(response);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
@@ -41,7 +40,7 @@ export default function ScoreBoard() {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 5000);
+    const pollingInterval = setInterval(fetchData, 1000);
 
     return () => clearInterval(pollingInterval);
   }, []);
@@ -117,6 +116,9 @@ export default function ScoreBoard() {
                   sx={{
                     backgroundColor:
                       highlightedTeam === team + 1 ? "#343434" : "transparent",
+                  }}
+                  onClick={() => {
+                    window.location.href = "/scoreboard/team/" + (team + 1);
                   }}
                 >
                   <Typography variant='subtitle2'>{team + 1}</Typography>

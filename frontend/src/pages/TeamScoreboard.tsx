@@ -29,7 +29,6 @@ export default function TeamScoreBoard() {
         .then(async (res) => {
           let response = (await res.json()) as TeamScoreboard;
           if (res.status === 200) {
-            console.log(response);
             setData(response);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
