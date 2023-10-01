@@ -511,6 +511,13 @@ func (*status_s) TeamScoreboard(team_number int8, rounds int) (*structs.TeamScor
 	teamScoreboard := structs.TeamScoreboard{}
 	teamScoreboard.Checks = make([]structs.TeamCheck, len(config.Checks))
 
+	entRound, err := Round.GetLastRound()
+	if err != nil {
+		return nil, err
+	}
+
+	teamScoreboard.Round = entRound.Number
+
 	for i, configCheck := range config.Checks {
 		teamScoreboard.Checks[i].Name = configCheck.Name
 		teamScoreboard.Checks[i].Status = make([]int, rounds)

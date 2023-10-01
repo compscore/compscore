@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { Scoreboard } from "../models/Scoreboard";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import { TeamScoreboard } from "../models/TeamScoreboard";
 import {
   Box,
   Typography,
@@ -13,19 +14,20 @@ import {
   TableBody,
 } from "@mui/material";
 
-export default function ScoreBoard() {
-  const [data, setData] = useState<Scoreboard>();
+export default function TeamScoreBoard() {
+  const { team: team } = useParams() as { team: number };
+  const [data, setData] = useState<TeamScoreboard>();
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch("http://localhost:8080/api/scoreboard", {
+      fetch(`http://localhost:8080/api/scoreboard/team/${team}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as Scoreboard;
+          let response = (await res.json()) as TeamScoreboard;
           if (res.status === 200) {
             setData(response);
           } else {
@@ -40,16 +42,17 @@ export default function ScoreBoard() {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 1000);
+    const pollingInterval = setInterval(fetchData, 5000);
 
+    console.log(data);
     return () => clearInterval(pollingInterval);
   }, []);
 
-  const [highlightedTeam, setHighlightedTeam] = useState<number | null>(null);
+  const [highlightedRound, setHighlightedRound] = useState<number | null>(null);
   const [highlightedCheck, setHighlightedCheck] = useState<string | null>(null);
 
-  const getBackgroundColor = (status: number, team: number, check: string) => {
-    if (highlightedCheck === null && highlightedTeam === null) {
+  const getBackgroundColor = (status: number, round: number, check: string) => {
+    if (highlightedCheck === null && highlightedRound === null) {
       if (status === 0) {
         return "#f44336";
       } else if (status === 1) {
@@ -57,7 +60,7 @@ export default function ScoreBoard() {
       }
       return "#999891";
     }
-    if (highlightedCheck === check || highlightedTeam === team) {
+    if (highlightedCheck === check || highlightedRound === round) {
       if (status === 0) {
         return "#f44336";
       } else if (status === 1) {
@@ -89,115 +92,83 @@ export default function ScoreBoard() {
           marginTop: 5,
         }}
       >
-        Scoreboard
+        Team {team}
       </Typography>
       <Typography component='h1' variant='h5'>
         Round {data?.round}
       </Typography>
       <Box m={2}></Box>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ width: "80%" }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell size='small'>
-                <Typography variant='subtitle2'>Team</Typography>
-              </TableCell>
-              {data?.checks[0].teams.map((_, team) => (
+              <TableCell size='small'>Round</TableCell>
+              {data?.checks[0].status.map((_, index) => (
                 <TableCell
-                  key={team + 1}
-                  align='center'
                   size='small'
-                  onMouseEnter={() => {
-                    setHighlightedTeam(team + 1);
-                  }}
-                  onMouseLeave={() => {
-                    setHighlightedTeam(null);
-                  }}
+                  key={"round-" + (data?.round - index)}
                   sx={{
                     backgroundColor:
-                      highlightedTeam === team + 1 ? "#343434" : "transparent",
+                      highlightedRound === index ? "#343434" : "transparent",
                   }}
-                  onClick={() => {
-                    window.location.href = "/scoreboard/team/" + (team + 1);
+                  onMouseEnter={() => {
+                    setHighlightedRound(index);
+                  }}
+                  onMouseLeave={() => {
+                    setHighlightedRound(null);
                   }}
                 >
-                  <Typography variant='subtitle2'>{team + 1}</Typography>
+                  {data?.round - index}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.checks.map((check) => (
-              <TableRow>
+            {data?.checks.map((check, index) => (
+              <TableRow key={index}>
                 <TableCell
-                  key={check.name}
                   size='small'
-                  onMouseEnter={() => {
-                    setHighlightedCheck(check.name);
-                  }}
-                  onMouseLeave={() => {
-                    setHighlightedCheck(null);
-                  }}
                   sx={{
                     backgroundColor:
                       highlightedCheck === check.name
                         ? "#343434"
                         : "transparent",
                   }}
+                  onMouseEnter={() => {
+                    setHighlightedCheck(check.name);
+                  }}
+                  onMouseLeave={() => {
+                    setHighlightedCheck(null);
+                  }}
                 >
                   {check.name}
                 </TableCell>
-                {check.teams.map((status, team) => (
+                {check.status.map((status, index) => (
                   <TableCell
-                    key={team + "-" + check.name}
+                    key={index}
                     size='small'
                     sx={{
                       backgroundColor: getBackgroundColor(
                         status,
-                        team + 1,
+                        index,
                         check.name
                       ),
                     }}
                     onMouseEnter={() => {
-                      setHighlightedTeam(team + 1);
+                      setHighlightedRound(index);
                       setHighlightedCheck(check.name);
                     }}
                     onMouseLeave={() => {
-                      setHighlightedTeam(null);
+                      setHighlightedRound(null);
                       setHighlightedCheck(null);
                     }}
                   ></TableCell>
                 ))}
               </TableRow>
             ))}
-            <TableRow>
-              <TableCell size='small'>
-                <Typography variant='subtitle2'>Score</Typography>
-              </TableCell>
-              {data?.scores.map((score, team) => (
-                <TableCell
-                  key={"score" + team + 1}
-                  size='small'
-                  align='center'
-                  onMouseEnter={() => {
-                    setHighlightedTeam(team + 1);
-                  }}
-                  onMouseLeave={() => {
-                    setHighlightedTeam(null);
-                  }}
-                  sx={{
-                    backgroundColor:
-                      highlightedTeam === team + 1 ? "#343434" : "transparent",
-                  }}
-                >
-                  <Typography variant='subtitle2'>{score}</Typography>
-                </TableCell>
-              ))}
-            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
-      <Box m={2}></Box>
     </Box>
   );
 }
