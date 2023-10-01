@@ -1,17 +1,15 @@
 import { ThemeProvider } from "@mui/material/styles";
-import Container from "@mui/material/Container";
-import CssBaseline from "@mui/material/CssBaseline";
-import { useSystemTheme } from "./themes/Preference";
-import { BrowserRouter, Routes } from "react-router-dom";
+import { Container, CssBaseline } from "@mui/material";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
-import { Route } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
+import { useSystemTheme } from "./themes/Preference";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NavBar from "./components/NavBar";
 import Scoreboard from "./pages/Scoreboard";
-
-import { useCookies } from "react-cookie";
+import TeamScoreboard from "./pages/TeamScoreboard";
 
 export default function App() {
   const [cookies, setCookie] = useCookies(["auth"]);
@@ -27,6 +25,10 @@ export default function App() {
               <Route path='/' element={<Index />} />
               <Route path='/login' element={<Login setCookie={setCookie} />} />
               <Route path='/scoreboard' element={<Scoreboard />} />
+              <Route
+                path='/scoreboard/team/:team'
+                element={<TeamScoreboard />}
+              />
             </Routes>
           </SnackbarProvider>
         </BrowserRouter>
