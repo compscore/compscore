@@ -91,6 +91,9 @@ export default function CheckScoreBoard() {
         sx={{
           marginTop: 5,
         }}
+        onClick={() => {
+          window.location.href = "/scoreboard";
+        }}
       >
         {check}
       </Typography>
