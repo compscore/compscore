@@ -51,4 +51,5 @@ func LoadRoutes() {
 	API.GET("/scoreboard", scoreboard)
 	API.GET("/scoreboard/team/:team", teamScoreboard)
 	API.GET("/scoreboard/check/:check", checkScoreboard)
+	API.GET("/scoreboard/round/:round", roundScoreboard)
 }

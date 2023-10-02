@@ -443,9 +443,6 @@ func (*status_s) Delete(entStatus *ent.Status) error {
 }
 
 func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
-	scoreboard := structs.Scoreboard{}
-	scoreboard.Scores = make([]int, config.Teams.Amount)
-
 	entRound, err := Client.Round.Query().
 		Order(
 			ent.Desc(round.FieldNumber),
@@ -456,8 +453,14 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 		return nil, err
 	}
 
-	scoreboard.Round = entRound[0].Number
+	return Status.RoundScoreboard(entRound[0].Number)
+}
 
+func (*status_s) RoundScoreboard(round_number int) (*structs.Scoreboard, error) {
+	scoreboard := structs.Scoreboard{}
+	scoreboard.Scores = make([]int, config.Teams.Amount)
+
+	scoreboard.Round = round_number
 	for _, configCheck := range config.Checks {
 		scoreboardCheck := structs.Check{}
 		scoreboardCheck.Name = configCheck.Name
@@ -499,7 +502,7 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 	}
 
 	for i := 0; i < config.Teams.Amount; i++ {
-		score, err := Team.GetScore(int8(i + 1))
+		score, err := Team.GetScoreBeforeRound(int8(i+1), round_number)
 		if err != nil {
 			return nil, err
 		}
