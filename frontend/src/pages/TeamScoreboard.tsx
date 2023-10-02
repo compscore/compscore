@@ -91,6 +91,9 @@ export default function TeamScoreBoard() {
         sx={{
           marginTop: 5,
         }}
+        onClick={() => {
+          window.location.href = "/scoreboard";
+        }}
       >
         Team {team}
       </Typography>
