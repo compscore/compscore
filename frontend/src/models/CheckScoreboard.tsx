@@ -1,4 +1,4 @@
-export type TeamScoreboard = {
+export type CheckScoreboard = {
   round: number;
   teams: [
     {
