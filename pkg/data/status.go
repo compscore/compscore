@@ -453,10 +453,10 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 		return nil, err
 	}
 
-	return Status.ScoreboardRound(entRound[0].Number)
+	return Status.RoundScoreboard(entRound[0].Number)
 }
 
-func (*status_s) ScoreboardRound(round_number int) (*structs.Scoreboard, error) {
+func (*status_s) RoundScoreboard(round_number int) (*structs.Scoreboard, error) {
 	scoreboard := structs.Scoreboard{}
 	scoreboard.Scores = make([]int, config.Teams.Amount)
 
