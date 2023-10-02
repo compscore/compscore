@@ -117,6 +117,10 @@ export default function CheckScoreBoard() {
                   onMouseLeave={() => {
                     setHighlightedRound(null);
                   }}
+                  onClick={() => {
+                    window.location.href =
+                      "/scoreboard/round/" + (data?.round - index);
+                  }}
                 >
                   {data?.round - index}
                 </TableCell>
