@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { TeamScoreboard } from "../models/TeamScoreboard";
+import { CheckScoreboard } from "../models/CheckScoreboard";
 import {
   Box,
   Typography,
@@ -14,20 +14,20 @@ import {
   TableBody,
 } from "@mui/material";
 
-export default function TeamScoreBoard() {
-  const { team: team } = useParams() as { team: number };
-  const [data, setData] = useState<TeamScoreboard>();
+export default function CheckScoreBoard() {
+  const { check: check } = useParams() as { check: string };
+  const [data, setData] = useState<CheckScoreboard>();
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/team/${team}`, {
+      fetch(`http://localhost:8080/api/scoreboard/check/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as TeamScoreboard;
+          let response = (await res.json()) as CheckScoreboard;
           if (res.status === 200) {
             setData(response);
           } else {
@@ -49,10 +49,10 @@ export default function TeamScoreBoard() {
   }, []);
 
   const [highlightedRound, setHighlightedRound] = useState<number | null>(null);
-  const [highlightedCheck, setHighlightedCheck] = useState<string | null>(null);
+  const [highlightedTeam, setHighlightedTeam] = useState<string | null>(null);
 
   const getBackgroundColor = (status: number, round: number, check: string) => {
-    if (highlightedCheck === null && highlightedRound === null) {
+    if (highlightedTeam === null && highlightedRound === null) {
       if (status === 0) {
         return "#f44336";
       } else if (status === 1) {
@@ -60,7 +60,7 @@ export default function TeamScoreBoard() {
       }
       return "#999891";
     }
-    if (highlightedCheck === check || highlightedRound === round) {
+    if (highlightedTeam === check || highlightedRound === round) {
       if (status === 0) {
         return "#f44336";
       } else if (status === 1) {
@@ -92,7 +92,7 @@ export default function TeamScoreBoard() {
           marginTop: 5,
         }}
       >
-        Team {team}
+        {check}
       </Typography>
       <Typography component='h1' variant='h5'>
         Round {data?.round}
@@ -103,7 +103,7 @@ export default function TeamScoreBoard() {
           <TableHead>
             <TableRow>
               <TableCell size='small'>Round</TableCell>
-              {data?.checks[0].status.map((_, index) => (
+              {data?.teams[0].status.map((_, index) => (
                 <TableCell
                   size='small'
                   key={"round-" + (data?.round - index)}
@@ -124,29 +124,27 @@ export default function TeamScoreBoard() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.checks.map((check, index) => (
+            {data?.teams.map((team, index) => (
               <TableRow key={index}>
                 <TableCell
                   size='small'
                   sx={{
                     backgroundColor:
-                      highlightedCheck === check.name
-                        ? "#343434"
-                        : "transparent",
+                      highlightedTeam === team.name ? "#343434" : "transparent",
                   }}
                   onMouseEnter={() => {
-                    setHighlightedCheck(check.name);
+                    setHighlightedTeam(team.name);
                   }}
                   onMouseLeave={() => {
-                    setHighlightedCheck(null);
+                    setHighlightedTeam(null);
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/check/" + check.name;
+                    window.location.href = "/scoreboard/team/" + (index + 1);
                   }}
                 >
-                  {check.name}
+                  {team.name}
                 </TableCell>
-                {check.status.map((status, index) => (
+                {team.status.map((status, index) => (
                   <TableCell
                     key={index}
                     size='small'
@@ -154,16 +152,16 @@ export default function TeamScoreBoard() {
                       backgroundColor: getBackgroundColor(
                         status,
                         index,
-                        check.name
+                        team.name
                       ),
                     }}
                     onMouseEnter={() => {
                       setHighlightedRound(index);
-                      setHighlightedCheck(check.name);
+                      setHighlightedTeam(team.name);
                     }}
                     onMouseLeave={() => {
                       setHighlightedRound(null);
-                      setHighlightedCheck(null);
+                      setHighlightedTeam(null);
                     }}
                   ></TableCell>
                 ))}

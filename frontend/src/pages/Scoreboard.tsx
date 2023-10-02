@@ -144,6 +144,9 @@ export default function ScoreBoard() {
                         ? "#343434"
                         : "transparent",
                   }}
+                  onClick={() => {
+                    window.location.href = "/scoreboard/check/" + check.name;
+                  }}
                 >
                   {check.name}
                 </TableCell>
