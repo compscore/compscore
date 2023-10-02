@@ -102,7 +102,7 @@ export default function ScoreBoard() {
               <TableCell size='small'>
                 <Typography variant='subtitle2'>Team</Typography>
               </TableCell>
-              {data?.checks[0].teams.map((_, team) => (
+              {data?.checks[0].status.map((_, team) => (
                 <TableCell
                   key={team + 1}
                   align='center'
@@ -147,7 +147,7 @@ export default function ScoreBoard() {
                 >
                   {check.name}
                 </TableCell>
-                {check.teams.map((status, team) => (
+                {check.status.map((status, team) => (
                   <TableCell
                     key={team + "-" + check.name}
                     size='small'

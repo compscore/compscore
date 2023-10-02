@@ -4,7 +4,7 @@ export type Scoreboard = {
   checks: [
     {
       name: string;
-      teams: [number];
+      status: [number];
     }
   ];
 };

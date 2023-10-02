@@ -492,7 +492,7 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 				statuses[i] = 2
 			}
 		}
-		scoreboardCheck.Statuses = statuses
+		scoreboardCheck.Status = statuses
 		scoreboard.Checks = append(scoreboard.Checks, scoreboardCheck)
 	}
 
@@ -509,7 +509,7 @@ func (*status_s) Scoreboard() (*structs.Scoreboard, error) {
 
 func (*status_s) TeamScoreboard(team_number int8, rounds int) (*structs.TeamScoreboard, error) {
 	teamScoreboard := structs.TeamScoreboard{}
-	teamScoreboard.Checks = make([]structs.TeamCheck, len(config.Checks))
+	teamScoreboard.Checks = make([]structs.Check, len(config.Checks))
 
 	entRound, err := Round.GetLastRound()
 	if err != nil {
