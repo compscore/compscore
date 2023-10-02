@@ -138,6 +138,9 @@ export default function CheckScoreBoard() {
                   onMouseLeave={() => {
                     setHighlightedTeam(null);
                   }}
+                  onClick={() => {
+                    window.location.href = "/scoreboard/team/" + (index + 1);
+                  }}
                 >
                   {team.name}
                 </TableCell>
