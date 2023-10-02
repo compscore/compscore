@@ -140,6 +140,9 @@ export default function TeamScoreBoard() {
                   onMouseLeave={() => {
                     setHighlightedCheck(null);
                   }}
+                  onClick={() => {
+                    window.location.href = "/scoreboard/check/" + check.name;
+                  }}
                 >
                   {check.name}
                 </TableCell>
