@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import NavBar from "./components/NavBar";
 import Scoreboard from "./pages/Scoreboard";
 import TeamScoreboard from "./pages/TeamScoreboard";
+import CheckScoreboard from "./pages/CheckScoreboard";
 
 export default function App() {
   const [cookies, setCookie] = useCookies(["auth"]);
@@ -28,6 +29,10 @@ export default function App() {
               <Route
                 path='/scoreboard/team/:team'
                 element={<TeamScoreboard />}
+              />
+              <Route
+                path='/scoreboard/check/:check'
+                element={<CheckScoreboard />}
               />
             </Routes>
           </SnackbarProvider>
