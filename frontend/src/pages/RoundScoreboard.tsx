@@ -42,7 +42,7 @@ export default function RoundScoreBoard() {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 1000);
+    const pollingInterval = setInterval(fetchData, 15000);
 
     return () => clearInterval(pollingInterval);
   }, []);
