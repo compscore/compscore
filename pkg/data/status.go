@@ -502,7 +502,7 @@ func (*status_s) RoundScoreboard(round_number int) (*structs.Scoreboard, error) 
 	}
 
 	for i := 0; i < config.Teams.Amount; i++ {
-		score, err := Team.GetScore(int8(i + 1))
+		score, err := Team.GetScoreBeforeRound(int8(i+1), round_number)
 		if err != nil {
 			return nil, err
 		}
