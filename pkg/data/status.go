@@ -1,6 +1,8 @@
 package data
 
 import (
+	"bytes"
+	"text/template"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -556,4 +558,63 @@ func (*status_s) TeamScoreboard(team_number int8, rounds int) (*structs.TeamScor
 	}
 
 	return &teamScoreboard, nil
+}
+
+func (*status_s) CheckScoreboard(check_name string, rounds int) (*structs.CheckScoreboard, error) {
+	checkScoreboard := structs.CheckScoreboard{}
+	checkScoreboard.Teams = make([]structs.Check, config.Teams.Amount)
+
+	entRound, err := Round.GetLastRound()
+	if err != nil {
+		return nil, err
+	}
+
+	checkScoreboard.Round = entRound.Number
+
+	teamNameTemplate, err := template.New("Name Template").Parse(config.Teams.NameFormat)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < config.Teams.Amount; i++ {
+		output := bytes.NewBuffer([]byte{})
+		teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+
+		checkScoreboard.Teams[i].Name = output.String()
+		checkScoreboard.Teams[i].Status = make([]int, rounds)
+
+		entStatuses, err := Client.Status.Query().
+			Where(
+				status.HasCheckWith(
+					check.NameEQ(check_name),
+				),
+				status.HasTeamWith(
+					team.NumberEQ(int8(i+1)),
+				),
+			).
+			Order(
+				status.ByRoundField(
+					round.FieldNumber,
+					sql.OrderDesc(),
+				),
+			).
+			Limit(rounds).
+			All(Ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for j, entStatus := range entStatuses {
+			switch entStatus.Status {
+			case status.StatusDown:
+				checkScoreboard.Teams[i].Status[j] = 0
+			case status.StatusUp:
+				checkScoreboard.Teams[i].Status[j] = 1
+			case status.StatusUnknown:
+				checkScoreboard.Teams[i].Status[j] = 2
+			}
+		}
+	}
+
+	return &checkScoreboard, nil
 }
