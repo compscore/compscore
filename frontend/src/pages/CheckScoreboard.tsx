@@ -91,6 +91,9 @@ export default function CheckScoreBoard() {
         sx={{
           marginTop: 5,
         }}
+        onClick={() => {
+          window.location.href = "/scoreboard";
+        }}
       >
         {check}
       </Typography>
@@ -116,6 +119,10 @@ export default function CheckScoreBoard() {
                   }}
                   onMouseLeave={() => {
                     setHighlightedRound(null);
+                  }}
+                  onClick={() => {
+                    window.location.href =
+                      "/scoreboard/round/" + (data?.round - index);
                   }}
                 >
                   {data?.round - index}

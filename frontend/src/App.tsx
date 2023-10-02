@@ -11,6 +11,7 @@ import NavBar from "./components/NavBar";
 import Scoreboard from "./pages/Scoreboard";
 import TeamScoreboard from "./pages/TeamScoreboard";
 import CheckScoreboard from "./pages/CheckScoreboard";
+import RoundScoreboard from "./pages/RoundScoreboard";
 
 export default function App() {
   const [cookies, setCookie] = useCookies(["auth"]);
@@ -33,6 +34,10 @@ export default function App() {
               <Route
                 path='/scoreboard/check/:check'
                 element={<CheckScoreboard />}
+              />
+              <Route
+                path='/scoreboard/round/:round'
+                element={<RoundScoreboard />}
               />
             </Routes>
           </SnackbarProvider>
