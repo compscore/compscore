@@ -93,7 +93,13 @@ export default function RoundScoreBoard() {
       >
         Scoreboard
       </Typography>
-      <Typography component='h1' variant='h5'>
+      <Typography
+        component='h1'
+        variant='h5'
+        onClick={() => {
+          window.location.href = "/scoreboard";
+        }}
+      >
         Round {data?.round}
       </Typography>
       <Box m={2}></Box>
