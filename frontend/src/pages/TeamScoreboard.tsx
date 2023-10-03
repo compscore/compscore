@@ -132,13 +132,7 @@ export default function TeamScoreBoard() {
           </TableHead>
           <TableBody>
             {data?.checks.map((check, index) => (
-              <TableRow
-                key={index}
-                onClick={() => {
-                  window.location.href =
-                    "/status/check/" + check.name + "/team/" + team;
-                }}
-              >
+              <TableRow key={index}>
                 <TableCell
                   size='small'
                   sx={{
@@ -177,6 +171,10 @@ export default function TeamScoreBoard() {
                     onMouseLeave={() => {
                       setHighlightedRound(null);
                       setHighlightedCheck(null);
+                    }}
+                    onClick={() => {
+                      window.location.href =
+                        "/status/check/" + check.name + "/team/" + team;
                     }}
                   ></TableCell>
                 ))}
