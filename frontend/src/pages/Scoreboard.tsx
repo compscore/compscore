@@ -169,6 +169,10 @@ export default function ScoreBoard() {
                       setHighlightedTeam(null);
                       setHighlightedCheck(null);
                     }}
+                    onClick={() => {
+                      window.location.href =
+                        "/status/check/" + check.name + "/team/" + (team + 1);
+                    }}
                   ></TableCell>
                 ))}
               </TableRow>
