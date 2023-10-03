@@ -21,7 +21,7 @@ type CheckScoreboard struct {
 	Teams []Check `json:"teams"`
 }
 
-type StatusHistory struct {
+type Status struct {
 	Error  string `json:"error"`
 	Time   string `json:"time"`
 	Status int    `json:"status"`
