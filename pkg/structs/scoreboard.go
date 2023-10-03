@@ -20,3 +20,10 @@ type CheckScoreboard struct {
 	Round int     `json:"round"`
 	Teams []Check `json:"teams"`
 }
+
+type Status struct {
+	Error  string `json:"error"`
+	Time   string `json:"time"`
+	Status int    `json:"status"`
+	Round  int    `json:"round"`
+}

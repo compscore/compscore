@@ -621,3 +621,45 @@ func (*status_s) CheckScoreboard(check_name string, rounds int) (*structs.CheckS
 
 	return &checkScoreboard, nil
 }
+
+func (*status_s) History(check_name string, team_number int8, rounds int) (*[]structs.Status, error) {
+	entStatuses, err := Client.Status.Query().
+		WithRound().
+		Where(
+			status.HasCheckWith(
+				check.NameEQ(check_name),
+			),
+			status.HasTeamWith(
+				team.NumberEQ(team_number),
+			),
+		).
+		Order(
+			status.ByRoundField(
+				round.FieldNumber,
+				sql.OrderDesc(),
+			),
+		).
+		Limit(rounds).
+		All(Ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	statuses := make([]structs.Status, len(entStatuses))
+	for i, entStatus := range entStatuses {
+		statuses[i].Round = entStatus.Edges.Round.Number
+		statuses[i].Error = entStatus.Error
+		statuses[i].Time = entStatus.Time.Format("2006-01-02 15:04:05")
+
+		switch entStatus.Status {
+		case status.StatusDown:
+			statuses[i].Status = 0
+		case status.StatusUp:
+			statuses[i].Status = 1
+		case status.StatusUnknown:
+			statuses[i].Status = 2
+		}
+	}
+
+	return &statuses, nil
+}
