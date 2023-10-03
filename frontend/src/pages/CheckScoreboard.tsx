@@ -151,24 +151,28 @@ export default function CheckScoreBoard() {
                 >
                   {team.name}
                 </TableCell>
-                {team.status.map((status, index) => (
+                {team.status.map((status, s_index) => (
                   <TableCell
-                    key={index}
+                    key={s_index}
                     size='small'
                     sx={{
                       backgroundColor: getBackgroundColor(
                         status,
-                        index,
+                        s_index,
                         team.name
                       ),
                     }}
                     onMouseEnter={() => {
-                      setHighlightedRound(index);
+                      setHighlightedRound(s_index);
                       setHighlightedTeam(team.name);
                     }}
                     onMouseLeave={() => {
                       setHighlightedRound(null);
                       setHighlightedTeam(null);
+                    }}
+                    onClick={() => {
+                      window.location.href =
+                        "/status/check/" + check + "/team/" + (index + 1);
                     }}
                   ></TableCell>
                 ))}

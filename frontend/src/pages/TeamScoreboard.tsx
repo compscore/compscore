@@ -172,6 +172,10 @@ export default function TeamScoreBoard() {
                       setHighlightedRound(null);
                       setHighlightedCheck(null);
                     }}
+                    onClick={() => {
+                      window.location.href =
+                        "/status/check/" + check.name + "/team/" + team;
+                    }}
                   ></TableCell>
                 ))}
               </TableRow>
