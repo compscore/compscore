@@ -12,7 +12,7 @@ import Scoreboard from "./pages/Scoreboard";
 import TeamScoreboard from "./pages/TeamScoreboard";
 import CheckScoreboard from "./pages/CheckScoreboard";
 import RoundScoreboard from "./pages/RoundScoreboard";
-import StatusHistory from "./pages/StatusHistory";
+import Status from "./pages/Status";
 
 export default function App() {
   const [cookies, setCookie] = useCookies(["auth"]);
@@ -42,7 +42,7 @@ export default function App() {
               />
               <Route
                 path='/status/check/:check/team/:team'
-                element={<StatusHistory />}
+                element={<Status />}
               />
             </Routes>
           </SnackbarProvider>
