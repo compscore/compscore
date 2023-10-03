@@ -132,7 +132,13 @@ export default function TeamScoreBoard() {
           </TableHead>
           <TableBody>
             {data?.checks.map((check, index) => (
-              <TableRow key={index}>
+              <TableRow
+                key={index}
+                onClick={() => {
+                  window.location.href =
+                    "/status/check/" + check.name + "/team/" + team;
+                }}
+              >
                 <TableCell
                   size='small'
                   sx={{
