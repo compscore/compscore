@@ -9,6 +9,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,8 +17,25 @@ type team_s struct{}
 
 var Team = team_s{}
 
-func (*team_s) Get(number int8) (*ent.Team, error) {
-	exists, err := Team.Exists(number)
+func (*team_s) exists(number int8) (bool, error) {
+	return client.Team.
+		Query().
+		Where(
+			team.NumberEQ(number),
+		).
+		Exist(ctx)
+}
+
+func (*team_s) Exists(number int8) (bool, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.Exists: lock")
+	defer mutex.Unlock()
+
+	return Team.exists(number)
+}
+
+func (*team_s) get(number int8) (*ent.Team, error) {
+	exists, err := Team.exists(number)
 	if err != nil {
 		return nil, err
 	}
@@ -26,139 +44,227 @@ func (*team_s) Get(number int8) (*ent.Team, error) {
 		return nil, fmt.Errorf("team %d does not exist", number)
 	}
 
-	return Client.Team.
+	return client.Team.
 		Query().
 		Where(
 			team.NumberEQ(number),
-		).Only(Ctx)
+		).Only(ctx)
+}
+
+func (*team_s) Get(number int8) (*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.Get: lock")
+	defer mutex.Unlock()
+
+	return Team.get(number)
+}
+
+func (*team_s) getByName(name string) (*ent.Team, error) {
+	return client.Team.
+		Query().
+		Where(
+			team.NameEQ(name),
+		).Only(ctx)
 }
 
 func (*team_s) GetByName(name string) (*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetByName: lock")
+	defer mutex.Unlock()
+
+	return Team.getByName(name)
+}
+
+func (*team_s) getByNumberWithStatus(number int8) (*ent.Team, error) {
+	return client.Team.
 		Query().
 		Where(
-			team.NameEQ(name),
-		).Only(Ctx)
+			team.NumberEQ(number),
+		).
+		WithStatus().
+		Only(ctx)
 }
 
 func (*team_s) GetByNumberWithStatus(number int8) (*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetByNumberWithStatus: lock")
+	defer mutex.Unlock()
+
+	return Team.getByNumberWithStatus(number)
+}
+
+func (*team_s) getByNameWithStatus(name string) (*ent.Team, error) {
+	return client.Team.
 		Query().
 		Where(
-			team.NumberEQ(number),
+			team.NameEQ(name),
 		).
 		WithStatus().
-		Only(Ctx)
+		Only(ctx)
 }
 
 func (*team_s) GetByNameWithStatus(name string) (*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetByNameWithStatus: lock")
+	defer mutex.Unlock()
+
+	return Team.getByNameWithStatus(name)
+}
+
+func (*team_s) getByNumberWithCredentials(number int8) (*ent.Team, error) {
+	return client.Team.
 		Query().
 		Where(
-			team.NameEQ(name),
+			team.NumberEQ(number),
 		).
-		WithStatus().
-		Only(Ctx)
+		WithCredential().
+		Only(ctx)
 }
 
 func (*team_s) GetByNumberWithCredentials(number int8) (*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetByNumberWithCredentials: lock")
+	defer mutex.Unlock()
+
+	return Team.getByNumberWithCredentials(number)
+}
+
+func (*team_s) getByNameWithCredentials(name string) (*ent.Team, error) {
+	return client.Team.
 		Query().
 		Where(
-			team.NumberEQ(number),
+			team.NameEQ(name),
 		).
 		WithCredential().
-		Only(Ctx)
+		Only(ctx)
 }
 
 func (*team_s) GetByNameWithCredentials(name string) (*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetByNameWithCredentials: lock")
+	defer mutex.Unlock()
+
+	return Team.getByNameWithCredentials(name)
+}
+
+func (*team_s) getByNumberWithEdges(number int8) (*ent.Team, error) {
+	return client.Team.
 		Query().
 		Where(
-			team.NameEQ(name),
+			team.NumberEQ(number),
 		).
 		WithCredential().
-		Only(Ctx)
+		WithStatus().
+		Only(ctx)
 }
 
 func (*team_s) GetByNumberWithEdges(number int8) (*ent.Team, error) {
-	return Client.Team.
-		Query().
-		Where(
-			team.NumberEQ(number),
-		).
-		WithCredential().
-		WithStatus().
-		Only(Ctx)
+	mutex.Lock()
+	logrus.Trace("team_s.GetByNumberWithEdges: lock")
+	defer mutex.Unlock()
+
+	return Team.getByNumberWithEdges(number)
 }
 
-func (*team_s) GetByNameWithEdges(name string) (*ent.Team, error) {
-	return Client.Team.
+func (*team_s) getByNameWithEdges(name string) (*ent.Team, error) {
+	return client.Team.
 		Query().
 		Where(
 			team.NameEQ(name),
 		).
 		WithCredential().
 		WithStatus().
-		Only(Ctx)
+		Only(ctx)
+}
+
+func (*team_s) GetByNameWithEdges(name string) (*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.GetByNameWithEdges: lock")
+	defer mutex.Unlock()
+
+	return Team.getByNameWithEdges(name)
+}
+
+func (*team_s) getAll() ([]*ent.Team, error) {
+	return client.Team.
+		Query().
+		Order(
+			ent.Asc(team.FieldNumber),
+		).
+		All(ctx)
 }
 
 func (*team_s) GetAll() ([]*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetAll: lock")
+	defer mutex.Unlock()
+
+	return Team.getAll()
+}
+
+func (*team_s) getAllWithStatus() ([]*ent.Team, error) {
+	return client.Team.
 		Query().
+		WithStatus().
 		Order(
 			ent.Asc(team.FieldNumber),
 		).
-		All(Ctx)
+		All(ctx)
 }
 
 func (*team_s) GetAllWithStatus() ([]*ent.Team, error) {
-	return Client.Team.
+	mutex.Lock()
+	logrus.Trace("team_s.GetAllWithStatus: lock")
+	defer mutex.Unlock()
+
+	return Team.getAllWithStatus()
+}
+
+func (*team_s) getAllWithCredentials() ([]*ent.Team, error) {
+	return client.Team.
 		Query().
-		WithStatus().
+		WithCredential().
 		Order(
 			ent.Asc(team.FieldNumber),
 		).
-		All(Ctx)
+		All(ctx)
 }
 
 func (*team_s) GetAllWithCredentials() ([]*ent.Team, error) {
-	return Client.Team.
-		Query().
-		WithCredential().
-		Order(
-			ent.Asc(team.FieldNumber),
-		).
-		All(Ctx)
+	mutex.Lock()
+	logrus.Trace("team_s.GetAllWithCredentials: lock")
+	defer mutex.Unlock()
+
+	return Team.getAllWithCredentials()
 }
 
-func (*team_s) GetAllWithEdges() ([]*ent.Team, error) {
-	return Client.Team.
+func (*team_s) getAllWithEdges() ([]*ent.Team, error) {
+	return client.Team.
 		Query().
 		WithStatus().
 		WithCredential().
 		Order(
 			ent.Asc(team.FieldNumber),
 		).
-		All(Ctx)
+		All(ctx)
 }
 
-func (*team_s) Exists(number int8) (bool, error) {
-	return Client.Team.
-		Query().
-		Where(
-			team.NumberEQ(number),
-		).Exist(Ctx)
+func (*team_s) GetAllWithEdges() ([]*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.GetAllWithEdges: lock")
+	defer mutex.Unlock()
+
+	return Team.getAllWithEdges()
 }
 
-func (*team_s) Create(number int8, name string, password string) (*ent.Team, error) {
-	exist, err := Team.Exists(number)
+func (*team_s) create(number int8, name string, password string) (*ent.Team, error) {
+	exists, err := Team.exists(number)
 	if err != nil {
 		return nil, err
 	}
 
-	if exist {
-		return Team.Get(number)
+	if exists {
+		return Team.get(number)
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -166,22 +272,38 @@ func (*team_s) Create(number int8, name string, password string) (*ent.Team, err
 		return nil, err
 	}
 
-	return Client.Team.
+	return client.Team.
 		Create().
 		SetNumber(number).
 		SetName(name).
 		SetPassword(string(hashedPassword)).
-		Save(Ctx)
+		Save(ctx)
 }
 
-func (*team_s) Update(team *ent.Team, number int8, name string) (*ent.Team, error) {
+func (*team_s) Create(number int8, name string, password string) (*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.Create: lock")
+	defer mutex.Unlock()
+
+	return Team.create(number, name, password)
+}
+
+func (*team_s) update(team *ent.Team, number int8, name string) (*ent.Team, error) {
 	return team.Update().
 		SetNumber(number).
 		SetName(name).
-		Save(Ctx)
+		Save(ctx)
 }
 
-func (*team_s) UpdatePassword(team *ent.Team, password string) (*ent.Team, error) {
+func (*team_s) Update(team *ent.Team, number int8, name string) (*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.Update: lock")
+	defer mutex.Unlock()
+
+	return Team.update(team, number, name)
+}
+
+func (*team_s) updatePassword(team *ent.Team, password string) (*ent.Team, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -189,11 +311,41 @@ func (*team_s) UpdatePassword(team *ent.Team, password string) (*ent.Team, error
 
 	return team.Update().
 		SetPassword(string(hashedPassword)).
-		Save(Ctx)
+		Save(ctx)
+}
+
+func (*team_s) UpdatePassword(team *ent.Team, password string) (*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.UpdatePassword: lock")
+	defer mutex.Unlock()
+
+	return Team.updatePassword(team, password)
+}
+
+func (*team_s) checkPassword(team int8, password string) (bool, error) {
+	teamEnt, err := Team.get(team)
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(teamEnt.Password), []byte(password))
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (*team_s) CheckPassword(team int8, password string) (bool, error) {
-	teamEnt, err := Team.Get(team)
+	mutex.Lock()
+	logrus.Trace("team_s.CheckPassword: lock")
+	defer mutex.Unlock()
+
+	return Team.checkPassword(team, password)
+}
+
+func (*team_s) checkPasswordByName(team_name string, password string) (bool, error) {
+	teamEnt, err := Team.getByName(team_name)
 	if err != nil {
 		return false, err
 	}
@@ -207,39 +359,41 @@ func (*team_s) CheckPassword(team int8, password string) (bool, error) {
 }
 
 func (*team_s) CheckPasswordByName(team_name string, password string) (bool, error) {
-	teamEnt, err := Team.GetByName(team_name)
-	if err != nil {
-		return false, err
-	}
+	mutex.Lock()
+	logrus.Trace("team_s.CheckPasswordByName: lock")
+	defer mutex.Unlock()
 
-	err = bcrypt.CompareHashAndPassword([]byte(teamEnt.Password), []byte(password))
-	if err != nil {
-		return false, nil
-	}
+	return Team.checkPasswordByName(team_name, password)
+}
 
-	return true, nil
+func (*team_s) delete(team *ent.Team) error {
+	return client.Team.
+		DeleteOne(team).
+		Exec(ctx)
 }
 
 func (*team_s) Delete(team *ent.Team) error {
-	return Client.Team.
-		DeleteOne(team).
-		Exec(Ctx)
+	mutex.Lock()
+	logrus.Trace("team_s.Delete: lock")
+	defer mutex.Unlock()
+
+	return Team.delete(team)
 }
 
-func (*team_s) GetScore(team_number int8) (score int, err error) {
+func getScore(teamNumber int8) (score int, err error) {
 	for _, configCheck := range config.Checks {
-		count, err := Client.Status.
+		count, err := client.Status.
 			Query().
 			Where(
 				status.HasCheckWith(
 					check.NameEQ(configCheck.Name),
 				),
 				status.HasTeamWith(
-					team.NumberEQ(team_number),
+					team.NumberEQ(teamNumber),
 				),
 				status.StatusEQ(status.StatusUp),
 			).
-			Count(Ctx)
+			Count(ctx)
 		if err != nil {
 			return 0, err
 		}
@@ -250,9 +404,17 @@ func (*team_s) GetScore(team_number int8) (score int, err error) {
 	return score, nil
 }
 
-func (*team_s) GetScoreBeforeRound(team_number int8, round_number int) (score int, err error) {
+func (*team_s) GetScore(teamNumber int8) (score int, err error) {
+	mutex.Lock()
+	logrus.Trace("team_s.GetScore: lock")
+	defer mutex.Unlock()
+
+	return getScore(teamNumber)
+}
+
+func (*team_s) getScoreBeforeRound(team_number int8, round_number int) (score int, err error) {
 	for _, configCheck := range config.Checks {
-		count, err := Client.Status.
+		count, err := client.Status.
 			Query().
 			Where(
 				status.HasCheckWith(
@@ -266,7 +428,7 @@ func (*team_s) GetScoreBeforeRound(team_number int8, round_number int) (score in
 					round.NumberLT(round_number),
 				),
 			).
-			Count(Ctx)
+			Count(ctx)
 		if err != nil {
 			return 0, err
 		}
@@ -275,4 +437,12 @@ func (*team_s) GetScoreBeforeRound(team_number int8, round_number int) (score in
 	}
 
 	return score, nil
+}
+
+func (*team_s) GetScoreBeforeRound(team_number int8, round_number int) (score int, err error) {
+	mutex.Lock()
+	logrus.Trace("team_s.GetScoreBeforeRound: lock")
+	defer mutex.Unlock()
+
+	return Team.getScoreBeforeRound(team_number, round_number)
 }
