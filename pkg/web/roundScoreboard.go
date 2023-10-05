@@ -15,7 +15,7 @@ func roundScoreboard(ctx *gin.Context) {
 		return
 	}
 
-	scoreboard, err := data.Status.RoundScoreboard(round)
+	scoreboard, err := data.Scoreboard.Round(round)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
