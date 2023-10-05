@@ -26,6 +26,20 @@ func (rc *RoundCreate) SetNumber(i int) *RoundCreate {
 	return rc
 }
 
+// SetComplete sets the "complete" field.
+func (rc *RoundCreate) SetComplete(b bool) *RoundCreate {
+	rc.mutation.SetComplete(b)
+	return rc
+}
+
+// SetNillableComplete sets the "complete" field if the given value is not nil.
+func (rc *RoundCreate) SetNillableComplete(b *bool) *RoundCreate {
+	if b != nil {
+		rc.SetComplete(*b)
+	}
+	return rc
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (rc *RoundCreate) AddStatuIDs(ids ...int) *RoundCreate {
 	rc.mutation.AddStatuIDs(ids...)
@@ -48,6 +62,7 @@ func (rc *RoundCreate) Mutation() *RoundMutation {
 
 // Save creates the Round in the database.
 func (rc *RoundCreate) Save(ctx context.Context) (*Round, error) {
+	rc.defaults()
 	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
 }
 
@@ -73,6 +88,14 @@ func (rc *RoundCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (rc *RoundCreate) defaults() {
+	if _, ok := rc.mutation.Complete(); !ok {
+		v := round.DefaultComplete
+		rc.mutation.SetComplete(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (rc *RoundCreate) check() error {
 	if _, ok := rc.mutation.Number(); !ok {
@@ -82,6 +105,9 @@ func (rc *RoundCreate) check() error {
 		if err := round.NumberValidator(v); err != nil {
 			return &ValidationError{Name: "number", err: fmt.Errorf(`ent: validator failed for field "Round.number": %w`, err)}
 		}
+	}
+	if _, ok := rc.mutation.Complete(); !ok {
+		return &ValidationError{Name: "complete", err: errors.New(`ent: missing required field "Round.complete"`)}
 	}
 	return nil
 }
@@ -112,6 +138,10 @@ func (rc *RoundCreate) createSpec() (*Round, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.Number(); ok {
 		_spec.SetField(round.FieldNumber, field.TypeInt, value)
 		_node.Number = value
+	}
+	if value, ok := rc.mutation.Complete(); ok {
+		_spec.SetField(round.FieldComplete, field.TypeBool, value)
+		_node.Complete = value
 	}
 	if nodes := rc.mutation.StatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -146,6 +176,7 @@ func (rcb *RoundCreateBulk) Save(ctx context.Context) ([]*Round, error) {
 	for i := range rcb.builders {
 		func(i int, root context.Context) {
 			builder := rcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*RoundMutation)
 				if !ok {

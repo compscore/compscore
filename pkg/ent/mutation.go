@@ -997,6 +997,7 @@ type RoundMutation struct {
 	id            *int
 	number        *int
 	addnumber     *int
+	complete      *bool
 	clearedFields map[string]struct{}
 	status        map[int]struct{}
 	removedstatus map[int]struct{}
@@ -1160,6 +1161,42 @@ func (m *RoundMutation) ResetNumber() {
 	m.addnumber = nil
 }
 
+// SetComplete sets the "complete" field.
+func (m *RoundMutation) SetComplete(b bool) {
+	m.complete = &b
+}
+
+// Complete returns the value of the "complete" field in the mutation.
+func (m *RoundMutation) Complete() (r bool, exists bool) {
+	v := m.complete
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldComplete returns the old "complete" field's value of the Round entity.
+// If the Round object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoundMutation) OldComplete(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldComplete is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldComplete requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldComplete: %w", err)
+	}
+	return oldValue.Complete, nil
+}
+
+// ResetComplete resets all changes to the "complete" field.
+func (m *RoundMutation) ResetComplete() {
+	m.complete = nil
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by ids.
 func (m *RoundMutation) AddStatuIDs(ids ...int) {
 	if m.status == nil {
@@ -1248,9 +1285,12 @@ func (m *RoundMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoundMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.number != nil {
 		fields = append(fields, round.FieldNumber)
+	}
+	if m.complete != nil {
+		fields = append(fields, round.FieldComplete)
 	}
 	return fields
 }
@@ -1262,6 +1302,8 @@ func (m *RoundMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case round.FieldNumber:
 		return m.Number()
+	case round.FieldComplete:
+		return m.Complete()
 	}
 	return nil, false
 }
@@ -1273,6 +1315,8 @@ func (m *RoundMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case round.FieldNumber:
 		return m.OldNumber(ctx)
+	case round.FieldComplete:
+		return m.OldComplete(ctx)
 	}
 	return nil, fmt.Errorf("unknown Round field %s", name)
 }
@@ -1288,6 +1332,13 @@ func (m *RoundMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNumber(v)
+		return nil
+	case round.FieldComplete:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetComplete(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Round field %s", name)
@@ -1355,6 +1406,9 @@ func (m *RoundMutation) ResetField(name string) error {
 	switch name {
 	case round.FieldNumber:
 		m.ResetNumber()
+		return nil
+	case round.FieldComplete:
+		m.ResetComplete()
 		return nil
 	}
 	return fmt.Errorf("unknown Round field %s", name)
