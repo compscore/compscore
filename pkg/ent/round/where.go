@@ -58,6 +58,11 @@ func Number(v int) predicate.Round {
 	return predicate.Round(sql.FieldEQ(FieldNumber, v))
 }
 
+// Complete applies equality check predicate on the "complete" field. It's identical to CompleteEQ.
+func Complete(v bool) predicate.Round {
+	return predicate.Round(sql.FieldEQ(FieldComplete, v))
+}
+
 // NumberEQ applies the EQ predicate on the "number" field.
 func NumberEQ(v int) predicate.Round {
 	return predicate.Round(sql.FieldEQ(FieldNumber, v))
@@ -96,6 +101,16 @@ func NumberLT(v int) predicate.Round {
 // NumberLTE applies the LTE predicate on the "number" field.
 func NumberLTE(v int) predicate.Round {
 	return predicate.Round(sql.FieldLTE(FieldNumber, v))
+}
+
+// CompleteEQ applies the EQ predicate on the "complete" field.
+func CompleteEQ(v bool) predicate.Round {
+	return predicate.Round(sql.FieldEQ(FieldComplete, v))
+}
+
+// CompleteNEQ applies the NEQ predicate on the "complete" field.
+func CompleteNEQ(v bool) predicate.Round {
+	return predicate.Round(sql.FieldNEQ(FieldComplete, v))
 }
 
 // HasStatus applies the HasEdge predicate on the "status" edge.

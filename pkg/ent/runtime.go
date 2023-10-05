@@ -28,6 +28,10 @@ func init() {
 	roundDescNumber := roundFields[0].Descriptor()
 	// round.NumberValidator is a validator for the "number" field. It is called by the builders before save.
 	round.NumberValidator = roundDescNumber.Validators[0].(func(int) error)
+	// roundDescComplete is the schema descriptor for complete field.
+	roundDescComplete := roundFields[1].Descriptor()
+	// round.DefaultComplete holds the default value on creation for the complete field.
+	round.DefaultComplete = roundDescComplete.Default.(bool)
 	statusFields := schema.Status{}.Fields()
 	_ = statusFields
 	// statusDescTime is the schema descriptor for time field.

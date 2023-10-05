@@ -23,7 +23,7 @@ func statusHistory(ctx *gin.Context) {
 		return
 	}
 
-	statusHistory, err := data.Status.History(check, int8(team), 10)
+	statusHistory, err := data.Scoreboard.History(check, int8(team), 10)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

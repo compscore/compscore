@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"log"
+	"sync"
 	"text/template"
 
 	"github.com/compscore/compscore/pkg/config"
@@ -12,20 +13,21 @@ import (
 )
 
 var (
-	Client *ent.Client
-	Ctx    context.Context = context.Background()
+	client *ent.Client
+	ctx    context.Context = context.Background()
+	mutex  *sync.Mutex     = &sync.Mutex{}
 )
 
 func Init() {
-	client, err := ent.Open("sqlite3", "file:database.sqlite?_loc=auto&cache=shared&_fk=1")
+	c, err := ent.Open("sqlite3", "file:database.sqlite?_loc=auto&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatalf("failed opening connection to sqlite: %v", err)
 	}
 
-	Client = client
+	client = c
 
 	// Run the auto migration tool.
-	if err := Client.Schema.Create(Ctx); err != nil {
+	if err := c.Schema.Create(ctx); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 

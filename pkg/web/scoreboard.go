@@ -6,7 +6,7 @@ import (
 )
 
 func scoreboard(ctx *gin.Context) {
-	scoreboard, err := data.Status.Scoreboard()
+	scoreboard, err := data.Scoreboard.Main()
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return

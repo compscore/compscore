@@ -50,6 +50,7 @@ var (
 	RoundsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "number", Type: field.TypeInt, Unique: true},
+		{Name: "complete", Type: field.TypeBool, Default: false},
 	}
 	// RoundsTable holds the schema information for the "rounds" table.
 	RoundsTable = &schema.Table{

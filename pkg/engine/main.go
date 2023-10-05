@@ -136,17 +136,24 @@ func runEngine() {
 func runRound(roundMutex *sync.Mutex) error {
 	defer roundMutex.Unlock()
 
-	round, err := data.Round.CreateNextRound()
+	entRound, err := data.Round.CreateNextRound()
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		entRound, err := data.Round.Complete(entRound.Number)
+		if err != nil {
+			logrus.WithError(err).Errorf("Failed to complete round: %v", entRound)
+		}
+	}()
 
 	checks := 0
 
 	for i := 1; i <= config.Teams.Amount; i++ {
 		for _, check := range config.Checks {
 			_, err := data.Status.Create(
-				round.Number,
+				entRound.Number,
 				check.Name,
 				int8(i),
 				status.StatusUnknown,
@@ -171,7 +178,7 @@ func runRound(roundMutex *sync.Mutex) error {
 			for i := 1; i <= config.Teams.Amount; i++ {
 				_, err = data.Status.Update(
 					int8(i),
-					round.Number,
+					entRound.Number,
 					check.Name,
 					status.StatusDown,
 					fmt.Sprintf("failed to parse target template: %v", err),
@@ -188,7 +195,7 @@ func runRound(roundMutex *sync.Mutex) error {
 			if err != nil {
 				_, err = data.Status.Update(
 					int8(i),
-					round.Number,
+					entRound.Number,
 					check.Name,
 					status.StatusDown,
 					fmt.Sprintf("failed to parse target template: %v", err),
@@ -203,7 +210,7 @@ func runRound(roundMutex *sync.Mutex) error {
 			if err != nil {
 				_, err = data.Status.Update(
 					int8(i),
-					round.Number,
+					entRound.Number,
 					check.Name,
 					status.StatusDown,
 					fmt.Sprintf("failed to get credential: %v", err),
@@ -214,7 +221,7 @@ func runRound(roundMutex *sync.Mutex) error {
 				continue
 			}
 
-			go runScoreCheck(round.Number, check, int8(i), target.String(), entCredential.Password, resultsChan, wgRound)
+			go runScoreCheck(entRound.Number, check, int8(i), target.String(), entCredential.Password, resultsChan, wgRound)
 		}
 	}
 
@@ -222,7 +229,7 @@ func runRound(roundMutex *sync.Mutex) error {
 		for result := range resultsChan {
 			_, err = data.Status.Update(
 				result.Team,
-				round.Number,
+				entRound.Number,
 				result.Check.Name,
 				func() status.Status {
 					if result.Success {

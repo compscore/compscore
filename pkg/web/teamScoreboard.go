@@ -19,7 +19,7 @@ func teamScoreboard(ctx *gin.Context) {
 		return
 	}
 
-	teamScoreboard, err := data.Status.TeamScoreboard(int8(team), 10)
+	teamScoreboard, err := data.Scoreboard.Team(int8(team), 10)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return

@@ -19,6 +19,9 @@ func (Round) Fields() []ent.Field {
 			Comment("Round number").
 			Positive().
 			Unique(),
+		field.Bool("complete").
+			Comment("Round Complete").
+			Default(false),
 	}
 }
 

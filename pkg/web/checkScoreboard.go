@@ -8,7 +8,7 @@ import (
 func checkScoreboard(ctx *gin.Context) {
 	check := ctx.Param("check")
 
-	checkScoreboard, err := data.Status.CheckScoreboard(check, 10)
+	checkScoreboard, err := data.Scoreboard.Check(check, 10)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return

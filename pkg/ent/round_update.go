@@ -41,6 +41,20 @@ func (ru *RoundUpdate) AddNumber(i int) *RoundUpdate {
 	return ru
 }
 
+// SetComplete sets the "complete" field.
+func (ru *RoundUpdate) SetComplete(b bool) *RoundUpdate {
+	ru.mutation.SetComplete(b)
+	return ru
+}
+
+// SetNillableComplete sets the "complete" field if the given value is not nil.
+func (ru *RoundUpdate) SetNillableComplete(b *bool) *RoundUpdate {
+	if b != nil {
+		ru.SetComplete(*b)
+	}
+	return ru
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (ru *RoundUpdate) AddStatuIDs(ids ...int) *RoundUpdate {
 	ru.mutation.AddStatuIDs(ids...)
@@ -137,6 +151,9 @@ func (ru *RoundUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.AddedNumber(); ok {
 		_spec.AddField(round.FieldNumber, field.TypeInt, value)
 	}
+	if value, ok := ru.mutation.Complete(); ok {
+		_spec.SetField(round.FieldComplete, field.TypeBool, value)
+	}
 	if ru.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -212,6 +229,20 @@ func (ruo *RoundUpdateOne) SetNumber(i int) *RoundUpdateOne {
 // AddNumber adds i to the "number" field.
 func (ruo *RoundUpdateOne) AddNumber(i int) *RoundUpdateOne {
 	ruo.mutation.AddNumber(i)
+	return ruo
+}
+
+// SetComplete sets the "complete" field.
+func (ruo *RoundUpdateOne) SetComplete(b bool) *RoundUpdateOne {
+	ruo.mutation.SetComplete(b)
+	return ruo
+}
+
+// SetNillableComplete sets the "complete" field if the given value is not nil.
+func (ruo *RoundUpdateOne) SetNillableComplete(b *bool) *RoundUpdateOne {
+	if b != nil {
+		ruo.SetComplete(*b)
+	}
 	return ruo
 }
 
@@ -340,6 +371,9 @@ func (ruo *RoundUpdateOne) sqlSave(ctx context.Context) (_node *Round, err error
 	}
 	if value, ok := ruo.mutation.AddedNumber(); ok {
 		_spec.AddField(round.FieldNumber, field.TypeInt, value)
+	}
+	if value, ok := ruo.mutation.Complete(); ok {
+		_spec.SetField(round.FieldComplete, field.TypeBool, value)
 	}
 	if ruo.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{

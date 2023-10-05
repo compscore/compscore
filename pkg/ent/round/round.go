@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldNumber holds the string denoting the number field in the database.
 	FieldNumber = "number"
+	// FieldComplete holds the string denoting the complete field in the database.
+	FieldComplete = "complete"
 	// EdgeStatus holds the string denoting the status edge name in mutations.
 	EdgeStatus = "status"
 	// Table holds the table name of the round in the database.
@@ -31,6 +33,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldNumber,
+	FieldComplete,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -46,6 +49,8 @@ func ValidColumn(column string) bool {
 var (
 	// NumberValidator is a validator for the "number" field. It is called by the builders before save.
 	NumberValidator func(int) error
+	// DefaultComplete holds the default value on creation for the "complete" field.
+	DefaultComplete bool
 )
 
 // OrderOption defines the ordering options for the Round queries.
@@ -59,6 +64,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByNumber orders the results by the number field.
 func ByNumber(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNumber, opts...).ToFunc()
+}
+
+// ByComplete orders the results by the complete field.
+func ByComplete(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldComplete, opts...).ToFunc()
 }
 
 // ByStatusCount orders the results by status count.
