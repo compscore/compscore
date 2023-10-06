@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
 import RoundScoreboard from "../components/RoundScoreboard";
 
@@ -13,16 +13,6 @@ export default function RoundScoreBoard() {
         alignItems: "center",
       }}
     >
-      <Typography
-        component='h1'
-        variant='h3'
-        fontWeight={700}
-        sx={{
-          marginTop: 5,
-        }}
-      >
-        Scoreboard
-      </Typography>
       <RoundScoreboard round={round} />
     </Box>
   );
