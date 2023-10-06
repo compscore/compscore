@@ -75,6 +75,16 @@ export default function ScoreBoard() {
 
   return (
     <>
+      <Typography
+        component='h1'
+        variant='h3'
+        fontWeight={700}
+        sx={{
+          marginTop: 5,
+        }}
+      >
+        Scoreboard
+      </Typography>
       <Typography component='h1' variant='h5'>
         Round {data?.round}
       </Typography>
