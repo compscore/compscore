@@ -80,6 +80,19 @@ export default function CheckScoreBoard({ check }: props) {
 
   return (
     <>
+      <Typography
+        component='h1'
+        variant='h3'
+        fontWeight={700}
+        sx={{
+          marginTop: 5,
+        }}
+        onClick={() => {
+          window.location.href = "/scoreboard";
+        }}
+      >
+        {check}
+      </Typography>
       <Typography component='h1' variant='h5'>
         Round {data?.round}
       </Typography>

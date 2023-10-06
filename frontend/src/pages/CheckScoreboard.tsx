@@ -1,6 +1,6 @@
-import { Box, Typography } from "@mui/material";
-import CheckScoreboard from "../components/CheckScoreboard";
+import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
+import CheckScoreboard from "../components/CheckScoreboard";
 
 export default function CheckScoreBoard() {
   const { check: check } = useParams() as { check: string };
@@ -13,19 +13,6 @@ export default function CheckScoreBoard() {
         alignItems: "center",
       }}
     >
-      <Typography
-        component='h1'
-        variant='h3'
-        fontWeight={700}
-        sx={{
-          marginTop: 5,
-        }}
-        onClick={() => {
-          window.location.href = "/scoreboard";
-        }}
-      >
-        {check}
-      </Typography>
       <CheckScoreboard check={check} />
     </Box>
   );
