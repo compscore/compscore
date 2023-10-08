@@ -13,7 +13,7 @@ import (
 func checks(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error": err.Error(),
 		})
 		return
