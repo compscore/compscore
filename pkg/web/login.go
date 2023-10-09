@@ -27,7 +27,13 @@ func login(ctx *gin.Context) {
 		return
 	}
 
-	json.Unmarshal(body_bytes, &body)
+	err = json.Unmarshal(body_bytes, &body)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
 	if body.Username == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
