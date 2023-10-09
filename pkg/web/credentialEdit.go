@@ -4,10 +4,11 @@ import (
 	"io"
 	"net/http"
 
+	"encoding/json"
+
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/internal/json"
 )
 
 type credential_edit_s struct {
