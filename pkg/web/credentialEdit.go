@@ -11,12 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type credential_edit_s struct {
+type credentialEdit_s struct {
 	Password string `json:"password"`
 }
 
-func credential_edit(ctx *gin.Context) {
-	var body credential_edit_s
+func credentialEdit(ctx *gin.Context) {
+	var body credentialEdit_s
 
 	check := ctx.Param("check")
 
