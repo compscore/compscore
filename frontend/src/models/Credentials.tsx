@@ -1,4 +1,4 @@
-export type Credentials = [
+export type credentials = [
   {
     check: string;
     team: string;
