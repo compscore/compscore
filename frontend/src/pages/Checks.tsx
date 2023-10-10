@@ -1,13 +1,9 @@
-import { CookieSetOptions } from "universal-cookie";
-
 type Props = {
-  setCookie: (
-    name: "auth",
-    value: any,
-    options?: CookieSetOptions | undefined
-  ) => void;
+  cookies: {
+    auth?: any;
+  };
 };
 
-export default function Login({ setCookie }: Props) {
+export default function Login({ cookies }: Props) {
   return <></>;
 }
