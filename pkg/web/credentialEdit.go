@@ -44,13 +44,6 @@ func credentialEdit(ctx *gin.Context) {
 		return
 	}
 
-	if body.Password == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "No password provided",
-		})
-		return
-	}
-
 	_, err = data.Credential.UpdatePassword(entTeam.Number, check, body.Password)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
