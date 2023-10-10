@@ -12,6 +12,7 @@ import Scoreboard from "./pages/Scoreboard";
 import TeamScoreboard from "./pages/TeamScoreboard";
 import CheckScoreboard from "./pages/CheckScoreboard";
 import RoundScoreboard from "./pages/RoundScoreboard";
+import Checks from "./pages/Checks";
 import Status from "./pages/Status";
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
             <Routes>
               <Route path='/' element={<Index />} />
               <Route path='/login' element={<Login setCookie={setCookie} />} />
+              <Route path='/checks' element={<Checks cookies={cookies} />} />
               <Route path='/scoreboard' element={<Scoreboard />} />
               <Route
                 path='/scoreboard/team/:team'
