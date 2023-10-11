@@ -56,4 +56,5 @@ func LoadRoutes() {
 	API.GET("/scoreboard/round/:round", roundScoreboard)
 	API.GET("/status/check/:check/team/:team", statusHistory)
 	API.GET("/credentials", credential.Credentials)
+	API.GET("/credential/:check", credential.Get)
 }
