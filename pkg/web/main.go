@@ -49,12 +49,14 @@ func Start() {
 func LoadRoutes() {
 	API.POST("/login", login)
 	API.POST("/info", info)
-	API.POST("/credential/:check", credentialEdit)
 	API.GET("/scoreboard", scoreboard)
 	API.GET("/scoreboard/team/:team", teamScoreboard)
 	API.GET("/scoreboard/check/:check", checkScoreboard)
 	API.GET("/scoreboard/round/:round", roundScoreboard)
 	API.GET("/status/check/:check/team/:team", statusHistory)
+
+	// Credentials API
 	API.GET("/credentials", credential.Credentials)
 	API.GET("/credential/:check", credential.Get)
+	API.POST("/credential/:check", credential.Post)
 }

@@ -1,4 +1,4 @@
-package web
+package credential
 
 import (
 	"io"
@@ -15,11 +15,10 @@ type credentialEdit_s struct {
 	Password string `json:"password"`
 }
 
-func credentialEdit(ctx *gin.Context) {
+func Post(ctx *gin.Context) {
 	var body credentialEdit_s
 
 	check := ctx.Param("check")
-
 	entTeam, err := auth.Parse(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
