@@ -5,6 +5,3 @@ plugins/*
 !plugins/.gitkeep
 
 database.sqlite
-
-pkg/imports/*
-!pkg/imports/.gitkeep
