@@ -5,6 +5,7 @@ import (
 
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/web/check"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -54,5 +55,5 @@ func LoadRoutes() {
 	API.GET("/scoreboard/check/:check", checkScoreboard)
 	API.GET("/scoreboard/round/:round", roundScoreboard)
 	API.GET("/status/check/:check/team/:team", statusHistory)
-	API.GET("/checks", checks)
+	API.GET("/checks", check.Checks)
 }
