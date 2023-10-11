@@ -1,4 +1,4 @@
-package check
+package credential
 
 import (
 	"net/http"
@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Checks(ctx *gin.Context) {
+func Credentials(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
