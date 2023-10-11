@@ -30,7 +30,7 @@ export default function Checks({ cookies }: Props) {
     undefined
   );
   const fetchChecks = () => {
-    fetch("http://localhost:8080/api/checks", {
+    fetch("http://localhost:8080/api/credentials", {
       method: "GET",
       credentials: "include",
       headers: {
