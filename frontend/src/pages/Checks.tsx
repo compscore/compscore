@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import PasswordInput from "../components/PasswordInput";
 import { useEffect, useState } from "react";
-import { credentials } from "../models/Credentials";
+import { credential } from "../models/ent";
 import { enqueueSnackbar } from "notistack";
 
 type Props = {
@@ -26,7 +26,7 @@ export default function Checks({ cookies }: Props) {
     window.location.href = "/login";
   }
 
-  const [credentials, setCredentials] = useState<credentials | undefined>(
+  const [credentials, setCredentials] = useState<[credential] | undefined>(
     undefined
   );
   const fetchChecks = () => {
@@ -105,10 +105,10 @@ export default function Checks({ cookies }: Props) {
             </TableHead>
             <TableBody>
               {credentials?.map((credential) => (
-                <TableRow>
+                <TableRow key={credential.edges.check?.name}>
                   <TableCell>
                     <Typography variant='body1' component='h1'>
-                      {credential.check}
+                      {credential.edges.check?.name}
                     </Typography>
                   </TableCell>
 
@@ -116,7 +116,12 @@ export default function Checks({ cookies }: Props) {
                     <PasswordInput
                       value={credential.password}
                       onBlur={(e) => {
-                        updatePassword(e.target.value, credential.check);
+                        if (credential.edges.check) {
+                          updatePassword(
+                            e.target.value,
+                            credential.edges.check?.name
+                          );
+                        }
                       }}
                     />
                   </TableCell>

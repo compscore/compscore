@@ -8,7 +8,6 @@ import (
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/team"
-	"github.com/compscore/compscore/pkg/structs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -48,14 +47,5 @@ func Credentials(ctx *gin.Context) {
 		return
 	}
 
-	credentials := make([]structs.Credential, len(entCredentials))
-
-	for i, entCredential := range entCredentials {
-		credentials[i] = structs.Credential{
-			Check:    entCredential.Edges.Check.Name,
-			Password: entCredential.Password,
-		}
-	}
-
-	ctx.JSON(http.StatusOK, credentials)
+	ctx.JSON(http.StatusOK, entCredentials)
 }
