@@ -11,7 +11,6 @@ type props = {
 };
 
 function PasswordInput({ value, onBlur }: props) {
-  console.log(value);
   const [password, setPassword] = useState<string>(value);
   const [showPassword, setShowPassword] = useState(false);
 
