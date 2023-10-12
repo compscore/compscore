@@ -81,6 +81,16 @@ export default function RoundScoreBoard({ round }: props) {
     <>
       <Typography
         component='h1'
+        variant='h3'
+        fontWeight={700}
+        sx={{
+          marginTop: 5,
+        }}
+      >
+        Scoreboard
+      </Typography>
+      <Typography
+        component='h1'
         variant='h5'
         onClick={() => {
           window.location.href = "/scoreboard";
@@ -164,8 +174,9 @@ export default function RoundScoreBoard({ round }: props) {
                       setHighlightedCheck(null);
                     }}
                     onClick={() => {
-                      window.location.href =
-                        "/status/check/" + check.name + "/team/" + (team + 1);
+                      window.location.href = `/scoreboard/status/${team + 1}/${
+                        check.name
+                      }`;
                     }}
                   ></TableCell>
                 ))}

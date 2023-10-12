@@ -1,4 +1,4 @@
-package web
+package scoreboard
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func roundScoreboard(ctx *gin.Context) {
+func Round(ctx *gin.Context) {
 	roundStr := ctx.Param("round")
 	round, err := strconv.Atoi(roundStr)
 	if err != nil {

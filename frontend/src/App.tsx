@@ -43,7 +43,7 @@ export default function App() {
                 element={<RoundScoreboard />}
               />
               <Route
-                path='/status/check/:check/team/:team'
+                path='/scoreboard/status/:team/:check'
                 element={<Status />}
               />
             </Routes>

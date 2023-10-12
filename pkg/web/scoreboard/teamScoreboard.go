@@ -1,4 +1,4 @@
-package web
+package scoreboard
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func teamScoreboard(ctx *gin.Context) {
+func Team(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 	team, err := strconv.Atoi(teamStr)
 	if err != nil {

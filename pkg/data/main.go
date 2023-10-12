@@ -84,3 +84,10 @@ func Init() {
 		}
 	}
 }
+
+func Client(function func(*ent.Client) (interface{}, error)) (interface{}, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return function(client)
+}

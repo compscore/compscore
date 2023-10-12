@@ -22,7 +22,7 @@ export default function Status({ check, team }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/status/check/${check}/team/${team}`, {
+      fetch(`http://localhost:8080/api/scoreboard/status/${team}/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

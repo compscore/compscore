@@ -1,11 +1,11 @@
-package web
+package scoreboard
 
 import (
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/gin-gonic/gin"
 )
 
-func scoreboard(ctx *gin.Context) {
+func Scoreboard(ctx *gin.Context) {
 	scoreboard, err := data.Scoreboard.Main()
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})

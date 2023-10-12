@@ -27,6 +27,12 @@ func (cc *CredentialCreate) SetPassword(s string) *CredentialCreate {
 	return cc
 }
 
+// SetID sets the "id" field.
+func (cc *CredentialCreate) SetID(i int) *CredentialCreate {
+	cc.mutation.SetID(i)
+	return cc
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
 func (cc *CredentialCreate) SetCheckID(id int) *CredentialCreate {
 	cc.mutation.SetCheckID(id)
@@ -106,8 +112,10 @@ func (cc *CredentialCreate) sqlSave(ctx context.Context) (*Credential, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	cc.mutation.id = &_node.ID
 	cc.mutation.done = true
 	return _node, nil
@@ -118,6 +126,10 @@ func (cc *CredentialCreate) createSpec() (*Credential, *sqlgraph.CreateSpec) {
 		_node = &Credential{config: cc.config}
 		_spec = sqlgraph.NewCreateSpec(credential.Table, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt))
 	)
+	if id, ok := cc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := cc.mutation.Password(); ok {
 		_spec.SetField(credential.FieldPassword, field.TypeString, value)
 		_node.Password = value
@@ -199,7 +211,7 @@ func (ccb *CredentialCreateBulk) Save(ctx context.Context) ([]*Credential, error
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

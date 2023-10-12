@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Scoreboard from "../components/Scoreboard";
 
 export default function ScoreboardPage() {
@@ -10,16 +10,6 @@ export default function ScoreboardPage() {
         alignItems: "center",
       }}
     >
-      <Typography
-        component='h1'
-        variant='h3'
-        fontWeight={700}
-        sx={{
-          marginTop: 5,
-        }}
-      >
-        Scoreboard
-      </Typography>
       <Scoreboard />
       <Box m={2}></Box>
     </Box>

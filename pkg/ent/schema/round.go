@@ -16,12 +16,16 @@ type Round struct {
 func (Round) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("number").
+			StructTag(`json:"number"`).
 			Comment("Round number").
 			Positive().
 			Unique(),
 		field.Bool("complete").
+			StructTag(`json:"complete"`).
 			Comment("Round Complete").
 			Default(false),
+		field.Int("id").
+			StructTag(`json:"-"`),
 	}
 }
 
@@ -29,6 +33,7 @@ func (Round) Fields() []ent.Field {
 func (Round) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("status", Status.Type).
+			StructTag(`json:"status,omitempty"`).
 			Comment("Check statuses").
 			Annotations(
 				entsql.Annotation{

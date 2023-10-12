@@ -17,9 +17,9 @@ import (
 type Credential struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int `json:"-"`
 	// Password of Check
-	Password string `json:"password,omitempty"`
+	Password string `json:"password"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CredentialQuery when eager-loading is set.
 	Edges            CredentialEdges `json:"edges"`

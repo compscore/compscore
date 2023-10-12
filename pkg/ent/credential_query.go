@@ -334,7 +334,7 @@ func (cq *CredentialQuery) WithTeam(opts ...func(*TeamQuery)) *CredentialQuery {
 // Example:
 //
 //	var v []struct {
-//		Password string `json:"password,omitempty"`
+//		Password string `json:"password"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -357,7 +357,7 @@ func (cq *CredentialQuery) GroupBy(field string, fields ...string) *CredentialGr
 // Example:
 //
 //	var v []struct {
-//		Password string `json:"password,omitempty"`
+//		Password string `json:"password"`
 //	}
 //
 //	client.Credential.Query().
