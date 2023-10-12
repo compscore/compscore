@@ -16,9 +16,12 @@ type Check struct {
 func (Check) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
+			StructTag(`json:"name"`).
 			Comment("Check name").
 			NotEmpty().
 			Unique(),
+		field.Int("id").
+			StructTag(`json:"-"`),
 	}
 }
 
@@ -26,6 +29,7 @@ func (Check) Fields() []ent.Field {
 func (Check) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("status", Status.Type).
+			StructTag(`json:"status,omitempty"`).
 			Comment("Check statuses").
 			Annotations(
 				entsql.Annotation{
@@ -34,6 +38,7 @@ func (Check) Edges() []ent.Edge {
 			).
 			Ref("check"),
 		edge.From("credential", Credential.Type).
+			StructTag(`json:"credential,omitempty"`).
 			Comment("Check credential").
 			Annotations(
 				entsql.Annotation{

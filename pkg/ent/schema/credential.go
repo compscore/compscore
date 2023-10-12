@@ -15,7 +15,10 @@ type Credential struct {
 func (Credential) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("password").
+			StructTag(`json:"password"`).
 			Comment("Password of Check"),
+		field.Int("id").
+			StructTag(`json:"-"`),
 	}
 }
 
@@ -23,10 +26,12 @@ func (Credential) Fields() []ent.Field {
 func (Credential) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("check", Check.Type).
+			StructTag(`json:"check,omitempty"`).
 			Comment("Check").
 			Required().
 			Unique(),
 		edge.To("team", Team.Type).
+			StructTag(`json:"team,omitempty"`).
 			Comment("Team").
 			Required().
 			Unique(),

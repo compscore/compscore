@@ -16,10 +16,12 @@ type Team struct {
 func (Team) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int8("number").
+			StructTag(`json:"number"`).
 			Comment("Team number").
 			Unique().
 			Positive(),
 		field.String("name").
+			StructTag(`json:"name"`).
 			Comment("Team name").
 			NotEmpty().
 			Unique(),
@@ -27,6 +29,8 @@ func (Team) Fields() []ent.Field {
 			Comment("Team password").
 			Sensitive().
 			NotEmpty(),
+		field.Int("id").
+			StructTag(`json:"-"`),
 	}
 }
 
@@ -34,6 +38,7 @@ func (Team) Fields() []ent.Field {
 func (Team) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("status", Status.Type).
+			StructTag(`json:"status,omitempty"`).
 			Comment("Check statuses").
 			Annotations(
 				entsql.Annotation{
@@ -42,6 +47,7 @@ func (Team) Edges() []ent.Edge {
 			).
 			Ref("team"),
 		edge.From("credential", Credential.Type).
+			StructTag(`json:"credential,omitempty"`).
 			Comment("Check credential").
 			Annotations(
 				entsql.Annotation{
