@@ -5,7 +5,6 @@ import (
 
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/data"
-	"github.com/compscore/compscore/pkg/structs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,9 +28,6 @@ func Get(ctx *gin.Context) {
 
 	ctx.JSON(
 		http.StatusOK,
-		structs.Credential{
-			Check:    check,
-			Password: entCredential.Password,
-		},
+		entCredential,
 	)
 }
