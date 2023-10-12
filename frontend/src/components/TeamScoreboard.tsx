@@ -169,8 +169,7 @@ export default function TeamScoreBoard({ team }: props) {
                       setHighlightedCheck(null);
                     }}
                     onClick={() => {
-                      window.location.href =
-                        "/status/check/" + check.name + "/team/" + team;
+                      window.location.href = `/scoreboard/status/${team}/${check.name}`;
                     }}
                   ></TableCell>
                 ))}

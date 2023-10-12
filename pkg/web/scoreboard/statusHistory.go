@@ -1,4 +1,4 @@
-package web
+package scoreboard
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func statusHistory(ctx *gin.Context) {
+func Status(ctx *gin.Context) {
 	check := ctx.Param("check")
 	teamStr := ctx.Param("team")
 

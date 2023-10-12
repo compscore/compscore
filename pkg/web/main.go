@@ -6,6 +6,7 @@ import (
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/web/credential"
+	"github.com/compscore/compscore/pkg/web/scoreboard"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -49,11 +50,11 @@ func Start() {
 func LoadRoutes() {
 	API.POST("/login", login)
 	API.POST("/info", info)
-	API.GET("/scoreboard", scoreboard)
-	API.GET("/scoreboard/team/:team", teamScoreboard)
-	API.GET("/scoreboard/check/:check", checkScoreboard)
-	API.GET("/scoreboard/round/:round", roundScoreboard)
-	API.GET("/status/check/:check/team/:team", statusHistory)
+	API.GET("/scoreboard", scoreboard.Scoreboard)
+	API.GET("/scoreboard/team/:team", scoreboard.Team)
+	API.GET("/scoreboard/check/:check", scoreboard.Check)
+	API.GET("/scoreboard/round/:round", scoreboard.Round)
+	API.GET("/scoreboard/status/:team/:check", scoreboard.Status)
 
 	// Credentials API
 	API.GET("/credentials", credential.Credentials)

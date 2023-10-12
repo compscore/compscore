@@ -1,11 +1,11 @@
-package web
+package scoreboard
 
 import (
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/gin-gonic/gin"
 )
 
-func checkScoreboard(ctx *gin.Context) {
+func Check(ctx *gin.Context) {
 	check := ctx.Param("check")
 
 	checkScoreboard, err := data.Scoreboard.Check(check, 10)

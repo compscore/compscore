@@ -164,8 +164,9 @@ export default function RoundScoreBoard({ round }: props) {
                       setHighlightedCheck(null);
                     }}
                     onClick={() => {
-                      window.location.href =
-                        "/status/check/" + check.name + "/team/" + (team + 1);
+                      window.location.href = `/scoreboard/status/${team + 1}/${
+                        check.name
+                      }`;
                     }}
                   ></TableCell>
                 ))}

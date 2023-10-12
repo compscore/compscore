@@ -167,8 +167,9 @@ export default function CheckScoreBoard({ check }: props) {
                       setHighlightedTeam(null);
                     }}
                     onClick={() => {
-                      window.location.href =
-                        "/status/check/" + check + "/team/" + (index + 1);
+                      window.location.href = `/scoreboard/status/${
+                        index + 1
+                      }/${check}`;
                     }}
                   ></TableCell>
                 ))}
