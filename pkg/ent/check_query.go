@@ -334,7 +334,7 @@ func (cq *CheckQuery) WithCredential(opts ...func(*CredentialQuery)) *CheckQuery
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Name string `json:"name"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -357,7 +357,7 @@ func (cq *CheckQuery) GroupBy(field string, fields ...string) *CheckGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Name string `json:"name"`
 //	}
 //
 //	client.Check.Query().

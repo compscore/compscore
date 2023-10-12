@@ -15,11 +15,11 @@ import (
 type Team struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int `json:"-"`
 	// Team number
-	Number int8 `json:"number,omitempty"`
+	Number int8 `json:"number"`
 	// Team name
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 	// Team password
 	Password string `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.

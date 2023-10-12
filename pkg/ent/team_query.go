@@ -334,7 +334,7 @@ func (tq *TeamQuery) WithCredential(opts ...func(*CredentialQuery)) *TeamQuery {
 // Example:
 //
 //	var v []struct {
-//		Number int8 `json:"number,omitempty"`
+//		Number int8 `json:"number"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -357,7 +357,7 @@ func (tq *TeamQuery) GroupBy(field string, fields ...string) *TeamGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Number int8 `json:"number,omitempty"`
+//		Number int8 `json:"number"`
 //	}
 //
 //	client.Team.Query().

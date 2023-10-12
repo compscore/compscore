@@ -19,13 +19,13 @@ import (
 type Status struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int `json:"-"`
 	// Error message
-	Error string `json:"error,omitempty"`
+	Error string `json:"error"`
 	// Status
-	Status status.Status `json:"status,omitempty"`
+	Status status.Status `json:"status"`
 	// Time of check
-	Time time.Time `json:"time,omitempty"`
+	Time time.Time `json:"time"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StatusQuery when eager-loading is set.
 	Edges        StatusEdges `json:"edges"`

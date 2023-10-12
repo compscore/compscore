@@ -370,7 +370,7 @@ func (sq *StatusQuery) WithRound(opts ...func(*RoundQuery)) *StatusQuery {
 // Example:
 //
 //	var v []struct {
-//		Error string `json:"error,omitempty"`
+//		Error string `json:"error"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -393,7 +393,7 @@ func (sq *StatusQuery) GroupBy(field string, fields ...string) *StatusGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Error string `json:"error,omitempty"`
+//		Error string `json:"error"`
 //	}
 //
 //	client.Status.Query().

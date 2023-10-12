@@ -39,6 +39,12 @@ func (tc *TeamCreate) SetPassword(s string) *TeamCreate {
 	return tc
 }
 
+// SetID sets the "id" field.
+func (tc *TeamCreate) SetID(i int) *TeamCreate {
+	tc.mutation.SetID(i)
+	return tc
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (tc *TeamCreate) AddStatuIDs(ids ...int) *TeamCreate {
 	tc.mutation.AddStatuIDs(ids...)
@@ -141,8 +147,10 @@ func (tc *TeamCreate) sqlSave(ctx context.Context) (*Team, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	tc.mutation.id = &_node.ID
 	tc.mutation.done = true
 	return _node, nil
@@ -153,6 +161,10 @@ func (tc *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 		_node = &Team{config: tc.config}
 		_spec = sqlgraph.NewCreateSpec(team.Table, sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt))
 	)
+	if id, ok := tc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := tc.mutation.Number(); ok {
 		_spec.SetField(team.FieldNumber, field.TypeInt8, value)
 		_node.Number = value
@@ -240,7 +252,7 @@ func (tcb *TeamCreateBulk) Save(ctx context.Context) ([]*Team, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

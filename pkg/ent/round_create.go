@@ -40,6 +40,12 @@ func (rc *RoundCreate) SetNillableComplete(b *bool) *RoundCreate {
 	return rc
 }
 
+// SetID sets the "id" field.
+func (rc *RoundCreate) SetID(i int) *RoundCreate {
+	rc.mutation.SetID(i)
+	return rc
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by IDs.
 func (rc *RoundCreate) AddStatuIDs(ids ...int) *RoundCreate {
 	rc.mutation.AddStatuIDs(ids...)
@@ -123,8 +129,10 @@ func (rc *RoundCreate) sqlSave(ctx context.Context) (*Round, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	rc.mutation.id = &_node.ID
 	rc.mutation.done = true
 	return _node, nil
@@ -135,6 +143,10 @@ func (rc *RoundCreate) createSpec() (*Round, *sqlgraph.CreateSpec) {
 		_node = &Round{config: rc.config}
 		_spec = sqlgraph.NewCreateSpec(round.Table, sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt))
 	)
+	if id, ok := rc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := rc.mutation.Number(); ok {
 		_spec.SetField(round.FieldNumber, field.TypeInt, value)
 		_node.Number = value
@@ -203,7 +215,7 @@ func (rcb *RoundCreateBulk) Save(ctx context.Context) ([]*Round, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

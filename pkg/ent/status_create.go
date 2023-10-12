@@ -65,6 +65,12 @@ func (sc *StatusCreate) SetNillableTime(t *time.Time) *StatusCreate {
 	return sc
 }
 
+// SetID sets the "id" field.
+func (sc *StatusCreate) SetID(i int) *StatusCreate {
+	sc.mutation.SetID(i)
+	return sc
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
 func (sc *StatusCreate) SetCheckID(id int) *StatusCreate {
 	sc.mutation.SetCheckID(id)
@@ -179,8 +185,10 @@ func (sc *StatusCreate) sqlSave(ctx context.Context) (*Status, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -191,6 +199,10 @@ func (sc *StatusCreate) createSpec() (*Status, *sqlgraph.CreateSpec) {
 		_node = &Status{config: sc.config}
 		_spec = sqlgraph.NewCreateSpec(status.Table, sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt))
 	)
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sc.mutation.Error(); ok {
 		_spec.SetField(status.FieldError, field.TypeString, value)
 		_node.Error = value
@@ -298,7 +310,7 @@ func (scb *StatusCreateBulk) Save(ctx context.Context) ([]*Status, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

@@ -298,7 +298,7 @@ func (rq *RoundQuery) WithStatus(opts ...func(*StatusQuery)) *RoundQuery {
 // Example:
 //
 //	var v []struct {
-//		Number int `json:"number,omitempty"`
+//		Number int `json:"number"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -321,7 +321,7 @@ func (rq *RoundQuery) GroupBy(field string, fields ...string) *RoundGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Number int `json:"number,omitempty"`
+//		Number int `json:"number"`
 //	}
 //
 //	client.Round.Query().

@@ -15,11 +15,11 @@ import (
 type Round struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int `json:"-"`
 	// Round number
-	Number int `json:"number,omitempty"`
+	Number int `json:"number"`
 	// Round Complete
-	Complete bool `json:"complete,omitempty"`
+	Complete bool `json:"complete"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoundQuery when eager-loading is set.
 	Edges        RoundEdges `json:"edges"`
