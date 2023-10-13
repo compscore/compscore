@@ -89,5 +89,4 @@ func LoadRoutes() {
 	// Team Endpoints
 	API.GET("/teams", team.Teams)
 	API.GET("/team/:team", team.Get)
-	API.POST("/team/:team", team.Post)
 }
