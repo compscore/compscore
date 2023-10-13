@@ -91,14 +91,12 @@ func (*check_s) getWithTeamCredenital(name string, team_number int8) (*ent.Check
 		Query().
 		WithCredential(
 			func(q *ent.CredentialQuery) {
-				q.Where(
-					credential.HasTeamWith(
-						team.NumberEQ(team_number),
-					),
-				)
-			},
-			func(q *ent.CredentialQuery) {
-				q.WithTeam()
+				q.WithTeam().
+					Where(
+						credential.HasTeamWith(
+							team.NumberEQ(team_number),
+						),
+					)
 			},
 		).
 		Where(
