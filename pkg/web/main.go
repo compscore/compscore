@@ -71,7 +71,6 @@ func LoadRoutes() {
 	// Check Endpoints
 	API.GET("/checks", check.Checks)
 	API.GET("/check/:check", check.Get)
-	API.POST("/check/:check", check.Post)
 
 	// Round Endpoints
 	API.GET("/rounds", round.Rounds)

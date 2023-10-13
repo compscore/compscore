@@ -3,6 +3,8 @@ package data
 import (
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
+	"github.com/compscore/compscore/pkg/ent/team"
 	"github.com/sirupsen/logrus"
 )
 
@@ -82,6 +84,69 @@ func (*check_s) GetWithStatus(name string) (*ent.Check, error) {
 	defer mutex.Unlock()
 
 	return Check.getWithStatus(name)
+}
+
+func (*check_s) getWithTeamCredenital(name string, team_number int8) (*ent.Check, error) {
+	return client.Check.
+		Query().
+		WithCredential(
+			func(q *ent.CredentialQuery) {
+				q.Where(
+					credential.HasTeamWith(
+						team.NumberEQ(team_number),
+					),
+				)
+			},
+			func(q *ent.CredentialQuery) {
+				q.WithTeam()
+			},
+		).
+		Where(
+			check.NameEQ(name),
+		).Only(ctx)
+}
+
+func (*check_s) GetWithTeamCredenital(name string, team_number int8) (*ent.Check, error) {
+	mutex.Lock()
+	logrus.Trace("check_s.GetWithTeamCredenital: lock")
+	defer mutex.Unlock()
+
+	return Check.getWithTeamCredenital(name, team_number)
+}
+
+func (*check_s) getWithCredentials(name string) (*ent.Check, error) {
+	return client.Check.
+		Query().
+		WithCredential().
+		Where(
+			check.NameEQ(name),
+		).Only(ctx)
+}
+
+func (*check_s) GetWithCredentials(name string) (*ent.Check, error) {
+	mutex.Lock()
+	logrus.Trace("check_s.GetWithCredentials: lock")
+	defer mutex.Unlock()
+
+	return Check.getWithCredentials(name)
+}
+
+func (*check_s) getWithEdges(name string) (*ent.Check, error) {
+	return client.Check.
+		Query().
+		WithCredential().
+		WithStatus().
+		Where(
+			check.NameEQ(name),
+		).Only(ctx)
+}
+
+func (*check_s) GetWithEdges(name string) (*ent.Check, error) {
+	mutex.Lock()
+	logrus.Trace("check_s.GetWithEdges: lock")
+	defer mutex.Unlock()
+
+	return Check.getWithEdges(name)
 }
 
 func (*check_s) getAll() ([]*ent.Check, error) {
