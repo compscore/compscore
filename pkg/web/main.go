@@ -79,7 +79,6 @@ func LoadRoutes() {
 	// Status Endpoints
 	API.GET("/statuses", status.Statuses)
 	API.GET("/status/:team/:check", status.Get)
-	API.POST("/status/:team/:check", status.Post)
 
 	// Team Endpoints
 	API.GET("/teams", team.Teams)
