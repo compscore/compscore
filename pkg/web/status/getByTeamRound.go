@@ -1,4 +1,4 @@
-package team
+package status
 
 import (
 	"strconv"
@@ -7,8 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Get(ctx *gin.Context) {
+func GetByTeamRound(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
+	roundStr := ctx.Param("round")
 
 	team, err := strconv.Atoi(teamStr)
 	if err != nil {
@@ -18,7 +19,7 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	entTeam, err := data.Team.Get(int8(team))
+	round, err := strconv.Atoi(roundStr)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),
@@ -26,5 +27,13 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, entTeam)
+	entStatus, err := data.Status.GetAllByRoundAndTeamWithEdges(round, int8(team))
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, entStatus)
 }

@@ -1,4 +1,4 @@
-package team
+package status
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Get(ctx *gin.Context) {
+func GetByTeam(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 
 	team, err := strconv.Atoi(teamStr)
@@ -18,7 +18,7 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	entTeam, err := data.Team.Get(int8(team))
+	entStatus, err := data.Status.GetAllByTeamWithEdges(int8(team))
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),
@@ -26,5 +26,5 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, entTeam)
+	ctx.JSON(200, entStatus)
 }

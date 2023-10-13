@@ -1,12 +1,14 @@
-package team
+package status
 
 import (
 	"github.com/compscore/compscore/pkg/data"
 	"github.com/gin-gonic/gin"
 )
 
-func Teams(ctx *gin.Context) {
-	entTeams, err := data.Team.GetAll()
+func GetByCheck(ctx *gin.Context) {
+	check := ctx.Param("check")
+
+	entStatus, err := data.Status.GetAllByCheckWithEdges(check)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),
@@ -14,5 +16,5 @@ func Teams(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, entTeams)
+	ctx.JSON(200, entStatus)
 }

@@ -71,20 +71,22 @@ func LoadRoutes() {
 	// Check Endpoints
 	API.GET("/checks", check.Checks)
 	API.GET("/check/:check", check.Get)
-	API.POST("/check/:check", check.Post)
 
 	// Round Endpoints
 	API.GET("/rounds", round.Rounds)
 	API.GET("/round/:round", round.Get)
-	API.POST("/round/:round", round.Post)
 
 	// Status Endpoints
 	API.GET("/statuses", status.Statuses)
-	API.GET("/status/:team/:check", status.Get)
-	API.POST("/status/:team/:check", status.Post)
+	API.GET("/status/:team/:check/:round", status.Get)
+	API.GET("/status/team/:team", status.GetByTeam)
+	API.GET("/status/check/:check", status.GetByCheck)
+	API.GET("/status/round/:round", status.GetByRound)
+	API.GET("/status/team/:team/check/:check", status.GetByTeamCheck)
+	API.GET("/status/team/:team/round/:round", status.GetByTeamRound)
+	API.GET("/status/check/:check/round/:round", status.GetByCheckRound)
 
 	// Team Endpoints
 	API.GET("/teams", team.Teams)
 	API.GET("/team/:team", team.Get)
-	API.POST("/team/:team", team.Post)
 }

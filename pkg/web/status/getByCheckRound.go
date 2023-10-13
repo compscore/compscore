@@ -1,4 +1,4 @@
-package round
+package status
 
 import (
 	"strconv"
@@ -7,7 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Get(ctx *gin.Context) {
+func GetByCheckRound(ctx *gin.Context) {
+	check := ctx.Param("check")
 	roundStr := ctx.Param("round")
 
 	round_number, err := strconv.Atoi(roundStr)
@@ -18,7 +19,7 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	entRound, err := data.Round.Get(round_number)
+	entStatus, err := data.Status.GetAllByRoundAndCheckWithEdges(round_number, check)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),
@@ -26,5 +27,5 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, entRound)
+	ctx.JSON(200, entStatus)
 }
