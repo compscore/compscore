@@ -82,7 +82,7 @@ func LoadRoutes() {
 	API.GET("/status/team/:team", status.GetByTeam)
 	API.GET("/status/check/:check", status.GetByCheck)
 	API.GET("/status/round/:round", status.GetByRound)
-	// API.GET("/status/team/:team/check/:check", status.GetByTeamCheck)
+	API.GET("/status/team/:team/check/:check", status.GetByTeamCheck)
 	// API.GET("/status/team/:team/round/:round", status.GetByTeamRound)
 	// API.GET("/status/check/:check/round/:round", status.GetByCheckRound)
 
