@@ -70,6 +70,11 @@ func UpdateConfiguration() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal checks config")
 	}
+
+	err = viper.UnmarshalKey("users", &AdminUsers)
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to unmarshal users config")
+	}
 }
 
 func FileExists(path string) (bool, error) {
