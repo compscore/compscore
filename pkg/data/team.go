@@ -34,6 +34,23 @@ func (*team_s) Exists(number int8) (bool, error) {
 	return Team.exists(number)
 }
 
+func existsByName(name string) (bool, error) {
+	return client.Team.
+		Query().
+		Where(
+			team.NameEQ(name),
+		).
+		Exist(ctx)
+}
+
+func (*team_s) ExistsByName(name string) (bool, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.ExistsByName: lock")
+	defer mutex.Unlock()
+
+	return existsByName(name)
+}
+
 func (*team_s) get(number int8) (*ent.Team, error) {
 	exists, err := Team.exists(number)
 	if err != nil {
@@ -286,6 +303,28 @@ func (*team_s) Create(number int8, name string, password string) (*ent.Team, err
 	defer mutex.Unlock()
 
 	return Team.create(number, name, password)
+}
+
+func createAdminUser(username string, password string) (*ent.Team, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Team.
+		Create().
+		SetName(username).
+		SetPassword(string(hashedPassword)).
+		SetRole(team.RoleAdmin).
+		Save(ctx)
+}
+
+func (*team_s) CreateAdminUser(username string, password string) (*ent.Team, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.CreateAdminUser: lock")
+	defer mutex.Unlock()
+
+	return createAdminUser(username, password)
 }
 
 func (*team_s) update(team *ent.Team, number int8, name string) (*ent.Team, error) {
