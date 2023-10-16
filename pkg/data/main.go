@@ -36,6 +36,7 @@ func Init() {
 		log.Fatalf("failed parsing team name template: %v", err)
 	}
 
+	// Create admin users if they do not exist
 	for _, adminUser := range config.AdminUsers {
 		exists, err := Team.ExistsByName(adminUser.Username)
 		if err != nil {
