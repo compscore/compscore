@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/data"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -11,8 +12,14 @@ import (
 func GenerateJWT(team string) (string, int, error) {
 	expiration := time.Now().Add(time.Duration(config.Web.Timeout) * time.Hour)
 
+	role, err := data.Team.GetRole(team)
+	if err != nil {
+		return "", 0, err
+	}
+
 	claims := &structs.Claims{
 		Team: team,
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiration),
 		},

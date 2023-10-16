@@ -28,6 +28,7 @@ export type credential = {
 export type team = {
   number: number;
   name: string;
+  role: string;
   edges: {
     status?: status;
     credential?: credential;

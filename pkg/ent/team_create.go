@@ -27,6 +27,14 @@ func (tc *TeamCreate) SetNumber(i int8) *TeamCreate {
 	return tc
 }
 
+// SetNillableNumber sets the "number" field if the given value is not nil.
+func (tc *TeamCreate) SetNillableNumber(i *int8) *TeamCreate {
+	if i != nil {
+		tc.SetNumber(*i)
+	}
+	return tc
+}
+
 // SetName sets the "name" field.
 func (tc *TeamCreate) SetName(s string) *TeamCreate {
 	tc.mutation.SetName(s)
@@ -36,6 +44,20 @@ func (tc *TeamCreate) SetName(s string) *TeamCreate {
 // SetPassword sets the "password" field.
 func (tc *TeamCreate) SetPassword(s string) *TeamCreate {
 	tc.mutation.SetPassword(s)
+	return tc
+}
+
+// SetRole sets the "role" field.
+func (tc *TeamCreate) SetRole(t team.Role) *TeamCreate {
+	tc.mutation.SetRole(t)
+	return tc
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (tc *TeamCreate) SetNillableRole(t *team.Role) *TeamCreate {
+	if t != nil {
+		tc.SetRole(*t)
+	}
 	return tc
 }
 
@@ -82,6 +104,7 @@ func (tc *TeamCreate) Mutation() *TeamMutation {
 
 // Save creates the Team in the database.
 func (tc *TeamCreate) Save(ctx context.Context) (*Team, error) {
+	tc.defaults()
 	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
 }
 
@@ -107,11 +130,16 @@ func (tc *TeamCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (tc *TeamCreate) defaults() {
+	if _, ok := tc.mutation.Role(); !ok {
+		v := team.DefaultRole
+		tc.mutation.SetRole(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (tc *TeamCreate) check() error {
-	if _, ok := tc.mutation.Number(); !ok {
-		return &ValidationError{Name: "number", err: errors.New(`ent: missing required field "Team.number"`)}
-	}
 	if v, ok := tc.mutation.Number(); ok {
 		if err := team.NumberValidator(v); err != nil {
 			return &ValidationError{Name: "number", err: fmt.Errorf(`ent: validator failed for field "Team.number": %w`, err)}
@@ -131,6 +159,14 @@ func (tc *TeamCreate) check() error {
 	if v, ok := tc.mutation.Password(); ok {
 		if err := team.PasswordValidator(v); err != nil {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Team.password": %w`, err)}
+		}
+	}
+	if _, ok := tc.mutation.Role(); !ok {
+		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "Team.role"`)}
+	}
+	if v, ok := tc.mutation.Role(); ok {
+		if err := team.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "Team.role": %w`, err)}
 		}
 	}
 	return nil
@@ -176,6 +212,10 @@ func (tc *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Password(); ok {
 		_spec.SetField(team.FieldPassword, field.TypeString, value)
 		_node.Password = value
+	}
+	if value, ok := tc.mutation.Role(); ok {
+		_spec.SetField(team.FieldRole, field.TypeEnum, value)
+		_node.Role = value
 	}
 	if nodes := tc.mutation.StatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -226,6 +266,7 @@ func (tcb *TeamCreateBulk) Save(ctx context.Context) ([]*Team, error) {
 	for i := range tcb.builders {
 		func(i int, root context.Context) {
 			builder := tcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TeamMutation)
 				if !ok {

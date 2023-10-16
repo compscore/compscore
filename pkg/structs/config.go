@@ -67,3 +67,8 @@ type RunningConfig_s struct {
 	Engine  Engine_s  `yaml:"engine"`
 	Teams   []Team_s  `yaml:"teams"`
 }
+
+type AdminUser_s struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}

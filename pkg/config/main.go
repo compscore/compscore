@@ -12,12 +12,13 @@ import (
 var (
 	ConfigFile string = "config.yml"
 
-	Name    string
-	Engine  structs.Engine_s
-	Web     structs.Web_s
-	Teams   structs.Teams_s
-	Scoring structs.Scoring_s
-	Checks  []structs.Check_s
+	Name       string
+	Engine     structs.Engine_s
+	Web        structs.Web_s
+	Teams      structs.Teams_s
+	Scoring    structs.Scoring_s
+	Checks     []structs.Check_s
+	AdminUsers []structs.AdminUser_s
 )
 
 func Init() {
@@ -68,6 +69,11 @@ func UpdateConfiguration() {
 	err = viper.UnmarshalKey("checks", &Checks)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal checks config")
+	}
+
+	err = viper.UnmarshalKey("users", &AdminUsers)
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to unmarshal users config")
 	}
 }
 

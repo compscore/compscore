@@ -108,6 +108,16 @@ func NumberLTE(v int8) predicate.Team {
 	return predicate.Team(sql.FieldLTE(FieldNumber, v))
 }
 
+// NumberIsNil applies the IsNil predicate on the "number" field.
+func NumberIsNil() predicate.Team {
+	return predicate.Team(sql.FieldIsNull(FieldNumber))
+}
+
+// NumberNotNil applies the NotNil predicate on the "number" field.
+func NumberNotNil() predicate.Team {
+	return predicate.Team(sql.FieldNotNull(FieldNumber))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Team {
 	return predicate.Team(sql.FieldEQ(FieldName, v))
@@ -236,6 +246,26 @@ func PasswordEqualFold(v string) predicate.Team {
 // PasswordContainsFold applies the ContainsFold predicate on the "password" field.
 func PasswordContainsFold(v string) predicate.Team {
 	return predicate.Team(sql.FieldContainsFold(FieldPassword, v))
+}
+
+// RoleEQ applies the EQ predicate on the "role" field.
+func RoleEQ(v Role) predicate.Team {
+	return predicate.Team(sql.FieldEQ(FieldRole, v))
+}
+
+// RoleNEQ applies the NEQ predicate on the "role" field.
+func RoleNEQ(v Role) predicate.Team {
+	return predicate.Team(sql.FieldNEQ(FieldRole, v))
+}
+
+// RoleIn applies the In predicate on the "role" field.
+func RoleIn(vs ...Role) predicate.Team {
+	return predicate.Team(sql.FieldIn(FieldRole, vs...))
+}
+
+// RoleNotIn applies the NotIn predicate on the "role" field.
+func RoleNotIn(vs ...Role) predicate.Team {
+	return predicate.Team(sql.FieldNotIn(FieldRole, vs...))
 }
 
 // HasStatus applies the HasEdge predicate on the "status" edge.

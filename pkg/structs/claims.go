@@ -6,6 +6,7 @@ import (
 
 type Claims struct {
 	Team string
+	Role string
 	jwt.RegisteredClaims
 }
 
