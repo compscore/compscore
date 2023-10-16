@@ -305,7 +305,7 @@ func (*team_s) Create(number int8, name string, password string) (*ent.Team, err
 	return Team.create(number, name, password)
 }
 
-func createAdminUser(username string, password string) (*ent.Team, error) {
+func (*team_s) createAdminUser(username string, password string) (*ent.Team, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -324,7 +324,24 @@ func (*team_s) CreateAdminUser(username string, password string) (*ent.Team, err
 	logrus.Trace("team_s.CreateAdminUser: lock")
 	defer mutex.Unlock()
 
-	return createAdminUser(username, password)
+	return Team.createAdminUser(username, password)
+}
+
+func (*team_s) getRole(name string) (string, error) {
+	teamEnt, err := Team.getByName(name)
+	if err != nil {
+		return "", err
+	}
+
+	return string(teamEnt.Role), nil
+}
+
+func (*team_s) GetRole(name string) (string, error) {
+	mutex.Lock()
+	logrus.Trace("team_s.GetTeamRole: lock")
+	defer mutex.Unlock()
+
+	return Team.getRole(name)
 }
 
 func (*team_s) update(team *ent.Team, number int8, name string) (*ent.Team, error) {
