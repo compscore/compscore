@@ -18,6 +18,7 @@ func (Team) Fields() []ent.Field {
 		field.Int8("number").
 			StructTag(`json:"number"`).
 			Comment("Team number").
+			Optional().
 			Unique().
 			Positive(),
 		field.String("name").
@@ -31,6 +32,11 @@ func (Team) Fields() []ent.Field {
 			NotEmpty(),
 		field.Int("id").
 			StructTag(`json:"-"`),
+		field.Enum("role").
+			StructTag(`json:"role"`).
+			Comment("User Permissions").
+			Values("admin", "user").
+			Default("user"),
 	}
 }
 
