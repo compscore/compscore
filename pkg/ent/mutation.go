@@ -2173,6 +2173,7 @@ type TeamMutation struct {
 	addnumber         *int8
 	name              *string
 	password          *string
+	role              *team.Role
 	clearedFields     map[string]struct{}
 	status            map[int]struct{}
 	removedstatus     map[int]struct{}
@@ -2339,10 +2340,24 @@ func (m *TeamMutation) AddedNumber() (r int8, exists bool) {
 	return *v, true
 }
 
+// ClearNumber clears the value of the "number" field.
+func (m *TeamMutation) ClearNumber() {
+	m.number = nil
+	m.addnumber = nil
+	m.clearedFields[team.FieldNumber] = struct{}{}
+}
+
+// NumberCleared returns if the "number" field was cleared in this mutation.
+func (m *TeamMutation) NumberCleared() bool {
+	_, ok := m.clearedFields[team.FieldNumber]
+	return ok
+}
+
 // ResetNumber resets all changes to the "number" field.
 func (m *TeamMutation) ResetNumber() {
 	m.number = nil
 	m.addnumber = nil
+	delete(m.clearedFields, team.FieldNumber)
 }
 
 // SetName sets the "name" field.
@@ -2415,6 +2430,42 @@ func (m *TeamMutation) OldPassword(ctx context.Context) (v string, err error) {
 // ResetPassword resets all changes to the "password" field.
 func (m *TeamMutation) ResetPassword() {
 	m.password = nil
+}
+
+// SetRole sets the "role" field.
+func (m *TeamMutation) SetRole(t team.Role) {
+	m.role = &t
+}
+
+// Role returns the value of the "role" field in the mutation.
+func (m *TeamMutation) Role() (r team.Role, exists bool) {
+	v := m.role
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRole returns the old "role" field's value of the Team entity.
+// If the Team object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TeamMutation) OldRole(ctx context.Context) (v team.Role, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRole is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRole requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRole: %w", err)
+	}
+	return oldValue.Role, nil
+}
+
+// ResetRole resets all changes to the "role" field.
+func (m *TeamMutation) ResetRole() {
+	m.role = nil
 }
 
 // AddStatuIDs adds the "status" edge to the Status entity by ids.
@@ -2559,7 +2610,7 @@ func (m *TeamMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TeamMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.number != nil {
 		fields = append(fields, team.FieldNumber)
 	}
@@ -2568,6 +2619,9 @@ func (m *TeamMutation) Fields() []string {
 	}
 	if m.password != nil {
 		fields = append(fields, team.FieldPassword)
+	}
+	if m.role != nil {
+		fields = append(fields, team.FieldRole)
 	}
 	return fields
 }
@@ -2583,6 +2637,8 @@ func (m *TeamMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case team.FieldPassword:
 		return m.Password()
+	case team.FieldRole:
+		return m.Role()
 	}
 	return nil, false
 }
@@ -2598,6 +2654,8 @@ func (m *TeamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case team.FieldPassword:
 		return m.OldPassword(ctx)
+	case team.FieldRole:
+		return m.OldRole(ctx)
 	}
 	return nil, fmt.Errorf("unknown Team field %s", name)
 }
@@ -2627,6 +2685,13 @@ func (m *TeamMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
+		return nil
+	case team.FieldRole:
+		v, ok := value.(team.Role)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRole(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Team field %s", name)
@@ -2672,7 +2737,11 @@ func (m *TeamMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TeamMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(team.FieldNumber) {
+		fields = append(fields, team.FieldNumber)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2685,6 +2754,11 @@ func (m *TeamMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TeamMutation) ClearField(name string) error {
+	switch name {
+	case team.FieldNumber:
+		m.ClearNumber()
+		return nil
+	}
 	return fmt.Errorf("unknown Team nullable field %s", name)
 }
 
@@ -2700,6 +2774,9 @@ func (m *TeamMutation) ResetField(name string) error {
 		return nil
 	case team.FieldPassword:
 		m.ResetPassword()
+		return nil
+	case team.FieldRole:
+		m.ResetRole()
 		return nil
 	}
 	return fmt.Errorf("unknown Team field %s", name)

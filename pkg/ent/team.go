@@ -22,6 +22,8 @@ type Team struct {
 	Name string `json:"name"`
 	// Team password
 	Password string `json:"-"`
+	// User Permissions
+	Role team.Role `json:"role"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TeamQuery when eager-loading is set.
 	Edges        TeamEdges `json:"edges"`
@@ -64,7 +66,7 @@ func (*Team) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case team.FieldID, team.FieldNumber:
 			values[i] = new(sql.NullInt64)
-		case team.FieldName, team.FieldPassword:
+		case team.FieldName, team.FieldPassword, team.FieldRole:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -104,6 +106,12 @@ func (t *Team) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				t.Password = value.String
+			}
+		case team.FieldRole:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field role", values[i])
+			} else if value.Valid {
+				t.Role = team.Role(value.String)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -158,6 +166,9 @@ func (t *Team) String() string {
 	builder.WriteString(t.Name)
 	builder.WriteString(", ")
 	builder.WriteString("password=<sensitive>")
+	builder.WriteString(", ")
+	builder.WriteString("role=")
+	builder.WriteString(fmt.Sprintf("%v", t.Role))
 	builder.WriteByte(')')
 	return builder.String()
 }

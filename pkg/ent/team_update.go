@@ -36,9 +36,23 @@ func (tu *TeamUpdate) SetNumber(i int8) *TeamUpdate {
 	return tu
 }
 
+// SetNillableNumber sets the "number" field if the given value is not nil.
+func (tu *TeamUpdate) SetNillableNumber(i *int8) *TeamUpdate {
+	if i != nil {
+		tu.SetNumber(*i)
+	}
+	return tu
+}
+
 // AddNumber adds i to the "number" field.
 func (tu *TeamUpdate) AddNumber(i int8) *TeamUpdate {
 	tu.mutation.AddNumber(i)
+	return tu
+}
+
+// ClearNumber clears the value of the "number" field.
+func (tu *TeamUpdate) ClearNumber() *TeamUpdate {
+	tu.mutation.ClearNumber()
 	return tu
 }
 
@@ -51,6 +65,20 @@ func (tu *TeamUpdate) SetName(s string) *TeamUpdate {
 // SetPassword sets the "password" field.
 func (tu *TeamUpdate) SetPassword(s string) *TeamUpdate {
 	tu.mutation.SetPassword(s)
+	return tu
+}
+
+// SetRole sets the "role" field.
+func (tu *TeamUpdate) SetRole(t team.Role) *TeamUpdate {
+	tu.mutation.SetRole(t)
+	return tu
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (tu *TeamUpdate) SetNillableRole(t *team.Role) *TeamUpdate {
+	if t != nil {
+		tu.SetRole(*t)
+	}
 	return tu
 }
 
@@ -175,6 +203,11 @@ func (tu *TeamUpdate) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Team.password": %w`, err)}
 		}
 	}
+	if v, ok := tu.mutation.Role(); ok {
+		if err := team.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "Team.role": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -196,11 +229,17 @@ func (tu *TeamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.AddedNumber(); ok {
 		_spec.AddField(team.FieldNumber, field.TypeInt8, value)
 	}
+	if tu.mutation.NumberCleared() {
+		_spec.ClearField(team.FieldNumber, field.TypeInt8)
+	}
 	if value, ok := tu.mutation.Name(); ok {
 		_spec.SetField(team.FieldName, field.TypeString, value)
 	}
 	if value, ok := tu.mutation.Password(); ok {
 		_spec.SetField(team.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := tu.mutation.Role(); ok {
+		_spec.SetField(team.FieldRole, field.TypeEnum, value)
 	}
 	if tu.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -319,9 +358,23 @@ func (tuo *TeamUpdateOne) SetNumber(i int8) *TeamUpdateOne {
 	return tuo
 }
 
+// SetNillableNumber sets the "number" field if the given value is not nil.
+func (tuo *TeamUpdateOne) SetNillableNumber(i *int8) *TeamUpdateOne {
+	if i != nil {
+		tuo.SetNumber(*i)
+	}
+	return tuo
+}
+
 // AddNumber adds i to the "number" field.
 func (tuo *TeamUpdateOne) AddNumber(i int8) *TeamUpdateOne {
 	tuo.mutation.AddNumber(i)
+	return tuo
+}
+
+// ClearNumber clears the value of the "number" field.
+func (tuo *TeamUpdateOne) ClearNumber() *TeamUpdateOne {
+	tuo.mutation.ClearNumber()
 	return tuo
 }
 
@@ -334,6 +387,20 @@ func (tuo *TeamUpdateOne) SetName(s string) *TeamUpdateOne {
 // SetPassword sets the "password" field.
 func (tuo *TeamUpdateOne) SetPassword(s string) *TeamUpdateOne {
 	tuo.mutation.SetPassword(s)
+	return tuo
+}
+
+// SetRole sets the "role" field.
+func (tuo *TeamUpdateOne) SetRole(t team.Role) *TeamUpdateOne {
+	tuo.mutation.SetRole(t)
+	return tuo
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (tuo *TeamUpdateOne) SetNillableRole(t *team.Role) *TeamUpdateOne {
+	if t != nil {
+		tuo.SetRole(*t)
+	}
 	return tuo
 }
 
@@ -471,6 +538,11 @@ func (tuo *TeamUpdateOne) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Team.password": %w`, err)}
 		}
 	}
+	if v, ok := tuo.mutation.Role(); ok {
+		if err := team.RoleValidator(v); err != nil {
+			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "Team.role": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -509,11 +581,17 @@ func (tuo *TeamUpdateOne) sqlSave(ctx context.Context) (_node *Team, err error) 
 	if value, ok := tuo.mutation.AddedNumber(); ok {
 		_spec.AddField(team.FieldNumber, field.TypeInt8, value)
 	}
+	if tuo.mutation.NumberCleared() {
+		_spec.ClearField(team.FieldNumber, field.TypeInt8)
+	}
 	if value, ok := tuo.mutation.Name(); ok {
 		_spec.SetField(team.FieldName, field.TypeString, value)
 	}
 	if value, ok := tuo.mutation.Password(); ok {
 		_spec.SetField(team.FieldPassword, field.TypeString, value)
+	}
+	if value, ok := tuo.mutation.Role(); ok {
+		_spec.SetField(team.FieldRole, field.TypeEnum, value)
 	}
 	if tuo.mutation.StatusCleared() {
 		edge := &sqlgraph.EdgeSpec{
