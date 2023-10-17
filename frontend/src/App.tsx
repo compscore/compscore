@@ -46,6 +46,7 @@ export default function App() {
                 path='/scoreboard/status/:team/:check'
                 element={<StatusScoreboard />}
               />
+              <Route path='*' element={<Index />} />
             </Routes>
           </SnackbarProvider>
         </BrowserRouter>
