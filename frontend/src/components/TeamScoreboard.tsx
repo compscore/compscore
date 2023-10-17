@@ -17,7 +17,7 @@ type props = {
   team: number;
 };
 
-export default function TeamScoreBoard({ team }: props) {
+export default function TeamScoreboardComponent({ team }: props) {
   const [data, setData] = useState<TeamScoreboard>();
 
   useEffect(() => {

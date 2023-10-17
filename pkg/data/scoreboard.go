@@ -29,14 +29,15 @@ func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 		}
 
 		statuses := make([]int, config.Teams.Amount)
+		for i := 0; i < config.Teams.Amount; i++ {
+			statuses[i] = 2
+		}
 		for i, entStat := range entStatus {
 			switch entStat.Status {
 			case status.StatusDown:
 				statuses[i] = 0
 			case status.StatusUp:
 				statuses[i] = 1
-			case status.StatusUnknown:
-				statuses[i] = 2
 			}
 		}
 		scoreboardCheck.Status = statuses

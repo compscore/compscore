@@ -12,8 +12,10 @@ import {
 } from "@mui/material";
 import PasswordInput from "../components/PasswordInput";
 import { useEffect, useState } from "react";
-import { credential } from "../models/ent";
+import { Credential } from "../models/ent";
 import { enqueueSnackbar } from "notistack";
+import jwt_decode from "jwt-decode";
+import { JWT } from "../models/JWT";
 
 type Props = {
   cookies: {
@@ -26,7 +28,30 @@ export default function Checks({ cookies }: Props) {
     window.location.href = "/login";
   }
 
-  const [credentials, setCredentials] = useState<[credential] | undefined>(
+  if (cookies.auth && (jwt_decode(cookies.auth) as JWT).Role === "admin") {
+    return (
+      <Container component='main' maxWidth='xs'>
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography component='h1' variant='h3' fontWeight={700}>
+            Check Editor
+          </Typography>
+          <Box sx={{ m: 1 }} />
+          <Typography variant='h6' component='h1'>
+            You do not have any checks to edit.
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  const [credentials, setCredentials] = useState<[Credential] | undefined>(
     undefined
   );
   const fetchChecks = () => {

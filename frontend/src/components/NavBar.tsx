@@ -1,9 +1,12 @@
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
-import { Avatar, Typography } from "@mui/material";
-import Link from "@mui/material/Link";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Link,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import jwt_decode from "jwt-decode";
 import { JWT } from "../models/JWT";
 
@@ -11,14 +14,13 @@ type Props = {
   cookies: {
     auth?: any;
   };
-  setCookie: (
+  removeCookie: (
     name: "auth",
-    value: any,
-    options?: import("universal-cookie").CookieSetOptions | undefined
+    options?: import("universal-cookie").CookieSetOptions
   ) => void;
 };
 
-export default function NavBar({ cookies, setCookie }: Props) {
+export default function NavBar({ cookies, removeCookie }: Props) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static'>
@@ -39,13 +41,14 @@ export default function NavBar({ cookies, setCookie }: Props) {
           {cookies.auth ? (
             <>
               <Typography variant='h6'>
-                {(jwt_decode(cookies.auth) as JWT).Team}
+                {(jwt_decode(cookies.auth) as JWT).Team} -{" "}
+                {(jwt_decode(cookies.auth) as JWT).Role}
               </Typography>
               <Box sx={{ m: 1 }} />
               <Button
                 color='inherit'
                 onClick={() => {
-                  setCookie("auth", "", { maxAge: -1 });
+                  removeCookie("auth");
                   window.location.href = "/";
                 }}
               >

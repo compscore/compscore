@@ -100,7 +100,7 @@ var (
 		{Name: "number", Type: field.TypeInt8, Unique: true, Nullable: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "role", Type: field.TypeEnum, Enums: []string{"admin", "user"}, Default: "user"},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"admin", "competitor"}, Default: "competitor"},
 	}
 	// TeamsTable holds the schema information for the "teams" table.
 	TeamsTable = &schema.Table{

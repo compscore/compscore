@@ -10,15 +10,15 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { StatusHistory } from "../models/StatusHistory";
+import { StatusScoreboard } from "../models/StatusScoreboard";
 
 type props = {
   check: string;
   team: number;
 };
 
-export default function Status({ check, team }: props) {
-  const [data, setData] = useState<StatusHistory>();
+export default function StatusScoreboardComponent({ check, team }: props) {
+  const [data, setData] = useState<StatusScoreboard>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +29,7 @@ export default function Status({ check, team }: props) {
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as StatusHistory;
+          let response = (await res.json()) as StatusScoreboard;
           if (res.status === 200) {
             setData(response);
           } else {

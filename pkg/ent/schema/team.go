@@ -35,8 +35,8 @@ func (Team) Fields() []ent.Field {
 		field.Enum("role").
 			StructTag(`json:"role"`).
 			Comment("User Permissions").
-			Values("admin", "user").
-			Default("user"),
+			Values("admin", "competitor").
+			Default("competitor"),
 	}
 }
 
