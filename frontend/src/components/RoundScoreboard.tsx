@@ -17,7 +17,7 @@ type props = {
   round: string;
 };
 
-export default function RoundScoreBoard({ round }: props) {
+export default function RoundScoreboardComponent({ round }: props) {
   const [data, setData] = useState<Scoreboard>();
 
   useEffect(() => {
@@ -86,16 +86,13 @@ export default function RoundScoreBoard({ round }: props) {
         sx={{
           marginTop: 5,
         }}
-      >
-        Scoreboard
-      </Typography>
-      <Typography
-        component='h1'
-        variant='h5'
         onClick={() => {
           window.location.href = "/scoreboard";
         }}
       >
+        Scoreboard
+      </Typography>
+      <Typography component='h1' variant='h5'>
         Round {data?.round}
       </Typography>
       <Box m={2}></Box>

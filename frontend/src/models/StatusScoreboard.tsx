@@ -1,4 +1,4 @@
-export type StatusHistory = [
+export type StatusScoreboard = [
   {
     error: string;
     time: string;

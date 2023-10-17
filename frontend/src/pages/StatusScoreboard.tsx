@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import { useParams } from "react-router";
-import Status from "../components/Status";
+import StatusScoreboard from "../components/StatusScoreboard";
 
-export default function StatusPage() {
+export default function StatusScoreboardPage() {
   const { check: check, team: team } = useParams() as unknown as {
     check: string;
     team: number;
@@ -18,7 +18,7 @@ export default function StatusPage() {
         margin: "auto",
       }}
     >
-      <Status check={check} team={team} />
+      <StatusScoreboard check={check} team={team} />
     </Box>
   );
 }

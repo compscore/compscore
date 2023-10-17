@@ -17,7 +17,7 @@ type props = {
   check: string;
 };
 
-export default function CheckScoreBoard({ check }: props) {
+export default function CheckScoreboardComponent({ check }: props) {
   const [data, setData] = useState<CheckScoreboard>();
 
   useEffect(() => {
