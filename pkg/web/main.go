@@ -74,6 +74,7 @@ func LoadRoutes() {
 
 	// Round Endpoints
 	API.GET("/rounds", round.Rounds)
+	API.GET("/round/latest", round.Latest)
 	API.GET("/round/:round", round.Get)
 
 	// Status Endpoints

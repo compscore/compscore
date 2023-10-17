@@ -1,45 +1,45 @@
-export type check = {
+export type Check = {
   name: string;
   edges: {
-    status?: status;
-    credential?: credential;
+    status?: Status;
+    credential?: Credential;
   };
 };
 
-export type status = {
+export type Status = {
   error: string;
   status: string;
   time: string;
   edges: {
-    check?: check;
-    team?: team;
-    round?: round;
+    check?: Check;
+    team?: Team;
+    round?: Round;
   };
 };
 
-export type credential = {
+export type Credential = {
   password: string;
   edges: {
-    check?: check;
-    team?: team;
+    check?: Check;
+    team?: Team;
   };
 };
 
-export type team = {
+export type Team = {
   number: number;
   name: string;
   role: string;
   edges: {
-    status?: status;
-    credential?: credential;
-    round?: round;
+    status?: Status;
+    credential?: Credential;
+    round?: Round;
   };
 };
 
-export type round = {
+export type Round = {
   number: number;
   edges: {
-    status?: status;
-    team?: team;
+    status?: Status;
+    team?: Team;
   };
 };
