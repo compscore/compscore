@@ -14,14 +14,13 @@ type Props = {
   cookies: {
     auth?: any;
   };
-  setCookie: (
+  removeCookie: (
     name: "auth",
-    value: any,
-    options?: import("universal-cookie").CookieSetOptions | undefined
+    options?: import("universal-cookie").CookieSetOptions
   ) => void;
 };
 
-export default function NavBar({ cookies, setCookie }: Props) {
+export default function NavBar({ cookies, removeCookie }: Props) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static'>
@@ -49,7 +48,7 @@ export default function NavBar({ cookies, setCookie }: Props) {
               <Button
                 color='inherit'
                 onClick={() => {
-                  setCookie("auth", "", { maxAge: -1 });
+                  removeCookie("auth");
                   window.location.href = "/";
                 }}
               >

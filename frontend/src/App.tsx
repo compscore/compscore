@@ -1,27 +1,27 @@
-import { ThemeProvider } from "@mui/material/styles";
 import { Container, CssBaseline } from "@mui/material";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useCookies } from "react-cookie";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { useSystemTheme } from "./themes/Preference";
+import NavBar from "./components/NavBar";
+import CheckScoreboard from "./pages/CheckScoreboard";
+import Checks from "./pages/Checks";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import NavBar from "./components/NavBar";
-import Scoreboard from "./pages/Scoreboard";
-import TeamScoreboard from "./pages/TeamScoreboard";
-import CheckScoreboard from "./pages/CheckScoreboard";
 import RoundScoreboard from "./pages/RoundScoreboard";
-import Checks from "./pages/Checks";
+import Scoreboard from "./pages/Scoreboard";
 import StatusScoreboard from "./pages/StatusScoreboard";
+import TeamScoreboard from "./pages/TeamScoreboard";
+import { useSystemTheme } from "./themes/Preference";
 
 export default function App() {
-  const [cookies, setCookie] = useCookies(["auth"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
 
   return (
     <ThemeProvider theme={useSystemTheme()}>
       <CssBaseline />
-      <NavBar cookies={cookies} setCookie={setCookie} />
+      <NavBar cookies={cookies} removeCookie={removeCookie} />
       <Container component='main'>
         <BrowserRouter>
           <SnackbarProvider maxSnack={3}>
