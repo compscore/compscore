@@ -1,9 +1,11 @@
 import { Container, CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
+import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
+import Drawer from "./components/Drawer";
 import NavBar from "./components/NavBar";
 import CheckScoreboard from "./pages/CheckScoreboard";
 import Checks from "./pages/Checks";
@@ -17,11 +19,17 @@ import { useSystemTheme } from "./themes/Preference";
 
 export default function App() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
+  const [drawerState, setDrawerState] = useState<boolean>(false);
 
   return (
     <ThemeProvider theme={useSystemTheme()}>
       <CssBaseline />
-      <NavBar cookies={cookies} removeCookie={removeCookie} />
+      <Drawer
+        drawerState={drawerState}
+        setDrawerState={setDrawerState}
+        removeCookie={removeCookie}
+      />
+      <NavBar cookies={cookies} setDrawerState={setDrawerState} />
       <Container component='main'>
         <BrowserRouter>
           <SnackbarProvider maxSnack={3}>
