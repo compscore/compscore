@@ -1,9 +1,12 @@
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Button from "@mui/material/Button";
-import { Avatar, Typography } from "@mui/material";
-import Link from "@mui/material/Link";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Toolbar,
+  Typography,
+  Link,
+} from "@mui/material";
 import jwt_decode from "jwt-decode";
 import { JWT } from "../models/JWT";
 
