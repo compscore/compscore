@@ -3,9 +3,9 @@ import {
   Avatar,
   Box,
   Button,
+  Link,
   Toolbar,
   Typography,
-  Link,
 } from "@mui/material";
 import jwt_decode from "jwt-decode";
 import { JWT } from "../models/JWT";
@@ -42,7 +42,8 @@ export default function NavBar({ cookies, setCookie }: Props) {
           {cookies.auth ? (
             <>
               <Typography variant='h6'>
-                {(jwt_decode(cookies.auth) as JWT).Team}
+                {(jwt_decode(cookies.auth) as JWT).Team} -{" "}
+                {(jwt_decode(cookies.auth) as JWT).Role}
               </Typography>
               <Box sx={{ m: 1 }} />
               <Button
