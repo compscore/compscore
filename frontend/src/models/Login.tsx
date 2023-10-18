@@ -1,7 +1,7 @@
 export type LoginSuccess = {
   name: string;
   token: string;
-  expires: Date;
+  expiration: number;
   path: string;
   domain: string;
   secure: boolean;
