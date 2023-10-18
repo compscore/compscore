@@ -130,23 +130,28 @@ export default function RoundScoreboardComponent({ round }: props) {
           alignItems: "center",
         }}
       >
-        <DoubleArrowLeftIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href =
-              "/scoreboard/round/" + (parseInt(round) - 10);
-          }}
-        />
-        <ArrowLeftIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + (parseInt(round) - 1);
-          }}
-        />
+        {parseInt(round) > 10 && (
+          <DoubleArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) - 10);
+            }}
+          />
+        )}
+        {parseInt(round) > 1 && (
+          <ArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) - 1);
+            }}
+          />
+        )}
         <Typography
           component='h1'
           variant='h5'
@@ -156,23 +161,28 @@ export default function RoundScoreboardComponent({ round }: props) {
         >
           Round {data?.round}
         </Typography>
-        <ArrowRightIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + (parseInt(round) + 1);
-          }}
-        />
-        <DoubleArrowRightIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href =
-              "/scoreboard/round/" + (parseInt(round) + 10);
-          }}
-        />
+        {latestRound && parseInt(round) < latestRound?.number && (
+          <ArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) + 1);
+            }}
+          />
+        )}
+        {latestRound && parseInt(round) + 10 < latestRound?.number && (
+          <DoubleArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) + 10);
+            }}
+          />
+        )}
       </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper}>
