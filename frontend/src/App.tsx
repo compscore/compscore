@@ -86,6 +86,22 @@ export default function App() {
               </Main>
             }
           />
+          <Route path='iframe'>
+            <Route path='scoreboard' element={<Scoreboard />} />
+            <Route path='scoreboard/team/:team' element={<TeamScoreboard />} />
+            <Route
+              path='scoreboard/check/:check'
+              element={<CheckScoreboard />}
+            />
+            <Route
+              path='scoreboard/round/:round'
+              element={<RoundScoreboard />}
+            />
+            <Route
+              path='scoreboard/status/:team/:check'
+              element={<StatusScoreboard />}
+            />
+          </Route>
           <Route
             path='*'
             element={

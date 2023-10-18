@@ -29,23 +29,21 @@ export default function Login({ setCookie }: Props) {
       },
     })
       .then(async (res) => {
-        let response = await res.json();
         if (res.status === 200) {
+          let response = (await res.json()) as LoginSuccess;
           enqueueSnackbar("Logged in", { variant: "success" });
-
-          response = response as LoginSuccess;
 
           setCookie("auth", response.token, {
             path: response.path,
             domain: response.domain,
             secure: response.secure,
             httpOnly: response.httpOnly,
-            expires: response.expires,
+            expires: new Date(response.expiration * 1000),
           });
 
           window.location.href = "/";
         } else {
-          response = response as LoginFailure;
+          let response = (await res.json()) as LoginFailure;
 
           enqueueSnackbar(response.error, { variant: "error" });
         }
