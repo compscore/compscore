@@ -1,3 +1,5 @@
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import {
   Box,
   Paper,
@@ -11,7 +13,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { Scoreboard } from "../models/Scoreboard";
+import { Scoreboard } from "../../models/Scoreboard";
 
 export default function ScoreBoard() {
   const [data, setData] = useState<Scoreboard>();
@@ -85,9 +87,46 @@ export default function ScoreBoard() {
       >
         Scoreboard
       </Typography>
-      <Typography component='h1' variant='h5'>
-        Round {data?.round}
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {data && data.round > 10 && (
+          <DoubleArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = "/scoreboard/round/" + (data.round - 10);
+            }}
+          />
+        )}
+        {data && data.round > 1 && (
+          <ArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = "/scoreboard/round/" + (data.round - 1);
+            }}
+          />
+        )}
+        <Typography component='h1' variant='h5'>
+          Round {data?.round}
+        </Typography>
+        <ArrowLeftIcon
+          sx={{
+            visibility: "hidden",
+          }}
+        />
+        <ArrowLeftIcon
+          sx={{
+            visibility: "hidden",
+          }}
+        />
+      </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper}>
         <Table>

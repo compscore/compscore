@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { Scoreboard } from "../models/Scoreboard";
-import { Round } from "../models/ent";
+import { Scoreboard } from "../../models/Scoreboard";
+import { Round } from "../../models/ent";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
@@ -39,6 +39,10 @@ export default function RoundScoreboardComponent({ round }: props) {
             let response = (await res.json()) as Round;
 
             setLatestRound(response);
+
+            if (0 >= parseInt(round) || parseInt(round) >= response.number) {
+              window.location.href = "/scoreboard";
+            }
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
@@ -130,49 +134,83 @@ export default function RoundScoreboardComponent({ round }: props) {
           alignItems: "center",
         }}
       >
-        <DoubleArrowLeftIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href =
-              "/scoreboard/round/" + (parseInt(round) - 10);
-          }}
-        />
-        <ArrowLeftIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + (parseInt(round) - 1);
-          }}
-        />
+        {parseInt(round) > 10 ? (
+          <DoubleArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) - 10);
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
+        {parseInt(round) > 1 ? (
+          <ArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) - 1);
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
         <Typography
           component='h1'
           variant='h5'
           onClick={() => {
-            window.location.href = "/scoreboard/round/" + latestRound?.number;
+            window.location.href = "/scoreboard";
           }}
         >
           Round {data?.round}
         </Typography>
-        <ArrowRightIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + (parseInt(round) + 1);
-          }}
-        />
-        <DoubleArrowRightIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href =
-              "/scoreboard/round/" + (parseInt(round) + 10);
-          }}
-        />
+        {latestRound && parseInt(round) < latestRound?.number ? (
+          <ArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) + 1);
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
+        {latestRound && parseInt(round) + 10 < latestRound?.number ? (
+          <DoubleArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href =
+                "/scoreboard/round/" + (parseInt(round) + 10);
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
       </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper}>

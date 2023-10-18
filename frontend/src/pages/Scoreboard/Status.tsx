@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useParams } from "react-router";
-import StatusScoreboard from "../components/StatusScoreboard";
+import StatusScoreboard from "../../components/Scoreboard/Status";
 
 export default function StatusScoreboardPage() {
   const { check: check, team: team } = useParams() as unknown as {

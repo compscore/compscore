@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
-import CheckScoreboard from "../components/CheckScoreboard";
+import RoundScoreboard from "../../components/Scoreboard/Round";
 
-export default function CheckScoreboardPage() {
-  const { check: check } = useParams() as { check: string };
+export default function RoundScoreboardPage() {
+  const { round: round } = useParams() as { round: string };
 
   return (
     <Box
@@ -13,7 +13,7 @@ export default function CheckScoreboardPage() {
         alignItems: "center",
       }}
     >
-      <CheckScoreboard check={check} />
+      <RoundScoreboard round={round} />
     </Box>
   );
 }

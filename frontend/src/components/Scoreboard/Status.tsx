@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { StatusScoreboard } from "../models/StatusScoreboard";
+import { StatusScoreboard } from "../../models/StatusScoreboard";
 
 type props = {
   check: string;
