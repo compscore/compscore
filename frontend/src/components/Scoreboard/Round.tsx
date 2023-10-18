@@ -39,6 +39,10 @@ export default function RoundScoreboardComponent({ round }: props) {
             let response = (await res.json()) as Round;
 
             setLatestRound(response);
+
+            if (0 >= parseInt(round) || parseInt(round) >= response.number) {
+              window.location.href = "/scoreboard";
+            }
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
@@ -130,7 +134,7 @@ export default function RoundScoreboardComponent({ round }: props) {
           alignItems: "center",
         }}
       >
-        {parseInt(round) > 10 && (
+        {parseInt(round) > 10 ? (
           <DoubleArrowLeftIcon
             sx={{
               cursor: "pointer",
@@ -140,8 +144,14 @@ export default function RoundScoreboardComponent({ round }: props) {
                 "/scoreboard/round/" + (parseInt(round) - 10);
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        {parseInt(round) > 1 && (
+        {parseInt(round) > 1 ? (
           <ArrowLeftIcon
             sx={{
               cursor: "pointer",
@@ -151,17 +161,23 @@ export default function RoundScoreboardComponent({ round }: props) {
                 "/scoreboard/round/" + (parseInt(round) - 1);
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
         <Typography
           component='h1'
           variant='h5'
           onClick={() => {
-            window.location.href = "/scoreboard/round/" + latestRound?.number;
+            window.location.href = "/scoreboard";
           }}
         >
           Round {data?.round}
         </Typography>
-        {latestRound && parseInt(round) < latestRound?.number && (
+        {latestRound && parseInt(round) < latestRound?.number ? (
           <ArrowRightIcon
             sx={{
               cursor: "pointer",
@@ -171,8 +187,14 @@ export default function RoundScoreboardComponent({ round }: props) {
                 "/scoreboard/round/" + (parseInt(round) + 1);
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        {latestRound && parseInt(round) + 10 < latestRound?.number && (
+        {latestRound && parseInt(round) + 10 < latestRound?.number ? (
           <DoubleArrowRightIcon
             sx={{
               cursor: "pointer",
@@ -180,6 +202,12 @@ export default function RoundScoreboardComponent({ round }: props) {
             onClick={() => {
               window.location.href =
                 "/scoreboard/round/" + (parseInt(round) + 10);
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
             }}
           />
         )}
