@@ -1,5 +1,6 @@
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
+import { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -16,6 +17,19 @@ import { useSystemTheme } from "./themes/Preference";
 
 export default function App() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
+  const [mobile, setMobile] = useState<boolean>(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const updateWindowDimensions = () => {
+      setMobile(window.innerWidth <= 600);
+    };
+
+    window.addEventListener("resize", updateWindowDimensions);
+
+    return () => {
+      window.removeEventListener("resize", updateWindowDimensions);
+    };
+  }, []);
 
   return (
     <ThemeProvider theme={useSystemTheme()}>
@@ -25,7 +39,11 @@ export default function App() {
           <Route
             path='/'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <Index />
               </Main>
             }
@@ -33,7 +51,11 @@ export default function App() {
           <Route
             path='/login'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <Login setCookie={setCookie} />
               </Main>
             }
@@ -41,7 +63,11 @@ export default function App() {
           <Route
             path='/checks'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <Checks cookies={cookies} />
               </Main>
             }
@@ -49,7 +75,11 @@ export default function App() {
           <Route
             path='/scoreboard'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <Scoreboard />
               </Main>
             }
@@ -57,7 +87,11 @@ export default function App() {
           <Route
             path='/scoreboard/team/:team'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <TeamScoreboard />
               </Main>
             }
@@ -65,7 +99,11 @@ export default function App() {
           <Route
             path='/scoreboard/check/:check'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <CheckScoreboard />
               </Main>
             }
@@ -73,7 +111,11 @@ export default function App() {
           <Route
             path='/scoreboard/round/:round'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <RoundScoreboard />
               </Main>
             }
@@ -81,7 +123,11 @@ export default function App() {
           <Route
             path='/scoreboard/status/:team/:check'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <StatusScoreboard />
               </Main>
             }
@@ -105,7 +151,11 @@ export default function App() {
           <Route
             path='*'
             element={
-              <Main cookies={cookies} removeCookie={removeCookie}>
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
                 <Index />
               </Main>
             }

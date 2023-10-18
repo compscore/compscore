@@ -16,9 +16,10 @@ type Props = {
     auth?: any;
   };
   setDrawerState: React.Dispatch<React.SetStateAction<boolean>>;
+  mobile: boolean;
 };
 
-export default function NavBar({ cookies, setDrawerState }: Props) {
+export default function NavBar({ cookies, setDrawerState, mobile }: Props) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position='static'>
@@ -41,35 +42,41 @@ export default function NavBar({ cookies, setDrawerState }: Props) {
               textTransform: "none",
             }}
           >
-            <Typography variant='h6'>Compscore</Typography>
+            <Typography variant={mobile ? "body1" : "h6"}>Compscore</Typography>
           </Button>
           <Box sx={{ flexGrow: 1 }}></Box>
-          {cookies.auth && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                width: "fit-content",
-              }}
-            >
-              <Typography variant='h6'>
-                {(jwt_decode(cookies.auth) as JWT).Team}
-              </Typography>
-              <Box sx={{ m: 1 }} />
-              <Divider orientation='vertical' flexItem />
-              <Box sx={{ m: 1 }} />
-              <Typography variant='h6'>
-                {(jwt_decode(cookies.auth) as JWT).Role}
-              </Typography>
-              <Box sx={{ m: 1 }} />
-              <Divider orientation='vertical' flexItem />
-            </Box>
-          )}
-          <Box sx={{ m: 1 }} />
-          <Button href='/'>
-            <Avatar src='/compscore.svg' />
-          </Button>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              width: "fit-content",
+            }}
+          >
+            {cookies.auth && (
+              <>
+                <Typography variant={mobile ? "body1" : "h6"}>
+                  {(jwt_decode(cookies.auth) as JWT).Team}
+                </Typography>
+                <Box sx={{ m: 1 }} />
+                {!mobile && (
+                  <>
+                    <Divider orientation='vertical' flexItem />
+                    <Box sx={{ m: 1 }} />
+                    <Typography variant={mobile ? "body1" : "h6"}>
+                      {(jwt_decode(cookies.auth) as JWT).Role}
+                    </Typography>
+                    <Box sx={{ m: 1 }} />
+                    <Divider orientation='vertical' flexItem />
+                    <Box sx={{ m: 1 }} />
+                  </>
+                )}
+              </>
+            )}
+            <Button href='/'>
+              <Avatar src='/compscore.svg' />
+            </Button>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>
