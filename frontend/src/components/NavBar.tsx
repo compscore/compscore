@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Divider,
-  Link,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -33,15 +32,18 @@ export default function NavBar({ cookies, setDrawerState }: Props) {
             <MenuIcon />
           </Button>
           <Box sx={{ m: 1 }} />
-          <Link
-            href='/'
+          <Button
+            onClick={() => {
+              window.location.href = "/";
+            }}
             color='inherit'
-            underline='none'
-            variant='h6'
-            sx={{ flexGrow: 1 }}
+            sx={{
+              textTransform: "none",
+            }}
           >
-            Compscore
-          </Link>
+            <Typography variant='h6'>Compscore</Typography>
+          </Button>
+          <Box sx={{ flexGrow: 1 }}></Box>
           {cookies.auth && (
             <Box
               sx={{
