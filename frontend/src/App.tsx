@@ -7,14 +7,14 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Drawer from "./components/Drawer";
 import NavBar from "./components/NavBar";
-import CheckScoreboard from "./pages/CheckScoreboard";
+import CheckScoreboard from "./pages/Scoreboard/Check";
 import Checks from "./pages/Checks";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import RoundScoreboard from "./pages/RoundScoreboard";
-import Scoreboard from "./pages/Scoreboard";
-import StatusScoreboard from "./pages/StatusScoreboard";
-import TeamScoreboard from "./pages/TeamScoreboard";
+import RoundScoreboard from "./pages/Scoreboard/Round";
+import Scoreboard from "./pages/Scoreboard/Scoreboard";
+import StatusScoreboard from "./pages/Scoreboard/Status";
+import TeamScoreboard from "./pages/Scoreboard/Team";
 import { useSystemTheme } from "./themes/Preference";
 
 export default function App() {
