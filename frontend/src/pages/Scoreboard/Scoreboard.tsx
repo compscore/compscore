@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import Scoreboard from "../../components/Scoreboard";
+import Scoreboard from "../../components/Scoreboard/Scoreboard";
 
 export default function ScoreboardPage() {
   return (

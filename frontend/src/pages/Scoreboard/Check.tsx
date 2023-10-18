@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useParams } from "react-router-dom";
-import CheckScoreboard from "../../components/CheckScoreboard";
+import CheckScoreboard from "../../components/Scoreboard/Check";
 
 export default function CheckScoreboardPage() {
   const { check: check } = useParams() as { check: string };

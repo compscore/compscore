@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { CheckScoreboard } from "../models/CheckScoreboard";
+import { CheckScoreboard } from "../../models/CheckScoreboard";
 
 type props = {
   check: string;

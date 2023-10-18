@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { TeamScoreboard } from "../models/TeamScoreboard";
+import { TeamScoreboard } from "../../models/TeamScoreboard";
 
 type props = {
   team: number;

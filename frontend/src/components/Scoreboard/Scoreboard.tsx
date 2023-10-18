@@ -11,50 +11,14 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { Scoreboard } from "../models/Scoreboard";
-import { Round } from "../models/ent";
-import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
-import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Scoreboard } from "../../models/Scoreboard";
 
-type props = {
-  round: string;
-};
-
-export default function RoundScoreboardComponent({ round }: props) {
+export default function ScoreBoard() {
   const [data, setData] = useState<Scoreboard>();
-  const [latestRound, setLatestRound] = useState<Round>();
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/round/latest`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then(async (res) => {
-          if (res.status === 200) {
-            let response = (await res.json()) as Round;
-
-            setLatestRound(response);
-          } else {
-            enqueueSnackbar("Encountered an error", { variant: "error" });
-          }
-        })
-        .catch((err) => {
-          enqueueSnackbar("Encountered an error: " + err, { variant: "error" });
-          console.log(err);
-        });
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/round/${round}`, {
+      fetch("http://localhost:8080/api/scoreboard", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +40,7 @@ export default function RoundScoreboardComponent({ round }: props) {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 15000);
+    const pollingInterval = setInterval(fetchData, 1000);
 
     return () => clearInterval(pollingInterval);
   }, []);
@@ -118,62 +82,12 @@ export default function RoundScoreboardComponent({ round }: props) {
         sx={{
           marginTop: 5,
         }}
-        onClick={() => {
-          window.location.href = "/scoreboard";
-        }}
       >
         Scoreboard
       </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <DoubleArrowLeftIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href =
-              "/scoreboard/round/" + (parseInt(round) - 10);
-          }}
-        />
-        <ArrowLeftIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + (parseInt(round) - 1);
-          }}
-        />
-        <Typography
-          component='h1'
-          variant='h5'
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + latestRound?.number;
-          }}
-        >
-          Round {data?.round}
-        </Typography>
-        <ArrowRightIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href = "/scoreboard/round/" + (parseInt(round) + 1);
-          }}
-        />
-        <DoubleArrowRightIcon
-          sx={{
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            window.location.href =
-              "/scoreboard/round/" + (parseInt(round) + 10);
-          }}
-        />
-      </Box>
+      <Typography component='h1' variant='h5'>
+        Round {data?.round}
+      </Typography>
       <Box m={2}></Box>
       <TableContainer component={Paper}>
         <Table>
