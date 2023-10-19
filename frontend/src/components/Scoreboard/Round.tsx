@@ -290,7 +290,7 @@ export default function RoundScoreboardComponent({ round }: props) {
                     onClick={() => {
                       window.location.href = `/scoreboard/status/${team + 1}/${
                         check.name
-                      }`;
+                      }/${round}`;
                     }}
                   ></TableCell>
                 ))}
