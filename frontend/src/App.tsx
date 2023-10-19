@@ -9,6 +9,7 @@ import Checks from "./pages/Checks";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import CheckScoreboard from "./pages/Scoreboard/Check";
+import CheckRoundScoreboard from "./pages/Scoreboard/CheckRound";
 import RoundScoreboard from "./pages/Scoreboard/Round";
 import Scoreboard from "./pages/Scoreboard/Scoreboard";
 import StatusScoreboard from "./pages/Scoreboard/Status";
@@ -67,6 +68,10 @@ export default function App() {
         {
           path: "scoreboard/check/:check",
           element: <LazyComponent element={<CheckScoreboard />} />,
+        },
+        {
+          path: "scoreboard/check/:check/:round",
+          element: <LazyComponent element={<CheckRoundScoreboard />} />,
         },
         {
           path: "scoreboard/round/:round",
