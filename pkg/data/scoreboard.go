@@ -205,3 +205,36 @@ func (*scoreboard_s) History(check_name string, team_number int, rounds int) (*[
 
 	return Scoreboard.history(check_name, team_number, rounds)
 }
+
+func (*scoreboard_s) historyRound(check_name string, team_number int, round_number int, rounds int) (*[]structs.Status, error) {
+	entStatus, err := Status.getAllByCheckAndTeamWithEdgesFromRoundWithLimit(check_name, team_number, round_number, rounds)
+	if err != nil {
+		return nil, err
+	}
+
+	statuses := make([]structs.Status, len(entStatus))
+	for i, entStat := range entStatus {
+		statuses[i].Round = entStat.Edges.Round.Number
+		statuses[i].Error = entStat.Error
+		statuses[i].Time = entStat.Time.Format("2006-01-02 15:04:05")
+
+		switch entStat.Status {
+		case status.StatusDown:
+			statuses[i].Status = 0
+		case status.StatusUp:
+			statuses[i].Status = 1
+		case status.StatusUnknown:
+			statuses[i].Status = 2
+		}
+	}
+
+	return &statuses, nil
+}
+
+func (*scoreboard_s) HistoryRound(check_name string, team_number int, round_number int, rounds int) (*[]structs.Status, error) {
+	mutex.Lock()
+	logrus.Trace("scoreboard_s.History: lock")
+	defer mutex.Unlock()
+
+	return Scoreboard.historyRound(check_name, team_number, round_number, rounds)
+}
