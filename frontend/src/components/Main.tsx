@@ -11,9 +11,15 @@ type props = {
     auth?: any;
   };
   removeCookie: (name: "auth", options?: CookieSetOptions | undefined) => void;
+  mobile: boolean;
 };
 
-export default function Main({ children, cookies, removeCookie }: props) {
+export default function Main({
+  children,
+  cookies,
+  removeCookie,
+  mobile,
+}: props) {
   const [drawerState, setDrawerState] = useState<boolean>(false);
   return (
     <>
@@ -22,7 +28,11 @@ export default function Main({ children, cookies, removeCookie }: props) {
         setDrawerState={setDrawerState}
         removeCookie={removeCookie}
       />
-      <NavBar cookies={cookies} setDrawerState={setDrawerState} />
+      <NavBar
+        mobile={mobile}
+        cookies={cookies}
+        setDrawerState={setDrawerState}
+      />
       <Container component='main'>
         <SnackbarProvider maxSnack={3}>{children}</SnackbarProvider>
       </Container>
