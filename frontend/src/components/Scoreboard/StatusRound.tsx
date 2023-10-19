@@ -1,3 +1,7 @@
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import {
   Box,
   Paper,
@@ -9,27 +13,66 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/StatusScoreboard";
-import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import { Round } from "../../models/ent";
 
 type props = {
   check: string;
-  team: number;
+  team: string;
+  round: string;
 };
 
-export default function StatusScoreboardComponent({ check, team }: props) {
+export default function StatusRoundScoreboardComponent({
+  check,
+  team,
+  round,
+}: props) {
   const [data, setData] = useState<StatusScoreboard>();
+  const [latestRound, setLatestRound] = useState<Round>();
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/status/${team}/${check}`, {
+      fetch(`http://localhost:8080/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       })
+        .then(async (res) => {
+          if (res.status === 200) {
+            let response = (await res.json()) as Round;
+
+            setLatestRound(response);
+
+            if (0 >= parseInt(round) || parseInt(round) >= response.number) {
+              window.location.href = `/scoreboard/status/${team}/${check}`;
+            }
+          } else {
+            enqueueSnackbar("Encountered an error", { variant: "error" });
+          }
+        })
+        .catch((err) => {
+          enqueueSnackbar("Encountered an error: " + err, { variant: "error" });
+          console.log(err);
+        });
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      fetch(
+        `http://localhost:8080/api/scoreboard/status/${team}/${check}/${round}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then(async (res) => {
           let response = (await res.json()) as StatusScoreboard;
           if (res.status === 200) {
@@ -98,45 +141,87 @@ export default function StatusScoreboardComponent({ check, team }: props) {
           alignItems: "center",
         }}
       >
-        {data && data[0].round >= 10 && (
+        {parseInt(round) > 10 ? (
           <DoubleArrowLeftIcon
             sx={{
               cursor: "pointer",
             }}
             onClick={() => {
               window.location.href = `/scoreboard/status/${team}/${check}/${
-                data[0].round - 10
+                parseInt(round) - 10
               }`;
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        {data && data[0].round >= 1 && (
+        {parseInt(round) > 1 ? (
           <ArrowLeftIcon
             sx={{
               cursor: "pointer",
             }}
             onClick={() => {
               window.location.href = `/scoreboard/status/${team}/${check}/${
-                data[0].round - 1
+                parseInt(round) - 1
               }`;
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        {data && (
-          <Typography component='h1' variant='h5'>
-            Round {data[0].round}
-          </Typography>
+        <Typography
+          component='h1'
+          variant='h5'
+          onClick={() => {
+            window.location.href = `/scoreboard/status/${team}/${check}`;
+          }}
+        >
+          Round {round}
+        </Typography>
+        {latestRound && parseInt(round) < latestRound?.number ? (
+          <ArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/status/${team}/${check}/${
+                parseInt(round) + 1
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        <ArrowLeftIcon
-          sx={{
-            visibility: "hidden",
-          }}
-        />
-        <ArrowLeftIcon
-          sx={{
-            visibility: "hidden",
-          }}
-        />
+        {latestRound && parseInt(round) + 10 <= latestRound?.number ? (
+          <DoubleArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/status/${team}/${check}/${
+                parseInt(round) + 10
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
       </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper}>

@@ -169,7 +169,7 @@ export default function CheckScoreboardComponent({ check }: props) {
                     onClick={() => {
                       window.location.href = `/scoreboard/status/${
                         index + 1
-                      }/${check}`;
+                      }/${check}/${data?.round - s_index}`;
                     }}
                   ></TableCell>
                 ))}

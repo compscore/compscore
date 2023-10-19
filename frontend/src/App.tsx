@@ -12,6 +12,7 @@ import CheckScoreboard from "./pages/Scoreboard/Check";
 import RoundScoreboard from "./pages/Scoreboard/Round";
 import Scoreboard from "./pages/Scoreboard/Scoreboard";
 import StatusScoreboard from "./pages/Scoreboard/Status";
+import StatusRoundScoreboard from "./pages/Scoreboard/StatusRound";
 import TeamScoreboard from "./pages/Scoreboard/Team";
 import { useSystemTheme } from "./themes/Preference";
 
@@ -129,6 +130,18 @@ export default function App() {
                 removeCookie={removeCookie}
               >
                 <StatusScoreboard />
+              </Main>
+            }
+          />
+          <Route
+            path='/scoreboard/status/:team/:check/:round'
+            element={
+              <Main
+                mobile={mobile}
+                cookies={cookies}
+                removeCookie={removeCookie}
+              >
+                <StatusRoundScoreboard />
               </Main>
             }
           />
