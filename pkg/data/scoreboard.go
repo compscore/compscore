@@ -173,6 +173,52 @@ func (*scoreboard_s) Check(check_name string, rounds int) (*structs.CheckScorebo
 	return Scoreboard.check(check_name, rounds)
 }
 
+func (*scoreboard_s) checkRound(check_name string, round_number int, rounds int) (*structs.CheckScoreboard, error) {
+	checkScoreboard := structs.CheckScoreboard{}
+	checkScoreboard.Teams = make([]structs.Check, config.Teams.Amount)
+
+	checkScoreboard.Round = round_number
+
+	teamNameTemplate, err := template.New("Name Template").Parse(config.Teams.NameFormat)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := 0; i < config.Teams.Amount; i++ {
+		output := bytes.NewBuffer([]byte{})
+		teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+
+		checkScoreboard.Teams[i].Name = output.String()
+		checkScoreboard.Teams[i].Status = make([]int, rounds)
+
+		entStatus, err := Status.getAllByCheckAndTeamFromRoundWithLimit(check_name, int(i+1), round_number, rounds)
+		if err != nil {
+			return nil, err
+		}
+
+		for j, entStat := range entStatus {
+			switch entStat.Status {
+			case status.StatusDown:
+				checkScoreboard.Teams[i].Status[j] = 0
+			case status.StatusUp:
+				checkScoreboard.Teams[i].Status[j] = 1
+			case status.StatusUnknown:
+				checkScoreboard.Teams[i].Status[j] = 2
+			}
+		}
+	}
+
+	return &checkScoreboard, nil
+}
+
+func (*scoreboard_s) CheckRound(check_name string, round_number int, rounds int) (*structs.CheckScoreboard, error) {
+	mutex.Lock()
+	logrus.Trace("scoreboard_s.Check: lock")
+	defer mutex.Unlock()
+
+	return Scoreboard.checkRound(check_name, round_number, rounds)
+}
+
 func (*scoreboard_s) history(check_name string, team_number int, rounds int) (*[]structs.Status, error) {
 	entStatus, err := Status.getAllByCheckAndTeamWithEdgesWithLimit(check_name, team_number, rounds)
 	if err != nil {

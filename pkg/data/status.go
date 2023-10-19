@@ -654,6 +654,38 @@ func (*status_s) GetAllByCheckAndTeamWithLimit(checkName string, teamNumber int,
 	return Status.getAllByCheckAndTeamWithLimit(checkName, teamNumber, limit)
 }
 
+func (*status_s) getAllByCheckAndTeamFromRoundWithLimit(checkName string, teamNumber int, roundNumber int, limit int) ([]*ent.Status, error) {
+	return client.Status.
+		Query().
+		Where(
+			status.HasCheckWith(
+				check.NameEQ(checkName),
+			),
+			status.HasTeamWith(
+				team.NumberEQ(teamNumber),
+			),
+			status.HasRoundWith(
+				round.NumberLTE(roundNumber),
+			),
+		).
+		Order(
+			status.ByRoundField(
+				round.FieldNumber,
+				sql.OrderAsc(),
+			),
+		).
+		Limit(limit).
+		All(ctx)
+}
+
+func (*status_s) GetAllByCheckAndTeamFromRoundWithLimit(checkName string, teamNumber int, roundNumber int, limit int) ([]*ent.Status, error) {
+	mutex.Lock()
+	logrus.Trace("status_s.GetAllByCheckAndTeamWithLimit: lock")
+	defer mutex.Unlock()
+
+	return Status.getAllByCheckAndTeamFromRoundWithLimit(checkName, teamNumber, roundNumber, limit)
+}
+
 func (*status_s) getAllByCheckAndTeamWithEdges(checkName string, teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
