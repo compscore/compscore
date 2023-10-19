@@ -18,7 +18,7 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	entTeam, err := data.Team.Get(int8(team))
+	entTeam, err := data.Team.Get(team)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),

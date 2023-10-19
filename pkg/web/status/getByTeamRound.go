@@ -27,7 +27,7 @@ func GetByTeamRound(ctx *gin.Context) {
 		return
 	}
 
-	entStatus, err := data.Status.GetAllByRoundAndTeamWithEdges(round, int8(team))
+	entStatus, err := data.Status.GetAllByRoundAndTeamWithEdges(round, team)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),

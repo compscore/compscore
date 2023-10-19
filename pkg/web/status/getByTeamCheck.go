@@ -19,7 +19,7 @@ func GetByTeamCheck(ctx *gin.Context) {
 		return
 	}
 
-	entStatus, err := data.Status.GetAllByCheckAndTeamWithEdges(check, int8(team))
+	entStatus, err := data.Status.GetAllByCheckAndTeamWithEdges(check, team)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),

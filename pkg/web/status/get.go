@@ -28,7 +28,7 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	entStatus, err := data.Status.GetWithEdges(team, check, int8(round))
+	entStatus, err := data.Status.GetWithEdges(team, check, round)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"error": err.Error(),
