@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/StatusScoreboard";
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 type props = {
   check: string;
@@ -90,6 +92,52 @@ export default function StatusScoreboardComponent({ check, team }: props) {
       >
         Team {team} - {check}
       </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {data && data[0].round >= 10 && (
+          <DoubleArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/status/${team}/${check}/${
+                data[0].round - 10
+              }`;
+            }}
+          />
+        )}
+        {data && data[0].round >= 1 && (
+          <ArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/status/${team}/${check}/${
+                data[0].round - 1
+              }`;
+            }}
+          />
+        )}
+        {data && (
+          <Typography component='h1' variant='h5'>
+            Round {data[0].round}
+          </Typography>
+        )}
+        <ArrowLeftIcon
+          sx={{
+            visibility: "hidden",
+          }}
+        />
+        <ArrowLeftIcon
+          sx={{
+            visibility: "hidden",
+          }}
+        />
+      </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper}>
         <Table>

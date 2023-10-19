@@ -134,7 +134,7 @@ export default function RoundScoreboardComponent({ round }: props) {
           alignItems: "center",
         }}
       >
-        {parseInt(round) > 10 ? (
+        {parseInt(round) >= 10 ? (
           <DoubleArrowLeftIcon
             sx={{
               cursor: "pointer",
@@ -151,7 +151,7 @@ export default function RoundScoreboardComponent({ round }: props) {
             }}
           />
         )}
-        {parseInt(round) > 1 ? (
+        {parseInt(round) >= 1 ? (
           <ArrowLeftIcon
             sx={{
               cursor: "pointer",
@@ -177,7 +177,7 @@ export default function RoundScoreboardComponent({ round }: props) {
         >
           Round {data?.round}
         </Typography>
-        {latestRound && parseInt(round) < latestRound?.number ? (
+        {latestRound && parseInt(round) <= latestRound?.number ? (
           <ArrowRightIcon
             sx={{
               cursor: "pointer",
@@ -194,7 +194,7 @@ export default function RoundScoreboardComponent({ round }: props) {
             }}
           />
         )}
-        {latestRound && parseInt(round) + 10 < latestRound?.number ? (
+        {latestRound && parseInt(round) + 10 <= latestRound?.number ? (
           <DoubleArrowRightIcon
             sx={{
               cursor: "pointer",

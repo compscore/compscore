@@ -204,7 +204,7 @@ export default function StatusRoundScoreboardComponent({
             }}
           />
         )}
-        {latestRound && parseInt(round) + 10 < latestRound?.number ? (
+        {latestRound && parseInt(round) + 10 <= latestRound?.number ? (
           <DoubleArrowRightIcon
             sx={{
               cursor: "pointer",
