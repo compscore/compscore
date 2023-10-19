@@ -12,7 +12,7 @@ type credential_s struct{}
 
 var Credential = credential_s{}
 
-func (*credential_s) get(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) get(team_id int, check_name string) (*ent.Credential, error) {
 	return client.Credential.
 		Query().
 		Where(
@@ -25,7 +25,7 @@ func (*credential_s) get(team_id int8, check_name string) (*ent.Credential, erro
 		).Only(ctx)
 }
 
-func (*credential_s) Get(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) Get(team_id int, check_name string) (*ent.Credential, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.Get: lock")
 	defer mutex.Unlock()
@@ -41,7 +41,7 @@ func (*credential_s) GetComplex(entTeam *ent.Team, entCheck *ent.Check) (*ent.Cr
 	return Credential.get(entTeam.Number, entCheck.Name)
 }
 
-func (*credential_s) getWithEdges(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) getWithEdges(team_id int, check_name string) (*ent.Credential, error) {
 	return client.Credential.
 		Query().
 		WithTeam().
@@ -56,7 +56,7 @@ func (*credential_s) getWithEdges(team_id int8, check_name string) (*ent.Credent
 		).Only(ctx)
 }
 
-func (*credential_s) GetWithEdges(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) GetWithEdges(team_id int, check_name string) (*ent.Credential, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.GetWithEdges: lock")
 	defer mutex.Unlock()
@@ -72,7 +72,7 @@ func (*credential_s) GetComplexWithEdges(entTeam *ent.Team, entCheck *ent.Check)
 	return Credential.getWithEdges(entTeam.Number, entCheck.Name)
 }
 
-func (*credential_s) getWithCheck(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) getWithCheck(team_id int, check_name string) (*ent.Credential, error) {
 	return client.Credential.
 		Query().
 		WithCheck().
@@ -86,7 +86,7 @@ func (*credential_s) getWithCheck(team_id int8, check_name string) (*ent.Credent
 		).Only(ctx)
 }
 
-func (*credential_s) GetWithCheck(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) GetWithCheck(team_id int, check_name string) (*ent.Credential, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.GetWithCheck: lock")
 	defer mutex.Unlock()
@@ -102,7 +102,7 @@ func (*credential_s) GetComplexWithCheck(entTeam *ent.Team, entCheck *ent.Check)
 	return Credential.getWithCheck(entTeam.Number, entCheck.Name)
 }
 
-func (*credential_s) getWithTeam(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) getWithTeam(team_id int, check_name string) (*ent.Credential, error) {
 	return client.Credential.
 		Query().
 		WithTeam().
@@ -116,7 +116,7 @@ func (*credential_s) getWithTeam(team_id int8, check_name string) (*ent.Credenti
 		).Only(ctx)
 }
 
-func (*credential_s) GetWithTeam(team_id int8, check_name string) (*ent.Credential, error) {
+func (*credential_s) GetWithTeam(team_id int, check_name string) (*ent.Credential, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.GetWithTeam: lock")
 	defer mutex.Unlock()
@@ -132,7 +132,7 @@ func (*credential_s) GetComplexWithTeam(entTeam *ent.Team, entCheck *ent.Check) 
 	return Credential.getWithTeam(entTeam.Number, entCheck.Name)
 }
 
-func (*credential_s) exists(team_id int8, check_name string) (bool, error) {
+func (*credential_s) exists(team_id int, check_name string) (bool, error) {
 	return client.Credential.
 		Query().
 		Where(
@@ -146,7 +146,7 @@ func (*credential_s) exists(team_id int8, check_name string) (bool, error) {
 		Exist(ctx)
 }
 
-func (*credential_s) Exists(team_id int8, check_name string) (bool, error) {
+func (*credential_s) Exists(team_id int, check_name string) (bool, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.Exists: lock")
 	defer mutex.Unlock()
@@ -162,7 +162,7 @@ func (*credential_s) ExistsComplex(entTeam *ent.Team, entCheck *ent.Check) (bool
 	return Credential.exists(entTeam.Number, entCheck.Name)
 }
 
-func (*credential_s) create(team_id int8, check_name string, password string) (*ent.Credential, error) {
+func (*credential_s) create(team_id int, check_name string, password string) (*ent.Credential, error) {
 	entTeam, err := Team.get(team_id)
 	if err != nil {
 		return nil, err
@@ -190,7 +190,7 @@ func (*credential_s) create(team_id int8, check_name string, password string) (*
 		Save(ctx)
 }
 
-func (*credential_s) Create(team_id int8, check_name string, password string) (*ent.Credential, error) {
+func (*credential_s) Create(team_id int, check_name string, password string) (*ent.Credential, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.Create: lock")
 	defer mutex.Unlock()
@@ -212,7 +212,7 @@ func (*credential_s) update(entCredential *ent.Credential, password string) (*en
 		Save(ctx)
 }
 
-func (*credential_s) UpdatePassword(team_id int8, check_name string, password string) (*ent.Credential, error) {
+func (*credential_s) UpdatePassword(team_id int, check_name string, password string) (*ent.Credential, error) {
 	mutex.Lock()
 	logrus.Trace("credential_s.UpdatePassword: lock")
 	defer mutex.Unlock()
@@ -239,7 +239,7 @@ func (*credential_s) delete(entCredential *ent.Credential) error {
 		Exec(ctx)
 }
 
-func (*credential_s) Delete(team_id int8, check_name string) error {
+func (*credential_s) Delete(team_id int, check_name string) error {
 	mutex.Lock()
 	logrus.Trace("credential_s.Delete: lock")
 	defer mutex.Unlock()

@@ -45,7 +45,7 @@ func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 	}
 
 	for i := 0; i < config.Teams.Amount; i++ {
-		score, err := Team.getScoreBeforeRound(int8(i+1), round_number)
+		score, err := Team.getScoreBeforeRound(i+1, round_number)
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +79,7 @@ func (*scoreboard_s) Main() (*structs.Scoreboard, error) {
 	return Scoreboard.main()
 }
 
-func (*scoreboard_s) team(team_number int8, rounds int) (*structs.TeamScoreboard, error) {
+func (*scoreboard_s) team(team_number int, rounds int) (*structs.TeamScoreboard, error) {
 	teamScoreboard := structs.TeamScoreboard{}
 	teamScoreboard.Checks = make([]structs.Check, len(config.Checks))
 
@@ -114,7 +114,7 @@ func (*scoreboard_s) team(team_number int8, rounds int) (*structs.TeamScoreboard
 	return &teamScoreboard, nil
 }
 
-func (*scoreboard_s) Team(team_number int8, rounds int) (*structs.TeamScoreboard, error) {
+func (*scoreboard_s) Team(team_number int, rounds int) (*structs.TeamScoreboard, error) {
 	mutex.Lock()
 	logrus.Trace("scoreboard_s.Team: lock")
 	defer mutex.Unlock()
@@ -145,7 +145,7 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 		checkScoreboard.Teams[i].Name = output.String()
 		checkScoreboard.Teams[i].Status = make([]int, rounds)
 
-		entStatus, err := Status.getAllByCheckAndTeamWithLimit(check_name, int8(i+1), rounds)
+		entStatus, err := Status.getAllByCheckAndTeamWithLimit(check_name, int(i+1), rounds)
 		if err != nil {
 			return nil, err
 		}
@@ -173,7 +173,7 @@ func (*scoreboard_s) Check(check_name string, rounds int) (*structs.CheckScorebo
 	return Scoreboard.check(check_name, rounds)
 }
 
-func (*scoreboard_s) history(check_name string, team_number int8, rounds int) (*[]structs.Status, error) {
+func (*scoreboard_s) history(check_name string, team_number int, rounds int) (*[]structs.Status, error) {
 	entStatus, err := Status.getAllByCheckAndTeamWithEdgesWithLimit(check_name, team_number, rounds)
 	if err != nil {
 		return nil, err
@@ -198,7 +198,7 @@ func (*scoreboard_s) history(check_name string, team_number int8, rounds int) (*
 	return &statuses, nil
 }
 
-func (*scoreboard_s) History(check_name string, team_number int8, rounds int) (*[]structs.Status, error) {
+func (*scoreboard_s) History(check_name string, team_number int, rounds int) (*[]structs.Status, error) {
 	mutex.Lock()
 	logrus.Trace("scoreboard_s.History: lock")
 	defer mutex.Unlock()
