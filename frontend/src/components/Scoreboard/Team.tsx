@@ -144,7 +144,7 @@ export default function TeamScoreboardComponent({ team }: props) {
                     setHighlightedCheck(null);
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/check/" + check.name;
+                    window.location.href = `/scoreboard/check/${check.name}`;
                   }}
                 >
                   {check.name}

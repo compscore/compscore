@@ -263,7 +263,7 @@ export default function RoundScoreboardComponent({ round }: props) {
                         : "transparent",
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/check/" + check.name;
+                    window.location.href = `/scoreboard/check/${check.name}/${round}`;
                   }}
                 >
                   {check.name}

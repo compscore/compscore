@@ -178,7 +178,7 @@ export default function ScoreBoard() {
                         : "transparent",
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/check/" + check.name;
+                    window.location.href = `/scoreboard/check/${check.name}`;
                   }}
                 >
                   {check.name}
