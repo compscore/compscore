@@ -86,7 +86,7 @@ func (*check_s) GetWithStatus(name string) (*ent.Check, error) {
 	return Check.getWithStatus(name)
 }
 
-func (*check_s) getWithTeamCredenital(name string, team_number int8) (*ent.Check, error) {
+func (*check_s) getWithTeamCredenital(name string, team_number int) (*ent.Check, error) {
 	return client.Check.
 		Query().
 		WithCredential(
@@ -104,7 +104,7 @@ func (*check_s) getWithTeamCredenital(name string, team_number int8) (*ent.Check
 		).Only(ctx)
 }
 
-func (*check_s) GetWithTeamCredenital(name string, team_number int8) (*ent.Check, error) {
+func (*check_s) GetWithTeamCredenital(name string, team_number int) (*ent.Check, error) {
 	mutex.Lock()
 	logrus.Trace("check_s.GetWithTeamCredenital: lock")
 	defer mutex.Unlock()

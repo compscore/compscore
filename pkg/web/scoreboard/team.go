@@ -14,12 +14,8 @@ func Team(ctx *gin.Context) {
 		ctx.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	if 0 >= team && team >= 127 {
-		ctx.JSON(400, gin.H{"error": "Team number be between 1 and 127"})
-		return
-	}
 
-	teamScoreboard, err := data.Scoreboard.Team(int8(team), 10)
+	teamScoreboard, err := data.Scoreboard.Team(team, 10)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return

@@ -16,7 +16,7 @@ type status_s struct{}
 
 var Status = status_s{}
 
-func (*status_s) exists(roundNumber int, checkNumber string, teamNumber int8) (bool, error) {
+func (*status_s) exists(roundNumber int, checkNumber string, teamNumber int) (bool, error) {
 	return client.Status.
 		Query().
 		Where(
@@ -32,7 +32,7 @@ func (*status_s) exists(roundNumber int, checkNumber string, teamNumber int8) (b
 		).Exist(ctx)
 }
 
-func (*status_s) Exists(roundNumber int, checkNumber string, teamNumber int8) (bool, error) {
+func (*status_s) Exists(roundNumber int, checkNumber string, teamNumber int) (bool, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.Exists: lock")
 	defer mutex.Unlock()
@@ -40,7 +40,7 @@ func (*status_s) Exists(roundNumber int, checkNumber string, teamNumber int8) (b
 	return Status.exists(roundNumber, checkNumber, teamNumber)
 }
 
-func (*status_s) create(roundNumber int, checkNumber string, teamNumber int8, status status.Status) (*ent.Status, error) {
+func (*status_s) create(roundNumber int, checkNumber string, teamNumber int, status status.Status) (*ent.Status, error) {
 	entRound, err := Round.get(roundNumber)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (*status_s) create(roundNumber int, checkNumber string, teamNumber int8, st
 		Save(ctx)
 }
 
-func (*status_s) Create(roundNumber int, checkNumber string, teamNumber int8, status status.Status) (*ent.Status, error) {
+func (*status_s) Create(roundNumber int, checkNumber string, teamNumber int, status status.Status) (*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.Create: lock")
 	defer mutex.Unlock()
@@ -104,7 +104,7 @@ func (*status_s) CreateComplex(entRound *ent.Round, entCheck *ent.Check, entTeam
 	return Status.createComplex(entRound, entCheck, entTeam)
 }
 
-func (*status_s) get(roundNumber int, checkNumber string, teamNumber int8) (*ent.Status, error) {
+func (*status_s) get(roundNumber int, checkNumber string, teamNumber int) (*ent.Status, error) {
 	exist, err := Status.exists(roundNumber, checkNumber, teamNumber)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func (*status_s) get(roundNumber int, checkNumber string, teamNumber int8) (*ent
 		).Only(ctx)
 }
 
-func (*status_s) Get(roundNumber int, checkNumber string, teamNumber int8) (*ent.Status, error) {
+func (*status_s) Get(roundNumber int, checkNumber string, teamNumber int) (*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.Get: lock")
 	defer mutex.Unlock()
@@ -137,7 +137,7 @@ func (*status_s) Get(roundNumber int, checkNumber string, teamNumber int8) (*ent
 	return Status.get(roundNumber, checkNumber, teamNumber)
 }
 
-func (*status_s) getWithEdges(roundNumber int, checkNumber string, teamNumber int8) (*ent.Status, error) {
+func (*status_s) getWithEdges(roundNumber int, checkNumber string, teamNumber int) (*ent.Status, error) {
 	exist, err := Status.exists(roundNumber, checkNumber, teamNumber)
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (*status_s) getWithEdges(roundNumber int, checkNumber string, teamNumber in
 		Only(ctx)
 }
 
-func (*status_s) GetWithEdges(roundNumber int, checkNumber string, teamNumber int8) (*ent.Status, error) {
+func (*status_s) GetWithEdges(roundNumber int, checkNumber string, teamNumber int) (*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetWithEdges: lock")
 	defer mutex.Unlock()
@@ -418,7 +418,7 @@ func (*status_s) GetAllByCheckWithEdges(checkName string) ([]*ent.Status, error)
 	return Status.getAllByCheckWithEdges(checkName)
 }
 
-func (*status_s) getAllByTeam(teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) getAllByTeam(teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		Where(
@@ -439,7 +439,7 @@ func (*status_s) getAllByTeam(teamNumber int8) ([]*ent.Status, error) {
 		All(ctx)
 }
 
-func (*status_s) GetAllByTeam(teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) GetAllByTeam(teamNumber int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByTeam: lock")
 	defer mutex.Unlock()
@@ -447,7 +447,7 @@ func (*status_s) GetAllByTeam(teamNumber int8) ([]*ent.Status, error) {
 	return Status.getAllByTeam(teamNumber)
 }
 
-func (*status_s) getAllByTeamWithEdges(teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) getAllByTeamWithEdges(teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		WithRound().
@@ -471,7 +471,7 @@ func (*status_s) getAllByTeamWithEdges(teamNumber int8) ([]*ent.Status, error) {
 		All(ctx)
 }
 
-func (*status_s) GetAllByTeamWithEdges(teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) GetAllByTeamWithEdges(teamNumber int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByTeamWithEdges: lock")
 	defer mutex.Unlock()
@@ -538,7 +538,7 @@ func (*status_s) GetAllByRoundAndCheckWithEdges(roundNumber int, checkName strin
 	return Status.getAllByRoundAndCheckWithEdges(roundNumber, checkName)
 }
 
-func (*status_s) getAllByRoundAndTeam(roundNumber int, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) getAllByRoundAndTeam(roundNumber int, teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		Where(
@@ -558,7 +558,7 @@ func (*status_s) getAllByRoundAndTeam(roundNumber int, teamNumber int8) ([]*ent.
 		All(ctx)
 }
 
-func (*status_s) GetAllByRoundAndTeam(roundNumber int, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) GetAllByRoundAndTeam(roundNumber int, teamNumber int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByRoundAndTeam: lock")
 	defer mutex.Unlock()
@@ -566,7 +566,7 @@ func (*status_s) GetAllByRoundAndTeam(roundNumber int, teamNumber int8) ([]*ent.
 	return Status.getAllByRoundAndTeam(roundNumber, teamNumber)
 }
 
-func (*status_s) getAllByRoundAndTeamWithEdges(roundNumber int, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) getAllByRoundAndTeamWithEdges(roundNumber int, teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		WithRound().
@@ -589,7 +589,7 @@ func (*status_s) getAllByRoundAndTeamWithEdges(roundNumber int, teamNumber int8)
 		All(ctx)
 }
 
-func (*status_s) GetAllByRoundAndTeamWithEdges(roundNumber int, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) GetAllByRoundAndTeamWithEdges(roundNumber int, teamNumber int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByRoundAndTeamWithEdges: lock")
 	defer mutex.Unlock()
@@ -597,7 +597,7 @@ func (*status_s) GetAllByRoundAndTeamWithEdges(roundNumber int, teamNumber int8)
 	return Status.getAllByRoundAndTeamWithEdges(roundNumber, teamNumber)
 }
 
-func (*status_s) getAllByCheckAndTeam(checkName string, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) getAllByCheckAndTeam(checkName string, teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		Where(
@@ -617,7 +617,7 @@ func (*status_s) getAllByCheckAndTeam(checkName string, teamNumber int8) ([]*ent
 		All(ctx)
 }
 
-func (*status_s) GetAllByCheckAndTeam(checkName string, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) GetAllByCheckAndTeam(checkName string, teamNumber int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByCheckAndTeam: lock")
 	defer mutex.Unlock()
@@ -625,7 +625,7 @@ func (*status_s) GetAllByCheckAndTeam(checkName string, teamNumber int8) ([]*ent
 	return Status.getAllByCheckAndTeam(checkName, teamNumber)
 }
 
-func (*status_s) getAllByCheckAndTeamWithLimit(checkName string, teamNumber int8, limit int) ([]*ent.Status, error) {
+func (*status_s) getAllByCheckAndTeamWithLimit(checkName string, teamNumber int, limit int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		Where(
@@ -646,7 +646,7 @@ func (*status_s) getAllByCheckAndTeamWithLimit(checkName string, teamNumber int8
 		All(ctx)
 }
 
-func (*status_s) GetAllByCheckAndTeamWithLimit(checkName string, teamNumber int8, limit int) ([]*ent.Status, error) {
+func (*status_s) GetAllByCheckAndTeamWithLimit(checkName string, teamNumber int, limit int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByCheckAndTeamWithLimit: lock")
 	defer mutex.Unlock()
@@ -654,7 +654,7 @@ func (*status_s) GetAllByCheckAndTeamWithLimit(checkName string, teamNumber int8
 	return Status.getAllByCheckAndTeamWithLimit(checkName, teamNumber, limit)
 }
 
-func (*status_s) getAllByCheckAndTeamWithEdges(checkName string, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) getAllByCheckAndTeamWithEdges(checkName string, teamNumber int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		WithRound().
@@ -676,7 +676,7 @@ func (*status_s) getAllByCheckAndTeamWithEdges(checkName string, teamNumber int8
 		All(ctx)
 }
 
-func (*status_s) GetAllByCheckAndTeamWithEdges(checkName string, teamNumber int8) ([]*ent.Status, error) {
+func (*status_s) GetAllByCheckAndTeamWithEdges(checkName string, teamNumber int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByCheckAndTeamWithEdges: lock")
 	defer mutex.Unlock()
@@ -684,7 +684,7 @@ func (*status_s) GetAllByCheckAndTeamWithEdges(checkName string, teamNumber int8
 	return Status.getAllByCheckAndTeamWithEdges(checkName, teamNumber)
 }
 
-func (*status_s) getAllByCheckAndTeamWithEdgesWithLimit(checkName string, teamNumber int8, limit int) ([]*ent.Status, error) {
+func (*status_s) getAllByCheckAndTeamWithEdgesWithLimit(checkName string, teamNumber int, limit int) ([]*ent.Status, error) {
 	return client.Status.
 		Query().
 		WithRound().
@@ -707,7 +707,7 @@ func (*status_s) getAllByCheckAndTeamWithEdgesWithLimit(checkName string, teamNu
 		All(ctx)
 }
 
-func (*status_s) GetAllByCheckAndTeamWithEdgesWithLimit(checkName string, teamNumber int8, limit int) ([]*ent.Status, error) {
+func (*status_s) GetAllByCheckAndTeamWithEdgesWithLimit(checkName string, teamNumber int, limit int) ([]*ent.Status, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.GetAllByCheckAndTeamWithEdgesWithLimit: lock")
 	defer mutex.Unlock()
@@ -715,7 +715,7 @@ func (*status_s) GetAllByCheckAndTeamWithEdgesWithLimit(checkName string, teamNu
 	return Status.getAllByCheckAndTeamWithEdgesWithLimit(checkName, teamNumber, limit)
 }
 
-func (*status_s) update(teamNumber int8, roundNumber int, checkName string, statusEnum status.Status, message string) (int, error) {
+func (*status_s) update(teamNumber int, roundNumber int, checkName string, statusEnum status.Status, message string) (int, error) {
 	return client.Status.Update().
 		Where(
 			status.HasRoundWith(
@@ -734,7 +734,7 @@ func (*status_s) update(teamNumber int8, roundNumber int, checkName string, stat
 		Save(ctx)
 }
 
-func (*status_s) Update(teamNumber int8, roundNumber int, checkName string, statusEnum status.Status, message string) (int, error) {
+func (*status_s) Update(teamNumber int, roundNumber int, checkName string, statusEnum status.Status, message string) (int, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.Update: lock")
 	defer mutex.Unlock()
@@ -758,7 +758,7 @@ func (*status_s) UpdateComplex(entStatus *ent.Status, statusEnum status.Status, 
 	return Status.updateComplex(entStatus, statusEnum, message)
 }
 
-func (*status_s) delete(teamNumber int8, roundNumber int, checkName string) (int, error) {
+func (*status_s) delete(teamNumber int, roundNumber int, checkName string) (int, error) {
 	return client.Status.
 		Delete().
 		Where(
@@ -775,7 +775,7 @@ func (*status_s) delete(teamNumber int8, roundNumber int, checkName string) (int
 		Exec(ctx)
 }
 
-func (*status_s) Delete(teamNumber int8, roundNumber int, checkName string) (int, error) {
+func (*status_s) Delete(teamNumber int, roundNumber int, checkName string) (int, error) {
 	mutex.Lock()
 	logrus.Trace("status_s.Delete: lock")
 	defer mutex.Unlock()

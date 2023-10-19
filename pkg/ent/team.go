@@ -17,7 +17,7 @@ type Team struct {
 	// ID of the ent.
 	ID int `json:"-"`
 	// Team number
-	Number int8 `json:"number"`
+	Number int `json:"number"`
 	// Team name
 	Name string `json:"name"`
 	// Team password
@@ -93,7 +93,7 @@ func (t *Team) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field number", values[i])
 			} else if value.Valid {
-				t.Number = int8(value.Int64)
+				t.Number = int(value.Int64)
 			}
 		case team.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {

@@ -15,7 +15,7 @@ type Team struct {
 // Fields of the Team.
 func (Team) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int8("number").
+		field.Int("number").
 			StructTag(`json:"number"`).
 			Comment("Team number").
 			Optional().

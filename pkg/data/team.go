@@ -17,7 +17,7 @@ type team_s struct{}
 
 var Team = team_s{}
 
-func (*team_s) exists(number int8) (bool, error) {
+func (*team_s) exists(number int) (bool, error) {
 	return client.Team.
 		Query().
 		Where(
@@ -26,7 +26,7 @@ func (*team_s) exists(number int8) (bool, error) {
 		Exist(ctx)
 }
 
-func (*team_s) Exists(number int8) (bool, error) {
+func (*team_s) Exists(number int) (bool, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.Exists: lock")
 	defer mutex.Unlock()
@@ -51,7 +51,7 @@ func (*team_s) ExistsByName(name string) (bool, error) {
 	return existsByName(name)
 }
 
-func (*team_s) get(number int8) (*ent.Team, error) {
+func (*team_s) get(number int) (*ent.Team, error) {
 	exists, err := Team.exists(number)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (*team_s) get(number int8) (*ent.Team, error) {
 		).Only(ctx)
 }
 
-func (*team_s) Get(number int8) (*ent.Team, error) {
+func (*team_s) Get(number int) (*ent.Team, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.Get: lock")
 	defer mutex.Unlock()
@@ -92,7 +92,7 @@ func (*team_s) GetByName(name string) (*ent.Team, error) {
 	return Team.getByName(name)
 }
 
-func (*team_s) getByNumberWithStatus(number int8) (*ent.Team, error) {
+func (*team_s) getByNumberWithStatus(number int) (*ent.Team, error) {
 	return client.Team.
 		Query().
 		Where(
@@ -102,7 +102,7 @@ func (*team_s) getByNumberWithStatus(number int8) (*ent.Team, error) {
 		Only(ctx)
 }
 
-func (*team_s) GetByNumberWithStatus(number int8) (*ent.Team, error) {
+func (*team_s) GetByNumberWithStatus(number int) (*ent.Team, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.GetByNumberWithStatus: lock")
 	defer mutex.Unlock()
@@ -128,7 +128,7 @@ func (*team_s) GetByNameWithStatus(name string) (*ent.Team, error) {
 	return Team.getByNameWithStatus(name)
 }
 
-func (*team_s) getByNumberWithCredentials(number int8) (*ent.Team, error) {
+func (*team_s) getByNumberWithCredentials(number int) (*ent.Team, error) {
 	return client.Team.
 		Query().
 		Where(
@@ -138,7 +138,7 @@ func (*team_s) getByNumberWithCredentials(number int8) (*ent.Team, error) {
 		Only(ctx)
 }
 
-func (*team_s) GetByNumberWithCredentials(number int8) (*ent.Team, error) {
+func (*team_s) GetByNumberWithCredentials(number int) (*ent.Team, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.GetByNumberWithCredentials: lock")
 	defer mutex.Unlock()
@@ -164,7 +164,7 @@ func (*team_s) GetByNameWithCredentials(name string) (*ent.Team, error) {
 	return Team.getByNameWithCredentials(name)
 }
 
-func (*team_s) getByNumberWithEdges(number int8) (*ent.Team, error) {
+func (*team_s) getByNumberWithEdges(number int) (*ent.Team, error) {
 	return client.Team.
 		Query().
 		Where(
@@ -175,7 +175,7 @@ func (*team_s) getByNumberWithEdges(number int8) (*ent.Team, error) {
 		Only(ctx)
 }
 
-func (*team_s) GetByNumberWithEdges(number int8) (*ent.Team, error) {
+func (*team_s) GetByNumberWithEdges(number int) (*ent.Team, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.GetByNumberWithEdges: lock")
 	defer mutex.Unlock()
@@ -274,7 +274,7 @@ func (*team_s) GetAllWithEdges() ([]*ent.Team, error) {
 	return Team.getAllWithEdges()
 }
 
-func (*team_s) create(number int8, name string, password string) (*ent.Team, error) {
+func (*team_s) create(number int, name string, password string) (*ent.Team, error) {
 	exists, err := Team.exists(number)
 	if err != nil {
 		return nil, err
@@ -297,7 +297,7 @@ func (*team_s) create(number int8, name string, password string) (*ent.Team, err
 		Save(ctx)
 }
 
-func (*team_s) Create(number int8, name string, password string) (*ent.Team, error) {
+func (*team_s) Create(number int, name string, password string) (*ent.Team, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.Create: lock")
 	defer mutex.Unlock()
@@ -344,14 +344,14 @@ func (*team_s) GetRole(name string) (string, error) {
 	return Team.getRole(name)
 }
 
-func (*team_s) update(team *ent.Team, number int8, name string) (*ent.Team, error) {
+func (*team_s) update(team *ent.Team, number int, name string) (*ent.Team, error) {
 	return team.Update().
 		SetNumber(number).
 		SetName(name).
 		Save(ctx)
 }
 
-func (*team_s) Update(team *ent.Team, number int8, name string) (*ent.Team, error) {
+func (*team_s) Update(team *ent.Team, number int, name string) (*ent.Team, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.Update: lock")
 	defer mutex.Unlock()
@@ -378,7 +378,7 @@ func (*team_s) UpdatePassword(team *ent.Team, password string) (*ent.Team, error
 	return Team.updatePassword(team, password)
 }
 
-func (*team_s) checkPassword(team int8, password string) (bool, error) {
+func (*team_s) checkPassword(team int, password string) (bool, error) {
 	teamEnt, err := Team.get(team)
 	if err != nil {
 		return false, err
@@ -392,7 +392,7 @@ func (*team_s) checkPassword(team int8, password string) (bool, error) {
 	return true, nil
 }
 
-func (*team_s) CheckPassword(team int8, password string) (bool, error) {
+func (*team_s) CheckPassword(team int, password string) (bool, error) {
 	mutex.Lock()
 	logrus.Trace("team_s.CheckPassword: lock")
 	defer mutex.Unlock()
@@ -436,7 +436,7 @@ func (*team_s) Delete(team *ent.Team) error {
 	return Team.delete(team)
 }
 
-func getScore(teamNumber int8) (score int, err error) {
+func getScore(teamNumber int) (score int, err error) {
 	for _, configCheck := range config.Checks {
 		count, err := client.Status.
 			Query().
@@ -460,7 +460,7 @@ func getScore(teamNumber int8) (score int, err error) {
 	return score, nil
 }
 
-func (*team_s) GetScore(teamNumber int8) (score int, err error) {
+func (*team_s) GetScore(teamNumber int) (score int, err error) {
 	mutex.Lock()
 	logrus.Trace("team_s.GetScore: lock")
 	defer mutex.Unlock()
@@ -468,7 +468,7 @@ func (*team_s) GetScore(teamNumber int8) (score int, err error) {
 	return getScore(teamNumber)
 }
 
-func (*team_s) getScoreBeforeRound(team_number int8, round_number int) (score int, err error) {
+func (*team_s) getScoreBeforeRound(team_number int, round_number int) (score int, err error) {
 	for _, configCheck := range config.Checks {
 		count, err := client.Status.
 			Query().
@@ -495,7 +495,7 @@ func (*team_s) getScoreBeforeRound(team_number int8, round_number int) (score in
 	return score, nil
 }
 
-func (*team_s) GetScoreBeforeRound(team_number int8, round_number int) (score int, err error) {
+func (*team_s) GetScoreBeforeRound(team_number int, round_number int) (score int, err error) {
 	mutex.Lock()
 	logrus.Trace("team_s.GetScoreBeforeRound: lock")
 	defer mutex.Unlock()

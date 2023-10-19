@@ -53,14 +53,14 @@ func Init() {
 
 	// Create teams if they do not exist
 	for i := 1; i <= config.Teams.Amount; i++ {
-		exists, err := Team.Exists(int8(i))
+		exists, err := Team.Exists(i)
 		if err != nil {
 			log.Fatalf("failed checking for team %d: %v", i, err)
 		}
 		output := bytes.NewBuffer([]byte{})
 		teamNameTemplate.Execute(output, struct{ Team int }{Team: i})
 		if !exists {
-			_, err := Team.Create(int8(i), output.String(), config.Teams.Password)
+			_, err := Team.Create(i, output.String(), config.Teams.Password)
 			if err != nil {
 				log.Fatalf("failed creating team %d: %v", i, err)
 			}
@@ -85,13 +85,13 @@ func Init() {
 	// Create credentials if they do not exist
 	for _, check := range config.Checks {
 		for i := 1; i <= config.Teams.Amount; i++ {
-			exists, err := Credential.Exists(int8(i), check.Name)
+			exists, err := Credential.Exists(i, check.Name)
 			if err != nil {
 				log.Fatalf("failed checking for credential %d:%s: %v", i, check.Name, err)
 			}
 
 			if !exists {
-				_, err := Credential.Create(int8(i), check.Name, check.Credentials.Password)
+				_, err := Credential.Create(i, check.Name, check.Credentials.Password)
 				if err != nil {
 					log.Fatalf("failed creating credential %d:%s: %v", i, check.Name, err)
 				}
