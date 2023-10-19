@@ -29,7 +29,7 @@ var (
 type checkResult struct {
 	Success bool
 	Message string
-	Team    int8
+	Team    int
 	Check   structs.Check_s
 }
 
@@ -155,7 +155,7 @@ func runRound(roundMutex *sync.Mutex) error {
 			_, err := data.Status.Create(
 				entRound.Number,
 				check.Name,
-				int8(i),
+				i,
 				status.StatusUnknown,
 			)
 			if err != nil {
@@ -177,7 +177,7 @@ func runRound(roundMutex *sync.Mutex) error {
 		if err != nil {
 			for i := 1; i <= config.Teams.Amount; i++ {
 				_, err = data.Status.Update(
-					int8(i),
+					i,
 					entRound.Number,
 					check.Name,
 					status.StatusDown,
@@ -191,10 +191,10 @@ func runRound(roundMutex *sync.Mutex) error {
 		}
 		for i := 1; i <= config.Teams.Amount; i++ {
 			target := bytes.NewBuffer([]byte{})
-			err = targetTemplate.Execute(target, struct{ Team int8 }{Team: int8(i)})
+			err = targetTemplate.Execute(target, struct{ Team int }{Team: i})
 			if err != nil {
 				_, err = data.Status.Update(
-					int8(i),
+					i,
 					entRound.Number,
 					check.Name,
 					status.StatusDown,
@@ -206,10 +206,10 @@ func runRound(roundMutex *sync.Mutex) error {
 				continue
 			}
 
-			entCredential, err := data.Credential.Get(int8(i), check.Name)
+			entCredential, err := data.Credential.Get(i, check.Name)
 			if err != nil {
 				_, err = data.Status.Update(
-					int8(i),
+					i,
 					entRound.Number,
 					check.Name,
 					status.StatusDown,
@@ -221,7 +221,7 @@ func runRound(roundMutex *sync.Mutex) error {
 				continue
 			}
 
-			go runScoreCheck(entRound.Number, check, int8(i), target.String(), entCredential.Password, resultsChan, wgRound)
+			go runScoreCheck(entRound.Number, check, i, target.String(), entCredential.Password, resultsChan, wgRound)
 		}
 	}
 
@@ -251,7 +251,7 @@ func runRound(roundMutex *sync.Mutex) error {
 	return nil
 }
 
-func runScoreCheck(round int, check structs.Check_s, team int8, target string, password string, resultsChan chan checkResult, wg *sync.WaitGroup) {
+func runScoreCheck(round int, check structs.Check_s, team int, target string, password string, resultsChan chan checkResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	runFunc, ok := imports.Imports[check.Release.Org+"/"+check.Release.Repo]
