@@ -2169,8 +2169,8 @@ type TeamMutation struct {
 	op                Op
 	typ               string
 	id                *int
-	number            *int8
-	addnumber         *int8
+	number            *int
+	addnumber         *int
 	name              *string
 	password          *string
 	role              *team.Role
@@ -2291,13 +2291,13 @@ func (m *TeamMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetNumber sets the "number" field.
-func (m *TeamMutation) SetNumber(i int8) {
+func (m *TeamMutation) SetNumber(i int) {
 	m.number = &i
 	m.addnumber = nil
 }
 
 // Number returns the value of the "number" field in the mutation.
-func (m *TeamMutation) Number() (r int8, exists bool) {
+func (m *TeamMutation) Number() (r int, exists bool) {
 	v := m.number
 	if v == nil {
 		return
@@ -2308,7 +2308,7 @@ func (m *TeamMutation) Number() (r int8, exists bool) {
 // OldNumber returns the old "number" field's value of the Team entity.
 // If the Team object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TeamMutation) OldNumber(ctx context.Context) (v int8, err error) {
+func (m *TeamMutation) OldNumber(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldNumber is only allowed on UpdateOne operations")
 	}
@@ -2323,7 +2323,7 @@ func (m *TeamMutation) OldNumber(ctx context.Context) (v int8, err error) {
 }
 
 // AddNumber adds i to the "number" field.
-func (m *TeamMutation) AddNumber(i int8) {
+func (m *TeamMutation) AddNumber(i int) {
 	if m.addnumber != nil {
 		*m.addnumber += i
 	} else {
@@ -2332,7 +2332,7 @@ func (m *TeamMutation) AddNumber(i int8) {
 }
 
 // AddedNumber returns the value that was added to the "number" field in this mutation.
-func (m *TeamMutation) AddedNumber() (r int8, exists bool) {
+func (m *TeamMutation) AddedNumber() (r int, exists bool) {
 	v := m.addnumber
 	if v == nil {
 		return
@@ -2666,7 +2666,7 @@ func (m *TeamMutation) OldField(ctx context.Context, name string) (ent.Value, er
 func (m *TeamMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case team.FieldNumber:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2724,7 +2724,7 @@ func (m *TeamMutation) AddedField(name string) (ent.Value, bool) {
 func (m *TeamMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case team.FieldNumber:
-		v, ok := value.(int8)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

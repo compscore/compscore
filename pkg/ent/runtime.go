@@ -43,7 +43,7 @@ func init() {
 	// teamDescNumber is the schema descriptor for number field.
 	teamDescNumber := teamFields[0].Descriptor()
 	// team.NumberValidator is a validator for the "number" field. It is called by the builders before save.
-	team.NumberValidator = teamDescNumber.Validators[0].(func(int8) error)
+	team.NumberValidator = teamDescNumber.Validators[0].(func(int) error)
 	// teamDescName is the schema descriptor for name field.
 	teamDescName := teamFields[1].Descriptor()
 	// team.NameValidator is a validator for the "name" field. It is called by the builders before save.

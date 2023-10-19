@@ -22,13 +22,13 @@ type TeamCreate struct {
 }
 
 // SetNumber sets the "number" field.
-func (tc *TeamCreate) SetNumber(i int8) *TeamCreate {
+func (tc *TeamCreate) SetNumber(i int) *TeamCreate {
 	tc.mutation.SetNumber(i)
 	return tc
 }
 
 // SetNillableNumber sets the "number" field if the given value is not nil.
-func (tc *TeamCreate) SetNillableNumber(i *int8) *TeamCreate {
+func (tc *TeamCreate) SetNillableNumber(i *int) *TeamCreate {
 	if i != nil {
 		tc.SetNumber(*i)
 	}
@@ -202,7 +202,7 @@ func (tc *TeamCreate) createSpec() (*Team, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := tc.mutation.Number(); ok {
-		_spec.SetField(team.FieldNumber, field.TypeInt8, value)
+		_spec.SetField(team.FieldNumber, field.TypeInt, value)
 		_node.Number = value
 	}
 	if value, ok := tc.mutation.Name(); ok {

@@ -30,14 +30,14 @@ func (tu *TeamUpdate) Where(ps ...predicate.Team) *TeamUpdate {
 }
 
 // SetNumber sets the "number" field.
-func (tu *TeamUpdate) SetNumber(i int8) *TeamUpdate {
+func (tu *TeamUpdate) SetNumber(i int) *TeamUpdate {
 	tu.mutation.ResetNumber()
 	tu.mutation.SetNumber(i)
 	return tu
 }
 
 // SetNillableNumber sets the "number" field if the given value is not nil.
-func (tu *TeamUpdate) SetNillableNumber(i *int8) *TeamUpdate {
+func (tu *TeamUpdate) SetNillableNumber(i *int) *TeamUpdate {
 	if i != nil {
 		tu.SetNumber(*i)
 	}
@@ -45,7 +45,7 @@ func (tu *TeamUpdate) SetNillableNumber(i *int8) *TeamUpdate {
 }
 
 // AddNumber adds i to the "number" field.
-func (tu *TeamUpdate) AddNumber(i int8) *TeamUpdate {
+func (tu *TeamUpdate) AddNumber(i int) *TeamUpdate {
 	tu.mutation.AddNumber(i)
 	return tu
 }
@@ -224,13 +224,13 @@ func (tu *TeamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := tu.mutation.Number(); ok {
-		_spec.SetField(team.FieldNumber, field.TypeInt8, value)
+		_spec.SetField(team.FieldNumber, field.TypeInt, value)
 	}
 	if value, ok := tu.mutation.AddedNumber(); ok {
-		_spec.AddField(team.FieldNumber, field.TypeInt8, value)
+		_spec.AddField(team.FieldNumber, field.TypeInt, value)
 	}
 	if tu.mutation.NumberCleared() {
-		_spec.ClearField(team.FieldNumber, field.TypeInt8)
+		_spec.ClearField(team.FieldNumber, field.TypeInt)
 	}
 	if value, ok := tu.mutation.Name(); ok {
 		_spec.SetField(team.FieldName, field.TypeString, value)
@@ -352,14 +352,14 @@ type TeamUpdateOne struct {
 }
 
 // SetNumber sets the "number" field.
-func (tuo *TeamUpdateOne) SetNumber(i int8) *TeamUpdateOne {
+func (tuo *TeamUpdateOne) SetNumber(i int) *TeamUpdateOne {
 	tuo.mutation.ResetNumber()
 	tuo.mutation.SetNumber(i)
 	return tuo
 }
 
 // SetNillableNumber sets the "number" field if the given value is not nil.
-func (tuo *TeamUpdateOne) SetNillableNumber(i *int8) *TeamUpdateOne {
+func (tuo *TeamUpdateOne) SetNillableNumber(i *int) *TeamUpdateOne {
 	if i != nil {
 		tuo.SetNumber(*i)
 	}
@@ -367,7 +367,7 @@ func (tuo *TeamUpdateOne) SetNillableNumber(i *int8) *TeamUpdateOne {
 }
 
 // AddNumber adds i to the "number" field.
-func (tuo *TeamUpdateOne) AddNumber(i int8) *TeamUpdateOne {
+func (tuo *TeamUpdateOne) AddNumber(i int) *TeamUpdateOne {
 	tuo.mutation.AddNumber(i)
 	return tuo
 }
@@ -576,13 +576,13 @@ func (tuo *TeamUpdateOne) sqlSave(ctx context.Context) (_node *Team, err error) 
 		}
 	}
 	if value, ok := tuo.mutation.Number(); ok {
-		_spec.SetField(team.FieldNumber, field.TypeInt8, value)
+		_spec.SetField(team.FieldNumber, field.TypeInt, value)
 	}
 	if value, ok := tuo.mutation.AddedNumber(); ok {
-		_spec.AddField(team.FieldNumber, field.TypeInt8, value)
+		_spec.AddField(team.FieldNumber, field.TypeInt, value)
 	}
 	if tuo.mutation.NumberCleared() {
-		_spec.ClearField(team.FieldNumber, field.TypeInt8)
+		_spec.ClearField(team.FieldNumber, field.TypeInt)
 	}
 	if value, ok := tuo.mutation.Name(); ok {
 		_spec.SetField(team.FieldName, field.TypeString, value)

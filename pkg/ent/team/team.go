@@ -65,7 +65,7 @@ func ValidColumn(column string) bool {
 
 var (
 	// NumberValidator is a validator for the "number" field. It is called by the builders before save.
-	NumberValidator func(int8) error
+	NumberValidator func(int) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
