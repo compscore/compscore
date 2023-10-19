@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { Scoreboard } from "../../models/Scoreboard";
+import { Scoreboard } from "../../models/Scoreboard/Scoreboard";
 
 export default function ScoreBoard() {
   const [data, setData] = useState<Scoreboard>();
