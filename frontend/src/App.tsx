@@ -17,6 +17,7 @@ import StatusRoundScoreboard from "./pages/Scoreboard/StatusRound";
 import TeamScoreboard from "./pages/Scoreboard/Team";
 import TeamRoundScoreboard from "./pages/Scoreboard/TeamRound";
 import { useSystemTheme } from "./themes/Preference";
+import ChangePassword from "./pages/ChangePassword";
 
 const LazyComponent = ({
   element,
@@ -53,6 +54,10 @@ export default function App() {
         {
           path: "login",
           element: <LazyComponent element={<Login setCookie={setCookie} />} />,
+        },
+        {
+          path: "change-password",
+          element: <LazyComponent element={<ChangePassword />} />,
         },
         {
           path: "checks",
