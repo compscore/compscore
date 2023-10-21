@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { TeamScoreboard } from "../../models/Scoreboard/Team";
 
 type props = {
-  team: number;
+  team: string;
 };
 
 export default function TeamScoreboardComponent({ team }: props) {
