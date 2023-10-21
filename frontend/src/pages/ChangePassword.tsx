@@ -1,9 +1,14 @@
 import { Box, Button, Container, Typography } from "@mui/material";
-import { useState } from "react";
-import PasswordInput from "../components/PasswordInput";
 import { enqueueSnackbar } from "notistack";
+import { useState } from "react";
+import { CookieSetOptions } from "universal-cookie";
+import PasswordInput from "../components/PasswordInput";
 
-export default function ChangePassword() {
+type props = {
+  removeCookie: (name: "auth", options?: CookieSetOptions | undefined) => void;
+};
+
+export default function ChangePassword({ removeCookie }: props) {
   const [oldPassword, setOldPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
@@ -25,6 +30,8 @@ export default function ChangePassword() {
           enqueueSnackbar("Password changed", {
             variant: "success",
           });
+          removeCookie("auth");
+          window.location.href = "/login";
         } else {
           enqueueSnackbar("Failed to change password", {
             variant: "error",

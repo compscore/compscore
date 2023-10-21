@@ -408,7 +408,7 @@ func (*team_s) checkPasswordByName(team_name string, password string) (bool, err
 
 	err = bcrypt.CompareHashAndPassword([]byte(teamEnt.Password), []byte(password))
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 
 	return true, nil

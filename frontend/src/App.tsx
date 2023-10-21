@@ -57,7 +57,11 @@ export default function App() {
         },
         {
           path: "password",
-          element: <LazyComponent element={<ChangePassword />} />,
+          element: (
+            <LazyComponent
+              element={<ChangePassword removeCookie={removeCookie} />}
+            />
+          ),
         },
         {
           path: "checks",
