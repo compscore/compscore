@@ -91,13 +91,14 @@ func (*scoreboard_s) team(team_number int, rounds int) (*structs.TeamScoreboard,
 	teamScoreboard.Round = entRound.Number
 
 	for i, configCheck := range config.Checks {
-		teamScoreboard.Checks[i].Name = configCheck.Name
-		teamScoreboard.Checks[i].Status = make([]int, rounds)
 
 		entStatus, err := Status.getAllByCheckAndTeamWithLimit(configCheck.Name, team_number, rounds)
 		if err != nil {
 			return nil, err
 		}
+
+		teamScoreboard.Checks[i].Name = configCheck.Name
+		teamScoreboard.Checks[i].Status = make([]int, len(entStatus))
 
 		for j, entStat := range entStatus {
 			switch entStat.Status {
@@ -128,13 +129,14 @@ func (*scoreboard_s) teamRound(team_number int, round_number int, rounds int) (*
 	teamScoreboard.Round = round_number
 
 	for i, configCheck := range config.Checks {
-		teamScoreboard.Checks[i].Name = configCheck.Name
-		teamScoreboard.Checks[i].Status = make([]int, rounds)
 
 		entStatus, err := Status.getAllByCheckAndTeamFromRoundWithLimit(configCheck.Name, team_number, round_number, rounds)
 		if err != nil {
 			return nil, err
 		}
+
+		teamScoreboard.Checks[i].Name = configCheck.Name
+		teamScoreboard.Checks[i].Status = make([]int, len(entStatus))
 
 		for j, entStat := range entStatus {
 			switch entStat.Status {
@@ -179,13 +181,13 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 		output := bytes.NewBuffer([]byte{})
 		teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
 
-		checkScoreboard.Teams[i].Name = output.String()
-		checkScoreboard.Teams[i].Status = make([]int, rounds)
-
 		entStatus, err := Status.getAllByCheckAndTeamWithLimit(check_name, int(i+1), rounds)
 		if err != nil {
 			return nil, err
 		}
+
+		checkScoreboard.Teams[i].Name = output.String()
+		checkScoreboard.Teams[i].Status = make([]int, len(entStatus))
 
 		for j, entStat := range entStatus {
 			switch entStat.Status {
@@ -225,13 +227,13 @@ func (*scoreboard_s) checkRound(check_name string, round_number int, rounds int)
 		output := bytes.NewBuffer([]byte{})
 		teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
 
-		checkScoreboard.Teams[i].Name = output.String()
-		checkScoreboard.Teams[i].Status = make([]int, rounds)
-
 		entStatus, err := Status.getAllByCheckAndTeamFromRoundWithLimit(check_name, int(i+1), round_number, rounds)
 		if err != nil {
 			return nil, err
 		}
+
+		checkScoreboard.Teams[i].Name = output.String()
+		checkScoreboard.Teams[i].Status = make([]int, len(entStatus))
 
 		for j, entStat := range entStatus {
 			switch entStat.Status {
