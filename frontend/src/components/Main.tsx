@@ -1,12 +1,12 @@
 import { Container } from "@mui/material";
 import { SnackbarProvider } from "notistack";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { CookieSetOptions } from "universal-cookie";
 import Drawer from "./Drawer";
 import NavBar from "./NavBar";
+import { Outlet } from "react-router";
 
 type props = {
-  children: ReactNode;
   cookies: {
     auth?: any;
   };
@@ -14,12 +14,7 @@ type props = {
   mobile: boolean;
 };
 
-export default function Main({
-  children,
-  cookies,
-  removeCookie,
-  mobile,
-}: props) {
+export default function Main({ cookies, removeCookie, mobile }: props) {
   const [drawerState, setDrawerState] = useState<boolean>(false);
   return (
     <>
@@ -34,7 +29,9 @@ export default function Main({
         setDrawerState={setDrawerState}
       />
       <Container component='main'>
-        <SnackbarProvider maxSnack={3}>{children}</SnackbarProvider>
+        <SnackbarProvider maxSnack={3}>
+          <Outlet />
+        </SnackbarProvider>
       </Container>
     </>
   );

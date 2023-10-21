@@ -58,17 +58,13 @@ export default function NavBar({ cookies, setDrawerState, mobile }: Props) {
                 <Typography variant={mobile ? "body1" : "h6"}>
                   {(jwt_decode(cookies.auth) as JWT).Team}
                 </Typography>
-                <Box sx={{ m: 1 }} />
                 {!mobile && (
                   <>
-                    <Divider orientation='vertical' flexItem />
-                    <Box sx={{ m: 1 }} />
+                    <Divider orientation='vertical' flexItem sx={{ m: 1 }} />
                     <Typography variant={mobile ? "body1" : "h6"}>
                       {(jwt_decode(cookies.auth) as JWT).Role}
                     </Typography>
-                    <Box sx={{ m: 1 }} />
-                    <Divider orientation='vertical' flexItem />
-                    <Box sx={{ m: 1 }} />
+                    <Divider orientation='vertical' flexItem sx={{ m: 1 }} />
                   </>
                 )}
               </>

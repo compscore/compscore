@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { TeamScoreboard } from "../../models/TeamScoreboard";
+import { TeamScoreboard } from "../../models/Scoreboard/Team";
 
 type props = {
   team: number;
@@ -144,7 +144,7 @@ export default function TeamScoreboardComponent({ team }: props) {
                     setHighlightedCheck(null);
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/check/" + check.name;
+                    window.location.href = `/scoreboard/check/${check.name}`;
                   }}
                 >
                   {check.name}

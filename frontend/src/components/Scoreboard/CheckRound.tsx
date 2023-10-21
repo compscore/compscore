@@ -1,5 +1,3 @@
-import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import {
   Box,
   Paper,
@@ -14,17 +12,54 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { CheckScoreboard } from "../../models/Scoreboard/Check";
+import { Round } from "../../models/ent";
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
 type props = {
   check: string;
+  round: string;
 };
 
-export default function CheckScoreboardComponent({ check }: props) {
+export default function CheckRoundScoreboardComponent({ check, round }: props) {
   const [data, setData] = useState<CheckScoreboard>();
+  const [latestRound, setLatestRound] = useState<Round>();
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/check/${check}`, {
+      fetch(`http://localhost:8080/api/round/latest`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then(async (res) => {
+          if (res.status === 200) {
+            let response = (await res.json()) as Round;
+
+            setLatestRound(response);
+
+            if (0 >= parseInt(round) || parseInt(round) >= response.number) {
+              window.location.href = `/scoreboard/check/${check}`;
+            }
+          } else {
+            enqueueSnackbar("Encountered an error", { variant: "error" });
+          }
+        })
+        .catch((err) => {
+          enqueueSnackbar("Encountered an error: " + err, { variant: "error" });
+          console.log(err);
+        });
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      fetch(`http://localhost:8080/api/scoreboard/check/${check}/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +136,7 @@ export default function CheckScoreboardComponent({ check }: props) {
           alignItems: "center",
         }}
       >
-        {data && data.round >= 10 && (
+        {data && data.round > 10 ? (
           <DoubleArrowLeftIcon
             sx={{
               cursor: "pointer",
@@ -112,8 +147,14 @@ export default function CheckScoreboardComponent({ check }: props) {
               }`;
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        {data && data.round >= 1 && (
+        {data && data.round > 1 ? (
           <ArrowLeftIcon
             sx={{
               cursor: "pointer",
@@ -124,22 +165,58 @@ export default function CheckScoreboardComponent({ check }: props) {
               }`;
             }}
           />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        {data && (
-          <Typography component='h1' variant='h5'>
-            Round {data.round}
-          </Typography>
+        <Typography
+          component='h1'
+          variant='h5'
+          onClick={() => {
+            window.location.href = `/scoreboard/check/${check}`;
+          }}
+        >
+          Round {round}
+        </Typography>
+        {latestRound && data && data.round < latestRound?.number ? (
+          <ArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/check/${check}/${
+                data.round + 1
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
         )}
-        <ArrowLeftIcon
-          sx={{
-            visibility: "hidden",
-          }}
-        />
-        <ArrowLeftIcon
-          sx={{
-            visibility: "hidden",
-          }}
-        />
+        {latestRound && data && data.round + 10 <= latestRound?.number ? (
+          <DoubleArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/check/${check}/${
+                data.round + 10
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
       </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper} sx={{ width: "80%" }}>

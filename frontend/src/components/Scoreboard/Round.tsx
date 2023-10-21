@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { Scoreboard } from "../../models/Scoreboard";
+import { Scoreboard } from "../../models/Scoreboard/Scoreboard";
 import { Round } from "../../models/ent";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
@@ -263,7 +263,7 @@ export default function RoundScoreboardComponent({ round }: props) {
                         : "transparent",
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/check/" + check.name;
+                    window.location.href = `/scoreboard/check/${check.name}/${round}`;
                   }}
                 >
                   {check.name}

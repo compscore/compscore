@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { StatusScoreboard } from "../../models/StatusScoreboard";
+import { StatusScoreboard } from "../../models/Scoreboard/Status";
 import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 

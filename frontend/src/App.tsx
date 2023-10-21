@@ -1,14 +1,15 @@
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
-import { useState, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import Main from "./components/Main";
 import Checks from "./pages/Checks";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import CheckScoreboard from "./pages/Scoreboard/Check";
+import CheckRoundScoreboard from "./pages/Scoreboard/CheckRound";
 import RoundScoreboard from "./pages/Scoreboard/Round";
 import Scoreboard from "./pages/Scoreboard/Scoreboard";
 import StatusScoreboard from "./pages/Scoreboard/Status";
@@ -16,9 +17,107 @@ import StatusRoundScoreboard from "./pages/Scoreboard/StatusRound";
 import TeamScoreboard from "./pages/Scoreboard/Team";
 import { useSystemTheme } from "./themes/Preference";
 
+const LazyComponent = ({
+  element,
+}: {
+  element: React.ReactNode;
+}): React.ReactElement => {
+  return <Suspense fallback={<>Loading...</>}>{element}</Suspense>;
+};
+
 export default function App() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
   const [mobile, setMobile] = useState<boolean>(window.innerWidth <= 768);
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <LazyComponent
+          element={
+            <Main
+              mobile={mobile}
+              cookies={cookies}
+              removeCookie={removeCookie}
+            />
+          }
+        />
+      ),
+      errorElement: <Index />,
+      children: [
+        {
+          index: true,
+          element: <LazyComponent element={<Index />} />,
+        },
+        {
+          path: "login",
+          element: <LazyComponent element={<Login setCookie={setCookie} />} />,
+        },
+        {
+          path: "checks",
+          element: <LazyComponent element={<Checks cookies={cookies} />} />,
+        },
+        {
+          path: "scoreboard",
+          element: <LazyComponent element={<Scoreboard />} />,
+        },
+        {
+          path: "scoreboard/team/:team",
+          element: <LazyComponent element={<TeamScoreboard />} />,
+        },
+        {
+          path: "scoreboard/check/:check",
+          element: <LazyComponent element={<CheckScoreboard />} />,
+        },
+        {
+          path: "scoreboard/check/:check/:round",
+          element: <LazyComponent element={<CheckRoundScoreboard />} />,
+        },
+        {
+          path: "scoreboard/round/:round",
+          element: <LazyComponent element={<RoundScoreboard />} />,
+        },
+        {
+          path: "scoreboard/status/:team/:check",
+          element: <LazyComponent element={<StatusScoreboard />} />,
+        },
+        {
+          path: "scoreboard/status/:team/:check/:round",
+          element: <LazyComponent element={<StatusRoundScoreboard />} />,
+        },
+      ],
+    },
+    {
+      path: "/iframe",
+      errorElement: <Index />,
+      children: [
+        {
+          path: "scoreboard",
+          element: <LazyComponent element={<Scoreboard />} />,
+        },
+        {
+          path: "scoreboard/team/:team",
+          element: <LazyComponent element={<TeamScoreboard />} />,
+        },
+        {
+          path: "scoreboard/check/:check",
+          element: <LazyComponent element={<CheckScoreboard />} />,
+        },
+        {
+          path: "scoreboard/round/:round",
+          element: <LazyComponent element={<RoundScoreboard />} />,
+        },
+        {
+          path: "scoreboard/status/:team/:check",
+          element: <LazyComponent element={<StatusScoreboard />} />,
+        },
+        {
+          path: "scoreboard/status/:team/:check/:round",
+          element: <LazyComponent element={<StatusRoundScoreboard />} />,
+        },
+      ],
+    },
+  ]);
 
   useEffect(() => {
     const updateWindowDimensions = () => {
@@ -35,146 +134,7 @@ export default function App() {
   return (
     <ThemeProvider theme={useSystemTheme()}>
       <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path='/'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <Index />
-              </Main>
-            }
-          />
-          <Route
-            path='/login'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <Login setCookie={setCookie} />
-              </Main>
-            }
-          />
-          <Route
-            path='/checks'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <Checks cookies={cookies} />
-              </Main>
-            }
-          />
-          <Route
-            path='/scoreboard'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <Scoreboard />
-              </Main>
-            }
-          />
-          <Route
-            path='/scoreboard/team/:team'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <TeamScoreboard />
-              </Main>
-            }
-          />
-          <Route
-            path='/scoreboard/check/:check'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <CheckScoreboard />
-              </Main>
-            }
-          />
-          <Route
-            path='/scoreboard/round/:round'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <RoundScoreboard />
-              </Main>
-            }
-          />
-          <Route
-            path='/scoreboard/status/:team/:check'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <StatusScoreboard />
-              </Main>
-            }
-          />
-          <Route
-            path='/scoreboard/status/:team/:check/:round'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <StatusRoundScoreboard />
-              </Main>
-            }
-          />
-          <Route path='iframe'>
-            <Route path='scoreboard' element={<Scoreboard />} />
-            <Route path='scoreboard/team/:team' element={<TeamScoreboard />} />
-            <Route
-              path='scoreboard/check/:check'
-              element={<CheckScoreboard />}
-            />
-            <Route
-              path='scoreboard/round/:round'
-              element={<RoundScoreboard />}
-            />
-            <Route
-              path='scoreboard/status/:team/:check'
-              element={<StatusScoreboard />}
-            />
-          </Route>
-          <Route
-            path='*'
-            element={
-              <Main
-                mobile={mobile}
-                cookies={cookies}
-                removeCookie={removeCookie}
-              >
-                <Index />
-              </Main>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </ThemeProvider>
   );
 }

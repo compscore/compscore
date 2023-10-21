@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { StatusScoreboard } from "../../models/StatusScoreboard";
+import { StatusScoreboard } from "../../models/Scoreboard/Status";
 import { Round } from "../../models/ent";
 
 type props = {
