@@ -11,6 +11,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { LoginSuccess, LoginFailure } from "../models/Login";
 import { CookieSetOptions } from "universal-cookie";
+import PasswordInput from "../components/PasswordInput";
 
 type Props = {
   setCookie: (
@@ -85,13 +86,11 @@ export default function Login({ setCookie }: Props) {
             name='username'
             autoFocus
           />
-          <TextField
+          <PasswordInput
             margin='normal'
             required
-            fullWidth
             name='password'
             label='Password'
-            type='password'
             id='password'
           />
           <Tooltip title='Reach out to Black Team' arrow>

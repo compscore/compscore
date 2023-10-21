@@ -9,9 +9,23 @@ type props = {
   value?: string;
   onBlur?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   variant?: "standard" | "filled" | "outlined" | undefined;
+  margin?: "none" | "dense" | "normal" | undefined;
+  required?: boolean;
+  name?: string;
+  label?: string;
+  id?: string;
 };
 
-function PasswordInput({ value, variant, onBlur }: props) {
+function PasswordInput({
+  value,
+  variant,
+  onBlur,
+  margin,
+  required,
+  name,
+  label,
+  id,
+}: props) {
   const [password, setPassword] = useState<string>(
     value === undefined ? "" : value
   );
@@ -43,6 +57,11 @@ function PasswordInput({ value, variant, onBlur }: props) {
       }}
       onBlur={handleBlur}
       fullWidth
+      margin={margin}
+      required={required}
+      name={name}
+      label={label}
+      id={id}
       InputProps={{
         endAdornment: (
           <InputAdornment position='end'>
