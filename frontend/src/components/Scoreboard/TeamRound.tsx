@@ -13,6 +13,10 @@ import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { TeamScoreboard } from "../../models/Scoreboard/Team";
 import { Round } from "../../models/ent";
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
 type props = {
   team: string;
@@ -55,7 +59,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/team/${team}`, {
+      fetch(`http://localhost:8080/api/scoreboard/team/${team}/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -126,9 +130,94 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
       >
         Team {team}
       </Typography>
-      <Typography component='h1' variant='h5'>
-        Round {data?.round}
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {parseInt(round) > 10 ? (
+          <DoubleArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) - 10
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
+        {parseInt(round) > 1 ? (
+          <ArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) - 1
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
+        <Typography
+          component='h1'
+          variant='h5'
+          onClick={() => {
+            window.location.href = `/scoreboard/team/${team}`;
+          }}
+        >
+          Round {round}
+        </Typography>
+        {latestRound && parseInt(round) < latestRound?.number ? (
+          <ArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) + 1
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
+        {latestRound && parseInt(round) + 10 <= latestRound?.number ? (
+          <DoubleArrowRightIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) + 10
+              }`;
+            }}
+          />
+        ) : (
+          <ArrowLeftIcon
+            sx={{
+              visibility: "hidden",
+            }}
+          />
+        )}
+      </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper} sx={{ width: "80%" }}>
         <Table>
