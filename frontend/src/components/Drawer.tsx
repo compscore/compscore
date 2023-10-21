@@ -2,6 +2,7 @@ import { GridOn } from "@mui/icons-material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import HomeIcon from "@mui/icons-material/Home";
+import PasswordIcon from "@mui/icons-material/Password";
 import LoginIcon from "@mui/icons-material/Login";
 import {
   Box,
@@ -104,6 +105,17 @@ export default function DrawerComponent({
             <ListItemButton>
               <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
               <ListItemText primary='Logout' />
+            </ListItemButton>
+          </ListItem>
+          <ListItem
+            disablePadding
+            onClick={() => {
+              window.location.href = "/change-password";
+            }}
+          >
+            <ListItemButton>
+              <ListItemIcon>{<PasswordIcon />}</ListItemIcon>
+              <ListItemText primary='Change Password' />
             </ListItemButton>
           </ListItem>
         </List>
