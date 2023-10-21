@@ -8,6 +8,7 @@ import { useState } from "react";
 type props = {
   value?: string;
   onBlur?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   variant?: "standard" | "filled" | "outlined" | undefined;
   margin?: "none" | "dense" | "normal" | undefined;
   required?: boolean;
@@ -17,9 +18,10 @@ type props = {
 };
 
 function PasswordInput({
+  onBlur,
+  onChange,
   value,
   variant,
-  onBlur,
   margin,
   required,
   name,
@@ -53,6 +55,7 @@ function PasswordInput({
       variant={variant}
       value={password}
       onChange={(e) => {
+        onChange && onChange(e);
         setPassword(e.target.value);
       }}
       onBlur={handleBlur}
