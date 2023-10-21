@@ -2,7 +2,6 @@ package web
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -34,8 +33,6 @@ func password(ctx *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(string(body_bytes))
 
 	err = json.Unmarshal(body_bytes, &body)
 	if err != nil {
