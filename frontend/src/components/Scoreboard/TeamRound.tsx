@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { CheckScoreboard } from "../../models/Scoreboard/Check";
+import { TeamScoreboard } from "../../models/Scoreboard/Team";
 import { Round } from "../../models/ent";
 import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -19,12 +19,12 @@ import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
 type props = {
-  check: string;
+  team: string;
   round: string;
 };
 
-export default function CheckRoundScoreboardComponent({ check, round }: props) {
-  const [data, setData] = useState<CheckScoreboard>();
+export default function TeamRoundScoreboardComponent({ team, round }: props) {
+  const [data, setData] = useState<TeamScoreboard>();
   const [latestRound, setLatestRound] = useState<Round>();
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
             setLatestRound(response);
 
             if (0 >= parseInt(round) || parseInt(round) >= response.number) {
-              window.location.href = `/scoreboard/check/${check}`;
+              window.location.href = `/scoreboard/team/${team}`;
             }
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
@@ -59,14 +59,14 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/check/${check}/${round}`, {
+      fetch(`http://localhost:8080/api/scoreboard/team/${team}/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as CheckScoreboard;
+          let response = (await res.json()) as TeamScoreboard;
           if (res.status === 200) {
             setData(response);
           } else {
@@ -88,10 +88,10 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
   }, []);
 
   const [highlightedRound, setHighlightedRound] = useState<number | null>(null);
-  const [highlightedTeam, setHighlightedTeam] = useState<string | null>(null);
+  const [highlightedCheck, setHighlightedCheck] = useState<string | null>(null);
 
   const getBackgroundColor = (status: number, round: number, check: string) => {
-    if (highlightedTeam === null && highlightedRound === null) {
+    if (highlightedCheck === null && highlightedRound === null) {
       if (status === 0) {
         return "#f44336";
       } else if (status === 1) {
@@ -99,7 +99,7 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
       }
       return "#999891";
     }
-    if (highlightedTeam === check || highlightedRound === round) {
+    if (highlightedCheck === check || highlightedRound === round) {
       if (status === 0) {
         return "#f44336";
       } else if (status === 1) {
@@ -128,7 +128,7 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
           window.location.href = "/scoreboard";
         }}
       >
-        {check}
+        Team {team}
       </Typography>
       <Box
         sx={{
@@ -136,14 +136,14 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
           alignItems: "center",
         }}
       >
-        {data && data.round > 10 ? (
+        {parseInt(round) > 10 ? (
           <DoubleArrowLeftIcon
             sx={{
               cursor: "pointer",
             }}
             onClick={() => {
-              window.location.href = `/scoreboard/check/${check}/${
-                data.round - 10
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) - 10
               }`;
             }}
           />
@@ -154,14 +154,14 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
             }}
           />
         )}
-        {data && data.round > 1 ? (
+        {parseInt(round) > 1 ? (
           <ArrowLeftIcon
             sx={{
               cursor: "pointer",
             }}
             onClick={() => {
-              window.location.href = `/scoreboard/check/${check}/${
-                data.round - 1
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) - 1
               }`;
             }}
           />
@@ -176,19 +176,19 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
           component='h1'
           variant='h5'
           onClick={() => {
-            window.location.href = `/scoreboard/check/${check}`;
+            window.location.href = `/scoreboard/team/${team}`;
           }}
         >
           Round {round}
         </Typography>
-        {latestRound && data && data.round < latestRound?.number ? (
+        {latestRound && parseInt(round) < latestRound?.number ? (
           <ArrowRightIcon
             sx={{
               cursor: "pointer",
             }}
             onClick={() => {
-              window.location.href = `/scoreboard/check/${check}/${
-                data.round + 1
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) + 1
               }`;
             }}
           />
@@ -199,14 +199,14 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
             }}
           />
         )}
-        {latestRound && data && data.round + 10 <= latestRound?.number ? (
+        {latestRound && parseInt(round) + 10 <= latestRound?.number ? (
           <DoubleArrowRightIcon
             sx={{
               cursor: "pointer",
             }}
             onClick={() => {
-              window.location.href = `/scoreboard/check/${check}/${
-                data.round + 10
+              window.location.href = `/scoreboard/team/${team}/${
+                parseInt(round) + 10
               }`;
             }}
           />
@@ -224,7 +224,7 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
           <TableHead>
             <TableRow>
               <TableCell size='small'>Round</TableCell>
-              {data?.teams[0].status.map((_, index) => (
+              {data?.checks[0].status.map((_, index) => (
                 <TableCell
                   size='small'
                   key={"round-" + (data?.round - index)}
@@ -249,51 +249,51 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.teams.map((team, index) => (
+            {data?.checks.map((check, index) => (
               <TableRow key={index}>
                 <TableCell
                   size='small'
                   sx={{
                     backgroundColor:
-                      highlightedTeam === team.name ? "#343434" : "transparent",
+                      highlightedCheck === check.name
+                        ? "#343434"
+                        : "transparent",
                   }}
                   onMouseEnter={() => {
-                    setHighlightedTeam(team.name);
+                    setHighlightedCheck(check.name);
                   }}
                   onMouseLeave={() => {
-                    setHighlightedTeam(null);
+                    setHighlightedCheck(null);
                   }}
                   onClick={() => {
-                    window.location.href = `/scoreboard/team/${
-                      index + 1
-                    }/${round}`;
+                    window.location.href = `/scoreboard/check/${check.name}/${round}`;
                   }}
                 >
-                  {team.name}
+                  {check.name}
                 </TableCell>
-                {team.status.map((status, s_index) => (
+                {check.status.map((status, index) => (
                   <TableCell
-                    key={s_index}
+                    key={index}
                     size='small'
                     sx={{
                       backgroundColor: getBackgroundColor(
                         status,
-                        s_index,
-                        team.name
+                        index,
+                        check.name
                       ),
                     }}
                     onMouseEnter={() => {
-                      setHighlightedRound(s_index);
-                      setHighlightedTeam(team.name);
+                      setHighlightedRound(index);
+                      setHighlightedCheck(check.name);
                     }}
                     onMouseLeave={() => {
                       setHighlightedRound(null);
-                      setHighlightedTeam(null);
+                      setHighlightedCheck(null);
                     }}
                     onClick={() => {
-                      window.location.href = `/scoreboard/status/${
-                        index + 1
-                      }/${check}/${data?.round - s_index}`;
+                      window.location.href = `/scoreboard/status/${team}/${
+                        check.name
+                      }/${data?.round - index}`;
                     }}
                   ></TableCell>
                 ))}

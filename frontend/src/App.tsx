@@ -15,6 +15,7 @@ import Scoreboard from "./pages/Scoreboard/Scoreboard";
 import StatusScoreboard from "./pages/Scoreboard/Status";
 import StatusRoundScoreboard from "./pages/Scoreboard/StatusRound";
 import TeamScoreboard from "./pages/Scoreboard/Team";
+import TeamRoundScoreboard from "./pages/Scoreboard/TeamRound";
 import { useSystemTheme } from "./themes/Preference";
 
 const LazyComponent = ({
@@ -62,8 +63,16 @@ export default function App() {
           element: <LazyComponent element={<Scoreboard />} />,
         },
         {
+          path: "scoreboard/round/:round",
+          element: <LazyComponent element={<RoundScoreboard />} />,
+        },
+        {
           path: "scoreboard/team/:team",
           element: <LazyComponent element={<TeamScoreboard />} />,
+        },
+        {
+          path: "scoreboard/team/:team/:round",
+          element: <LazyComponent element={<TeamRoundScoreboard />} />,
         },
         {
           path: "scoreboard/check/:check",
@@ -72,10 +81,6 @@ export default function App() {
         {
           path: "scoreboard/check/:check/:round",
           element: <LazyComponent element={<CheckRoundScoreboard />} />,
-        },
-        {
-          path: "scoreboard/round/:round",
-          element: <LazyComponent element={<RoundScoreboard />} />,
         },
         {
           path: "scoreboard/status/:team/:check",
@@ -96,16 +101,20 @@ export default function App() {
           element: <LazyComponent element={<Scoreboard />} />,
         },
         {
+          path: "scoreboard/round/:round",
+          element: <LazyComponent element={<RoundScoreboard />} />,
+        },
+        {
           path: "scoreboard/team/:team",
           element: <LazyComponent element={<TeamScoreboard />} />,
         },
         {
-          path: "scoreboard/check/:check",
-          element: <LazyComponent element={<CheckScoreboard />} />,
+          path: "scoreboard/team/:team/:round",
+          element: <LazyComponent element={<TeamRoundScoreboard />} />,
         },
         {
-          path: "scoreboard/round/:round",
-          element: <LazyComponent element={<RoundScoreboard />} />,
+          path: "scoreboard/check/:check",
+          element: <LazyComponent element={<CheckScoreboard />} />,
         },
         {
           path: "scoreboard/status/:team/:check",

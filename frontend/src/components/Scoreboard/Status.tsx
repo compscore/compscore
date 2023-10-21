@@ -1,3 +1,5 @@
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import {
   Box,
   Paper,
@@ -11,8 +13,6 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/Scoreboard/Status";
-import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 type props = {
   check: string;
