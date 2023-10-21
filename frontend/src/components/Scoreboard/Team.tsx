@@ -1,3 +1,5 @@
+import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import {
   Box,
   Paper,
@@ -93,9 +95,52 @@ export default function TeamScoreboardComponent({ team }: props) {
       >
         Team {team}
       </Typography>
-      <Typography component='h1' variant='h5'>
-        Round {data?.round}
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {data && data.round >= 10 && (
+          <DoubleArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/team/${team}/${
+                data.round - 10
+              }`;
+            }}
+          />
+        )}
+        {data && data.round >= 1 && (
+          <ArrowLeftIcon
+            sx={{
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              window.location.href = `/scoreboard/team/${team}/${
+                data.round - 1
+              }`;
+            }}
+          />
+        )}
+        {data && (
+          <Typography component='h1' variant='h5'>
+            Round {data.round}
+          </Typography>
+        )}
+        <ArrowLeftIcon
+          sx={{
+            visibility: "hidden",
+          }}
+        />
+        <ArrowLeftIcon
+          sx={{
+            visibility: "hidden",
+          }}
+        />
+      </Box>
       <Box m={2}></Box>
       <TableContainer component={Paper} sx={{ width: "80%" }}>
         <Table>
