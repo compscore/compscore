@@ -236,7 +236,9 @@ export default function RoundScoreboardComponent({ round }: props) {
                       highlightedTeam === team + 1 ? "#343434" : "transparent",
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/team/" + (team + 1);
+                    window.location.href = `/scoreboard/team/${
+                      team + 1
+                    }/${round}`;
                   }}
                 >
                   <Typography variant='subtitle2'>{team + 1}</Typography>

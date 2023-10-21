@@ -264,7 +264,9 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
                     setHighlightedTeam(null);
                   }}
                   onClick={() => {
-                    window.location.href = "/scoreboard/team/" + (index + 1);
+                    window.location.href = `/scoreboard/team/${
+                      index + 1
+                    }/${round}`;
                   }}
                 >
                   {team.name}

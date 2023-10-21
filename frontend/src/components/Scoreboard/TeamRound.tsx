@@ -266,7 +266,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
                     setHighlightedCheck(null);
                   }}
                   onClick={() => {
-                    window.location.href = `/scoreboard/check/${check.name}`;
+                    window.location.href = `/scoreboard/check/${check.name}/${round}`;
                   }}
                 >
                   {check.name}
