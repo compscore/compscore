@@ -12,7 +12,7 @@ export default function Admin({ cookies }: props) {
     window.location.href = "/login";
   }
 
-  if ((jwt_decode(cookies.auth) as JWT).Role !== "admin") {
+  if ((cookies.auth && (jwt_decode(cookies.auth) as JWT)).Role !== "admin") {
     window.location.href = "/";
   }
 

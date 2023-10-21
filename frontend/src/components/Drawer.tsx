@@ -78,7 +78,8 @@ export default function DrawerComponent({
               <ListItemText primary='Scoreboard' />
             </ListItemButton>
           </ListItem>
-          {(jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
+          {cookies.auth &&
+          (jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
             <ListItem
               disablePadding
               onClick={() => {
