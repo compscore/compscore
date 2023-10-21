@@ -15,7 +15,7 @@ func Team(ctx *gin.Context) {
 		return
 	}
 
-	teamScoreboard, err := data.Scoreboard.Team(team, 10)
+	teamScoreboard, err := data.Scoreboard.Team(team, 15)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -40,7 +40,7 @@ func TeamRound(ctx *gin.Context) {
 		return
 	}
 
-	teamScoreboard, err := data.Scoreboard.TeamRound(team, round, 10)
+	teamScoreboard, err := data.Scoreboard.TeamRound(team, round, 15)
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
