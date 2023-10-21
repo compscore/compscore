@@ -58,10 +58,11 @@ func LoadRoutes() {
 
 	// Scoreboard Endpoints
 	API.GET("/scoreboard", scoreboard.Scoreboard)
+	API.GET("/scoreboard/round/:round", scoreboard.Round)
 	API.GET("/scoreboard/team/:team", scoreboard.Team)
+	API.GET("/scoreboard/team/:team/:round", scoreboard.TeamRound)
 	API.GET("/scoreboard/check/:check", scoreboard.Check)
 	API.GET("/scoreboard/check/:check/:round", scoreboard.CheckRound)
-	API.GET("/scoreboard/round/:round", scoreboard.Round)
 	API.GET("/scoreboard/status/:team/:check", scoreboard.Status)
 	API.GET("/scoreboard/status/:team/:check/:round", scoreboard.StatusRound)
 
