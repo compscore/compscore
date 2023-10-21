@@ -56,7 +56,7 @@ export default function App() {
           element: <LazyComponent element={<Login setCookie={setCookie} />} />,
         },
         {
-          path: "change-password",
+          path: "password",
           element: <LazyComponent element={<ChangePassword />} />,
         },
         {

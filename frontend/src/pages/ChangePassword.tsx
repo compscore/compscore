@@ -9,7 +9,7 @@ export default function ChangePassword() {
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
 
   const changePassword = (oldPassword: string, newPassword: string) => {
-    fetch("http://localhost:8080/api/changePassword", {
+    fetch("http://localhost:8080/api/password", {
       method: "POST",
       credentials: "include",
       headers: {

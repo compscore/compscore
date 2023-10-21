@@ -110,7 +110,7 @@ export default function DrawerComponent({
           <ListItem
             disablePadding
             onClick={() => {
-              window.location.href = "/change-password";
+              window.location.href = "/password";
             }}
           >
             <ListItemButton>
