@@ -20,12 +20,16 @@ type Props = {
   drawerState: boolean;
   setDrawerState: React.Dispatch<React.SetStateAction<boolean>>;
   removeCookie: (name: "auth", options?: CookieSetOptions | undefined) => void;
+  cookies: {
+    auth?: any;
+  };
 };
 
 export default function DrawerComponent({
   drawerState,
   setDrawerState,
   removeCookie,
+  cookies,
 }: Props) {
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -71,53 +75,59 @@ export default function DrawerComponent({
               <ListItemText primary='Scoreboard' />
             </ListItemButton>
           </ListItem>
-
-          <ListItem
-            disablePadding
-            onClick={() => {
-              window.location.href = "/checks";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
-              <ListItemText primary='Edits Checks' />
-            </ListItemButton>
-          </ListItem>
+          {cookies.auth && (
+            <ListItem
+              disablePadding
+              onClick={() => {
+                window.location.href = "/checks";
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
+                <ListItemText primary='Edits Checks' />
+              </ListItemButton>
+            </ListItem>
+          )}
           <Divider />
-          <ListItem
-            disablePadding
-            onClick={() => {
-              window.location.href = "/login";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<LoginIcon />}</ListItemIcon>
-              <ListItemText primary='Login' />
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            disablePadding
-            onClick={() => {
-              removeCookie("auth");
-              window.location.href = "/";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
-              <ListItemText primary='Logout' />
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            disablePadding
-            onClick={() => {
-              window.location.href = "/password";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<PasswordIcon />}</ListItemIcon>
-              <ListItemText primary='Change Password' />
-            </ListItemButton>
-          </ListItem>
+          {cookies.auth ? (
+            <>
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  removeCookie("auth");
+                  window.location.href = "/";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
+                  <ListItemText primary='Logout' />
+                </ListItemButton>
+              </ListItem>
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  window.location.href = "/password";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<PasswordIcon />}</ListItemIcon>
+                  <ListItemText primary='Change Password' />
+                </ListItemButton>
+              </ListItem>
+            </>
+          ) : (
+            <ListItem
+              disablePadding
+              onClick={() => {
+                window.location.href = "/login";
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{<LoginIcon />}</ListItemIcon>
+                <ListItemText primary='Login' />
+              </ListItemButton>
+            </ListItem>
+          )}
         </List>
       </Box>
     </Drawer>

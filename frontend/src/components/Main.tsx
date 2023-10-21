@@ -22,6 +22,7 @@ export default function Main({ cookies, removeCookie, mobile }: props) {
         drawerState={drawerState}
         setDrawerState={setDrawerState}
         removeCookie={removeCookie}
+        cookies={cookies}
       />
       <NavBar
         mobile={mobile}
