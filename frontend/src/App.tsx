@@ -8,6 +8,7 @@ import Main from "./components/Main";
 import Checks from "./pages/Checks";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 import CheckScoreboard from "./pages/Scoreboard/Check";
 import CheckRoundScoreboard from "./pages/Scoreboard/CheckRound";
 import RoundScoreboard from "./pages/Scoreboard/Round";
@@ -50,6 +51,10 @@ export default function App() {
         {
           index: true,
           element: <LazyComponent element={<Index />} />,
+        },
+        {
+          path: "admin",
+          element: <LazyComponent element={<Admin cookies={cookies} />} />,
         },
         {
           path: "login",

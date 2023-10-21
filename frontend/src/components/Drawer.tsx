@@ -4,6 +4,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import HomeIcon from "@mui/icons-material/Home";
 import PasswordIcon from "@mui/icons-material/Password";
 import LoginIcon from "@mui/icons-material/Login";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import {
   Box,
   Divider,
@@ -15,6 +16,8 @@ import {
   ListItemText,
 } from "@mui/material";
 import { CookieSetOptions } from "universal-cookie";
+import jwt_decode from "jwt-decode";
+import { JWT } from "../models/JWT";
 
 type Props = {
   drawerState: boolean;
@@ -75,7 +78,19 @@ export default function DrawerComponent({
               <ListItemText primary='Scoreboard' />
             </ListItemButton>
           </ListItem>
-          {cookies.auth && (
+          {(jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
+            <ListItem
+              disablePadding
+              onClick={() => {
+                window.location.href = "/admin";
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{<AdminPanelSettingsIcon />}</ListItemIcon>
+                <ListItemText primary='Admin Panel' />
+              </ListItemButton>
+            </ListItem>
+          ) : (
             <ListItem
               disablePadding
               onClick={() => {
