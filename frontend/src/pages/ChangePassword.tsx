@@ -93,6 +93,8 @@ export default function ChangePassword({ removeCookie }: props) {
               newPassword === confirmNewPassword
             ) {
               changePassword(oldPassword, newPassword);
+            } else {
+              enqueueSnackbar("Passwords do not match", { variant: "error" });
             }
           }}
         >
