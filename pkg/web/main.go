@@ -60,6 +60,7 @@ func LoadRoutes() {
 
 	// Admin Endpoints
 	API.POST("/admin/password", admin.Password)
+	API.POST("/admin/login", admin.Login)
 
 	// Scoreboard Endpoints
 	API.GET("/scoreboard", scoreboard.Scoreboard)

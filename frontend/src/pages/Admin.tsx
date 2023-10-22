@@ -5,14 +5,20 @@ import PasswordReset from "../components/Admin/PasswordReset";
 import { JWT } from "../models/JWT";
 import AuthenticateAs from "../components/Admin/AuthenticateAs";
 import EngineState from "../components/Admin/EngineState";
+import { CookieSetOptions } from "universal-cookie";
 
 type props = {
   cookies: {
     auth?: any;
   };
+  setCookie: (
+    name: "auth",
+    value: any,
+    options?: CookieSetOptions | undefined
+  ) => void;
 };
 
-export default function Admin({ cookies }: props) {
+export default function Admin({ cookies, setCookie }: props) {
   if (cookies.auth == undefined) {
     window.location.href = "/login";
   }
@@ -70,7 +76,7 @@ export default function Admin({ cookies }: props) {
         {state === "password" ? (
           <PasswordReset />
         ) : state === "authenticate" ? (
-          <AuthenticateAs />
+          <AuthenticateAs setCookie={setCookie} />
         ) : state === "engine" ? (
           <EngineState />
         ) : (

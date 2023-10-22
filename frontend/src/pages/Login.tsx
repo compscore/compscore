@@ -13,7 +13,7 @@ import { LoginSuccess, LoginFailure } from "../models/Login";
 import { CookieSetOptions } from "universal-cookie";
 import PasswordInput from "../components/PasswordInput";
 
-type Props = {
+type props = {
   setCookie: (
     name: "auth",
     value: any,
@@ -21,7 +21,7 @@ type Props = {
   ) => void;
 };
 
-export default function Login({ setCookie }: Props) {
+export default function Login({ setCookie }: props) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

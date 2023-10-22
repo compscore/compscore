@@ -54,7 +54,11 @@ export default function App() {
         },
         {
           path: "admin",
-          element: <LazyComponent element={<Admin cookies={cookies} />} />,
+          element: (
+            <LazyComponent
+              element={<Admin cookies={cookies} setCookie={setCookie} />}
+            />
+          ),
         },
         {
           path: "login",
