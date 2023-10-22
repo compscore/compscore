@@ -10,16 +10,12 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { setCookie } from "../../models/Cookies";
+import { LoginFailure, LoginSuccess } from "../../models/Login";
 import { Team } from "../../models/ent";
-import { LoginSuccess, LoginFailure } from "../../models/Login";
-import { CookieSetOptions } from "universal-cookie";
 
 type Props = {
-  setCookie: (
-    name: "auth",
-    value: any,
-    options?: CookieSetOptions | undefined
-  ) => void;
+  setCookie: setCookie;
 };
 
 export default function AuthenticateAs({ setCookie }: Props) {

@@ -29,7 +29,7 @@ const LazyComponent = ({
 };
 
 export default function App() {
-  const [cookies, setCookie, removeCookie] = useCookies(["auth"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth", "admin"]);
   const [mobile, setMobile] = useState<boolean>(window.innerWidth <= 768);
 
   const router = createBrowserRouter([

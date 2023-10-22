@@ -1,24 +1,20 @@
-import React from "react";
 import {
   Box,
-  Link,
-  Tooltip,
-  Typography,
-  TextField,
   Button,
   Container,
+  Link,
+  TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
-import { LoginSuccess, LoginFailure } from "../models/Login";
-import { CookieSetOptions } from "universal-cookie";
+import React from "react";
 import PasswordInput from "../components/PasswordInput";
+import { setCookie } from "../models/Cookies";
+import { LoginFailure, LoginSuccess } from "../models/Login";
 
 type props = {
-  setCookie: (
-    name: "auth",
-    value: any,
-    options?: CookieSetOptions | undefined
-  ) => void;
+  setCookie: setCookie;
 };
 
 export default function Login({ setCookie }: props) {
