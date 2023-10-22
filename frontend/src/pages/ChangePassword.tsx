@@ -3,6 +3,7 @@ import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import PasswordInput from "../components/PasswordInput";
 import { removeCookie } from "../models/Cookies";
+import { domain, path } from "../config";
 
 type props = {
   removeCookie: removeCookie;
@@ -30,7 +31,7 @@ export default function ChangePassword({ removeCookie }: props) {
           enqueueSnackbar("Password changed", {
             variant: "success",
           });
-          removeCookie("auth"), { path: '/' };
+          removeCookie("auth", { path: path, domain: domain });
           window.location.href = "/login";
         } else {
           enqueueSnackbar("Failed to change password", {

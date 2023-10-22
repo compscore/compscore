@@ -17,6 +17,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import jwt_decode from "jwt-decode";
+import { domain, path } from "../config";
 import { cookies, removeCookie, setCookie } from "../models/Cookies";
 import { JWT } from "../models/JWT";
 
@@ -115,8 +116,11 @@ export default function DrawerComponent({
                 <ListItem
                   disablePadding
                   onClick={() => {
-                    setCookie("auth", cookies.admin);
-                    removeCookie("admin", { path: '/' });
+                    setCookie("auth", cookies.admin, {
+                      path: path,
+                      domain: domain,
+                    });
+                    removeCookie("admin", { path: path, domain: domain });
                     window.location.href = "/";
                   }}
                 >
@@ -129,7 +133,7 @@ export default function DrawerComponent({
                 <ListItem
                   disablePadding
                   onClick={() => {
-                    removeCookie("auth", { path: '/' });
+                    removeCookie("auth", { path: path, domain: domain });
                     window.location.href = "/";
                   }}
                 >

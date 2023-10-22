@@ -12,6 +12,7 @@ import React from "react";
 import PasswordInput from "../components/PasswordInput";
 import { setCookie } from "../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../models/Login";
+import { domain, path } from "../config";
 
 type props = {
   setCookie: setCookie;
@@ -39,8 +40,8 @@ export default function Login({ setCookie }: props) {
           enqueueSnackbar("Logged in", { variant: "success" });
 
           setCookie("auth", response.token, {
-            path: response.path,
-            domain: response.domain,
+            path: path,
+            domain: domain,
             secure: response.secure,
             httpOnly: response.httpOnly,
             expires: new Date(response.expiration * 1000),
