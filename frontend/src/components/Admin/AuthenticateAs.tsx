@@ -10,21 +10,20 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { setCookie } from "../../models/Cookies";
+import { LoginFailure, LoginSuccess } from "../../models/Login";
 import { Team } from "../../models/ent";
-import { LoginSuccess, LoginFailure } from "../../models/Login";
-import { CookieSetOptions } from "universal-cookie";
 
 type Props = {
-  setCookie: (
-    name: "auth",
-    value: any,
-    options?: CookieSetOptions | undefined
-  ) => void;
+  setCookie: setCookie;
+  cookies: any;
 };
 
-export default function AuthenticateAs({ setCookie }: Props) {
+export default function AuthenticateAs({ setCookie, cookies }: Props) {
   const [users, setUsers] = useState<[Team]>();
   const [selectedUser, setSelectedUser] = useState<number>();
+
+  console.log(cookies.auth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +52,38 @@ export default function AuthenticateAs({ setCookie }: Props) {
   }, []);
 
   const authenticateAs = () => {
+    fetch(`http://localhost:8080/api/admin/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        team: users?.[selectedUser as number].name,
+      }),
+    })
+      .then(async (res) => {
+        console.log(res);
+        if (res.status === 200) {
+          let response = (await res.json()) as LoginSuccess;
+
+          setCookie("admin", cookies.auth);
+          setCookie("auth", response.token);
+
+          window.location.href = "/";
+        } else {
+          let response = (await res.json()) as LoginFailure;
+
+          enqueueSnackbar(response.error, { variant: "error" });
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar("Encountered an error" + err, { variant: "error" });
+        console.log(err);
+      });
+  };
+
+  const loginAs = () => {
     fetch(`http://localhost:8080/api/admin/login`, {
       method: "POST",
       headers: {
@@ -122,7 +153,17 @@ export default function AuthenticateAs({ setCookie }: Props) {
           authenticateAs();
         }}
       >
-        <Typography>Authenticate As</Typography>
+        <Typography>Temporary Authentication</Typography>
+      </Button>
+      <Box sx={{ m: 2 }} />
+      <Button
+        variant='contained'
+        fullWidth
+        onClick={() => {
+          loginAs();
+        }}
+      >
+        <Typography>Full Authentication</Typography>
       </Button>
     </Container>
   );

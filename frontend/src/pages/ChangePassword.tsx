@@ -1,11 +1,11 @@
 import { Box, Button, Container, Typography } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
-import { CookieSetOptions } from "universal-cookie";
 import PasswordInput from "../components/PasswordInput";
+import { removeCookie } from "../models/Cookies";
 
 type props = {
-  removeCookie: (name: "auth", options?: CookieSetOptions | undefined) => void;
+  removeCookie: removeCookie;
 };
 
 export default function ChangePassword({ removeCookie }: props) {

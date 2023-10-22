@@ -1,10 +1,11 @@
 import { GridOn } from "@mui/icons-material";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import HomeIcon from "@mui/icons-material/Home";
-import PasswordIcon from "@mui/icons-material/Password";
 import LoginIcon from "@mui/icons-material/Login";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import PasswordIcon from "@mui/icons-material/Password";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import {
   Box,
   Divider,
@@ -15,22 +16,22 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { CookieSetOptions } from "universal-cookie";
 import jwt_decode from "jwt-decode";
+import { cookies, removeCookie, setCookie } from "../models/Cookies";
 import { JWT } from "../models/JWT";
 
 type Props = {
   drawerState: boolean;
   setDrawerState: React.Dispatch<React.SetStateAction<boolean>>;
-  removeCookie: (name: "auth", options?: CookieSetOptions | undefined) => void;
-  cookies: {
-    auth?: any;
-  };
+  setCookie: setCookie;
+  removeCookie: removeCookie;
+  cookies: cookies;
 };
 
 export default function DrawerComponent({
   drawerState,
   setDrawerState,
+  setCookie,
   removeCookie,
   cookies,
 }: Props) {
@@ -107,18 +108,34 @@ export default function DrawerComponent({
           <Divider />
           {cookies.auth ? (
             <>
-              <ListItem
-                disablePadding
-                onClick={() => {
-                  removeCookie("auth");
-                  window.location.href = "/";
-                }}
-              >
-                <ListItemButton>
-                  <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
-                  <ListItemText primary='Logout' />
-                </ListItemButton>
-              </ListItem>
+              {cookies.admin ? (
+                <ListItem
+                  disablePadding
+                  onClick={() => {
+                    setCookie("auth", cookies.admin);
+                    removeCookie("admin");
+                    window.location.href = "/";
+                  }}
+                >
+                  <ListItemButton>
+                    <ListItemIcon>{<SupervisorAccountIcon />}</ListItemIcon>
+                    <ListItemText primary='Return to Admin' />
+                  </ListItemButton>
+                </ListItem>
+              ) : (
+                <ListItem
+                  disablePadding
+                  onClick={() => {
+                    removeCookie("auth");
+                    window.location.href = "/";
+                  }}
+                >
+                  <ListItemButton>
+                    <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
+                    <ListItemText primary='Logout' />
+                  </ListItemButton>
+                </ListItem>
+              )}
               <ListItem
                 disablePadding
                 onClick={() => {

@@ -1,21 +1,15 @@
 import { Box, Button, ButtonGroup, Container, Typography } from "@mui/material";
 import jwt_decode from "jwt-decode";
 import { useState } from "react";
-import PasswordReset from "../components/Admin/PasswordReset";
-import { JWT } from "../models/JWT";
 import AuthenticateAs from "../components/Admin/AuthenticateAs";
 import EngineState from "../components/Admin/EngineState";
-import { CookieSetOptions } from "universal-cookie";
+import PasswordReset from "../components/Admin/PasswordReset";
+import { cookies, setCookie } from "../models/Cookies";
+import { JWT } from "../models/JWT";
 
 type props = {
-  cookies: {
-    auth?: any;
-  };
-  setCookie: (
-    name: "auth",
-    value: any,
-    options?: CookieSetOptions | undefined
-  ) => void;
+  cookies: cookies;
+  setCookie: setCookie;
 };
 
 export default function Admin({ cookies, setCookie }: props) {
@@ -76,7 +70,7 @@ export default function Admin({ cookies, setCookie }: props) {
         {state === "password" ? (
           <PasswordReset />
         ) : state === "authenticate" ? (
-          <AuthenticateAs setCookie={setCookie} />
+          <AuthenticateAs setCookie={setCookie} cookies={cookies} />
         ) : state === "engine" ? (
           <EngineState />
         ) : (

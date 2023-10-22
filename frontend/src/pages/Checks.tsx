@@ -17,11 +17,10 @@ import { Credential } from "../models/ent";
 import { enqueueSnackbar } from "notistack";
 import jwt_decode from "jwt-decode";
 import { JWT } from "../models/JWT";
+import { cookies } from "../models/Cookies";
 
 type Props = {
-  cookies: {
-    auth?: any;
-  };
+  cookies: cookies;
 };
 
 export default function Checks({ cookies }: Props) {
