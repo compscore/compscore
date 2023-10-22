@@ -48,7 +48,6 @@ export default function CheckScoreboardComponent({ check }: props) {
 
     const pollingInterval = setInterval(fetchData, 5000);
 
-    console.log(data);
     return () => clearInterval(pollingInterval);
   }, []);
 
