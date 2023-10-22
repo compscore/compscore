@@ -5,6 +5,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
 import PasswordIcon from "@mui/icons-material/Password";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import {
   Box,
   Divider,
@@ -117,7 +118,7 @@ export default function DrawerComponent({
                   }}
                 >
                   <ListItemButton>
-                    <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
+                    <ListItemIcon>{<SupervisorAccountIcon />}</ListItemIcon>
                     <ListItemText primary='Return to Admin' />
                   </ListItemButton>
                 </ListItem>
