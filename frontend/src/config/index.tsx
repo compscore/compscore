@@ -1,2 +1,2 @@
-export const domain = "dev.compscore.org";
+export const domain = import.meta.env.DOMAIN;
 export const path = "/";
