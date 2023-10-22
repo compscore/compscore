@@ -27,7 +27,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/teams`, {
+      fetch(`/api/teams`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
   }, []);
 
   const authenticateAs = () => {
-    fetch(`http://localhost:8080/api/admin/login`, {
+    fetch(`/api/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +84,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
   };
 
   const loginAs = () => {
-    fetch(`http://localhost:8080/api/admin/login`, {
+    fetch(`/api/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -34,7 +34,7 @@ export default function StatusRoundScoreboardComponent({
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/round/latest`, {
+      fetch(`/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export default function StatusRoundScoreboardComponent({
   useEffect(() => {
     const fetchData = async () => {
       fetch(
-        `http://localhost:8080/api/scoreboard/status/${team}/${check}/${round}`,
+        `/api/scoreboard/status/${team}/${check}/${round}`,
         {
           method: "GET",
           headers: {

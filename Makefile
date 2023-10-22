@@ -17,3 +17,6 @@ install: build
 
 cloc:
 	cloc --exclude-dir=assets,node_modules --exclude-ext=json .
+
+generate:
+	go generate .

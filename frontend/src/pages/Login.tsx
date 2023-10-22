@@ -26,7 +26,7 @@ export default function Login({ setCookie }: props) {
       password: event.currentTarget.password.value,
     });
 
-    fetch("http://localhost:8080/api/login", {
+    fetch("/api/login", {
       method: "POST",
       body: data,
       headers: {

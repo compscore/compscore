@@ -18,14 +18,14 @@ services:
       - compscore-caddy-data:/data
       - compscore-caddy-config:/config
 
-  # engine:
-  #   container_name: compscore-engine
-  #   build:
-  #     context: .
-  #     dockerfile: Docker.engine
-  #   restart: unless-stopped
-  #   networks:
-  #     - compscore-backend
+  engine:
+    container_name: compscore-engine
+    build:
+      context: .
+      dockerfile: Dockerfile.engine
+    restart: unless-stopped
+    networks:
+      - compscore-backend
 
   # db:
   #   container_name: compscore-db

@@ -24,7 +24,7 @@ export default function StatusScoreboardComponent({ check, team }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/status/${team}/${check}`, {
+      fetch(`/api/scoreboard/status/${team}/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

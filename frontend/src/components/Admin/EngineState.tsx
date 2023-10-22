@@ -18,7 +18,7 @@ export default function EngineState() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/engine`, {
+      fetch(`/api/engine`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export default function EngineState() {
   };
 
   const startEngine = () => {
-    fetch(`http://localhost:8080/api/engine/start`, {
+    fetch(`/api/engine/start`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -88,7 +88,7 @@ export default function EngineState() {
   };
 
   const stopEngine = () => {
-    fetch(`http://localhost:8080/api/engine/stop`, {
+    fetch(`/api/engine/stop`, {
       method: "POST",
       credentials: "include",
       headers: {

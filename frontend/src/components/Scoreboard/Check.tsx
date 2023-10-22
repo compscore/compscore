@@ -24,7 +24,7 @@ export default function CheckScoreboardComponent({ check }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/check/${check}`, {
+      fetch(`/api/scoreboard/check/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

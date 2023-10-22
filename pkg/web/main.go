@@ -54,7 +54,7 @@ func Start() {
 	client.Open()
 	defer client.Close()
 
-	Router.Run(fmt.Sprintf("%s:%d", config.Web.Hostname, config.Web.Port))
+	Router.Run(fmt.Sprintf(":%d", config.Web.Port))
 }
 
 func LoadRoutes() {

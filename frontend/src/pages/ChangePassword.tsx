@@ -14,7 +14,7 @@ export default function ChangePassword({ removeCookie }: props) {
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
 
   const changePassword = (oldPassword: string, newPassword: string) => {
-    fetch("http://localhost:8080/api/password", {
+    fetch("/api/password", {
       method: "POST",
       credentials: "include",
       headers: {

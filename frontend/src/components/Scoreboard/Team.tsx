@@ -24,7 +24,7 @@ export default function TeamScoreboardComponent({ team }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/team/${team}`, {
+      fetch(`/api/scoreboard/team/${team}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -28,7 +28,7 @@ export default function RoundScoreboardComponent({ round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/round/latest`, {
+      fetch(`/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export default function RoundScoreboardComponent({ round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/round/${round}`, {
+      fetch(`/api/scoreboard/round/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
