@@ -30,7 +30,7 @@ export default function ChangePassword({ removeCookie }: props) {
           enqueueSnackbar("Password changed", {
             variant: "success",
           });
-          removeCookie("auth");
+          removeCookie("auth"), { path: '/' };
           window.location.href = "/login";
         } else {
           enqueueSnackbar("Failed to change password", {

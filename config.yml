@@ -14,7 +14,7 @@ teams:
   nameFormat: Team {{ .Team }}
   password: changeme123!
 scoring:
-  interval: 10 # seconds 
+  interval: 30 # seconds 
 engine:
   socket: /tmp/compscore.sock
   timeout: 5 # seconds

@@ -116,7 +116,7 @@ export default function DrawerComponent({
                   disablePadding
                   onClick={() => {
                     setCookie("auth", cookies.admin);
-                    removeCookie("admin");
+                    removeCookie("admin", { path: '/' });
                     window.location.href = "/";
                   }}
                 >
@@ -129,7 +129,7 @@ export default function DrawerComponent({
                 <ListItem
                   disablePadding
                   onClick={() => {
-                    removeCookie("auth");
+                    removeCookie("auth", { path: '/' });
                     window.location.href = "/";
                   }}
                 >
