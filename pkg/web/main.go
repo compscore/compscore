@@ -5,6 +5,7 @@ import (
 
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/web/admin"
 	"github.com/compscore/compscore/pkg/web/check"
 	"github.com/compscore/compscore/pkg/web/credential"
 	"github.com/compscore/compscore/pkg/web/round"
@@ -56,6 +57,9 @@ func LoadRoutes() {
 	API.POST("/login", login)
 	API.POST("/info", info)
 	API.POST("/password", password)
+
+	// Admin Endpoints
+	API.POST("/admin/password", admin.Password)
 
 	// Scoreboard Endpoints
 	API.GET("/scoreboard", scoreboard.Scoreboard)

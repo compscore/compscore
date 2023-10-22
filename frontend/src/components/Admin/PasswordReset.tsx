@@ -51,8 +51,9 @@ export default function PasswordReset() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
-        user: users?.[selectedUser as number].name,
+        team: users?.[selectedUser as number].name,
         password: password,
       }),
     })
