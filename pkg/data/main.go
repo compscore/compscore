@@ -9,7 +9,7 @@ import (
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -19,9 +19,9 @@ var (
 )
 
 func Init() {
-	c, err := ent.Open("sqlite3", "file:database.sqlite?_loc=auto&cache=shared&_fk=1")
+	c, err := ent.Open("postgres", "host=db port=5432 user=compscore dbname=compscore password=compscore sslmode=disable")
 	if err != nil {
-		log.Fatalf("failed opening connection to sqlite: %v", err)
+		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
 
 	client = c
