@@ -83,6 +83,43 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
       });
   };
 
+  const loginAs = () => {
+    fetch(`http://localhost:8080/api/admin/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        team: users?.[selectedUser as number].name,
+      }),
+    })
+      .then(async (res) => {
+        console.log(res);
+        if (res.status === 200) {
+          let response = (await res.json()) as LoginSuccess;
+
+          setCookie("auth", response.token, {
+            path: response.path,
+            domain: response.domain,
+            secure: response.secure,
+            httpOnly: response.httpOnly,
+            expires: new Date(response.expiration * 1000),
+          });
+
+          window.location.href = "/";
+        } else {
+          let response = (await res.json()) as LoginFailure;
+
+          enqueueSnackbar(response.error, { variant: "error" });
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar("Encountered an error" + err, { variant: "error" });
+        console.log(err);
+      });
+  };
+
   return (
     <Container maxWidth='xs'>
       <Typography variant='h4' align='center'>
@@ -116,7 +153,17 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
           authenticateAs();
         }}
       >
-        <Typography>Authenticate As</Typography>
+        <Typography>Temporary Authentication</Typography>
+      </Button>
+      <Box sx={{ m: 2 }} />
+      <Button
+        variant='contained'
+        fullWidth
+        onClick={() => {
+          loginAs();
+        }}
+      >
+        <Typography>Full Authentication</Typography>
       </Button>
     </Container>
   );
