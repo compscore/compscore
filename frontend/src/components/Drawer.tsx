@@ -79,31 +79,34 @@ export default function DrawerComponent({
               <ListItemText primary='Scoreboard' />
             </ListItemButton>
           </ListItem>
-          {cookies.auth &&
-          (jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
-            <ListItem
-              disablePadding
-              onClick={() => {
-                window.location.href = "/admin";
-              }}
-            >
-              <ListItemButton>
-                <ListItemIcon>{<AdminPanelSettingsIcon />}</ListItemIcon>
-                <ListItemText primary='Admin Panel' />
-              </ListItemButton>
-            </ListItem>
+          {cookies.auth ? (
+            (jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  window.location.href = "/admin";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<AdminPanelSettingsIcon />}</ListItemIcon>
+                  <ListItemText primary='Admin Panel' />
+                </ListItemButton>
+              </ListItem>
+            ) : (
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  window.location.href = "/checks";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
+                  <ListItemText primary='Edits Checks' />
+                </ListItemButton>
+              </ListItem>
+            )
           ) : (
-            <ListItem
-              disablePadding
-              onClick={() => {
-                window.location.href = "/checks";
-              }}
-            >
-              <ListItemButton>
-                <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
-                <ListItemText primary='Edits Checks' />
-              </ListItemButton>
-            </ListItem>
+            <></>
           )}
           <Divider />
           {cookies.auth ? (
