@@ -42,6 +42,7 @@ export default function App() {
               mobile={mobile}
               cookies={cookies}
               removeCookie={removeCookie}
+              setCookie={setCookie}
             />
           }
         />

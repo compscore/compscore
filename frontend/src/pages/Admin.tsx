@@ -70,7 +70,7 @@ export default function Admin({ cookies, setCookie }: props) {
         {state === "password" ? (
           <PasswordReset />
         ) : state === "authenticate" ? (
-          <AuthenticateAs setCookie={setCookie} />
+          <AuthenticateAs setCookie={setCookie} cookies={cookies} />
         ) : state === "engine" ? (
           <EngineState />
         ) : (

@@ -16,11 +16,14 @@ import { Team } from "../../models/ent";
 
 type Props = {
   setCookie: setCookie;
+  cookies: any;
 };
 
-export default function AuthenticateAs({ setCookie }: Props) {
+export default function AuthenticateAs({ setCookie, cookies }: Props) {
   const [users, setUsers] = useState<[Team]>();
   const [selectedUser, setSelectedUser] = useState<number>();
+
+  console.log(cookies.auth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,13 +67,8 @@ export default function AuthenticateAs({ setCookie }: Props) {
         if (res.status === 200) {
           let response = (await res.json()) as LoginSuccess;
 
-          setCookie("auth", response.token, {
-            path: response.path,
-            domain: response.domain,
-            secure: response.secure,
-            httpOnly: response.httpOnly,
-            expires: new Date(response.expiration * 1000),
-          });
+          setCookie("admin", cookies.auth);
+          setCookie("auth", response.token);
 
           window.location.href = "/";
         } else {
