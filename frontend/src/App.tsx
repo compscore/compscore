@@ -8,6 +8,7 @@ import Main from "./components/Main";
 import Checks from "./pages/Checks";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 import CheckScoreboard from "./pages/Scoreboard/Check";
 import CheckRoundScoreboard from "./pages/Scoreboard/CheckRound";
 import RoundScoreboard from "./pages/Scoreboard/Round";
@@ -17,6 +18,7 @@ import StatusRoundScoreboard from "./pages/Scoreboard/StatusRound";
 import TeamScoreboard from "./pages/Scoreboard/Team";
 import TeamRoundScoreboard from "./pages/Scoreboard/TeamRound";
 import { useSystemTheme } from "./themes/Preference";
+import ChangePassword from "./pages/ChangePassword";
 
 const LazyComponent = ({
   element,
@@ -51,8 +53,24 @@ export default function App() {
           element: <LazyComponent element={<Index />} />,
         },
         {
+          path: "admin",
+          element: (
+            <LazyComponent
+              element={<Admin cookies={cookies} setCookie={setCookie} />}
+            />
+          ),
+        },
+        {
           path: "login",
           element: <LazyComponent element={<Login setCookie={setCookie} />} />,
+        },
+        {
+          path: "password",
+          element: (
+            <LazyComponent
+              element={<ChangePassword removeCookie={removeCookie} />}
+            />
+          ),
         },
         {
           path: "checks",

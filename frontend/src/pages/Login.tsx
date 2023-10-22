@@ -1,10 +1,19 @@
 import React from "react";
-import { Box, Typography, TextField, Button, Container } from "@mui/material";
+import {
+  Box,
+  Link,
+  Tooltip,
+  Typography,
+  TextField,
+  Button,
+  Container,
+} from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { LoginSuccess, LoginFailure } from "../models/Login";
 import { CookieSetOptions } from "universal-cookie";
+import PasswordInput from "../components/PasswordInput";
 
-type Props = {
+type props = {
   setCookie: (
     name: "auth",
     value: any,
@@ -12,7 +21,7 @@ type Props = {
   ) => void;
 };
 
-export default function Login({ setCookie }: Props) {
+export default function Login({ setCookie }: props) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -64,7 +73,7 @@ export default function Login({ setCookie }: Props) {
           alignItems: "center",
         }}
       >
-        <Typography component='h1' variant='h5'>
+        <Typography component='h1' variant='h3'>
           Sign in
         </Typography>
         <Box component='form' onSubmit={handleSubmit}>
@@ -77,15 +86,27 @@ export default function Login({ setCookie }: Props) {
             name='username'
             autoFocus
           />
-          <TextField
+          <PasswordInput
             margin='normal'
             required
-            fullWidth
             name='password'
             label='Password'
-            type='password'
             id='password'
           />
+          <Tooltip title='Reach out to Black Team' arrow>
+            <Link
+              sx={{
+                textDecoration: "none",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant='body2' color='text.secondary'>
+                Forgot password?
+              </Typography>
+            </Link>
+          </Tooltip>
           <Button
             type='submit'
             fullWidth

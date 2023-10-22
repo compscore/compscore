@@ -2,7 +2,9 @@ import { GridOn } from "@mui/icons-material";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import HomeIcon from "@mui/icons-material/Home";
+import PasswordIcon from "@mui/icons-material/Password";
 import LoginIcon from "@mui/icons-material/Login";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import {
   Box,
   Divider,
@@ -14,17 +16,23 @@ import {
   ListItemText,
 } from "@mui/material";
 import { CookieSetOptions } from "universal-cookie";
+import jwt_decode from "jwt-decode";
+import { JWT } from "../models/JWT";
 
 type Props = {
   drawerState: boolean;
   setDrawerState: React.Dispatch<React.SetStateAction<boolean>>;
   removeCookie: (name: "auth", options?: CookieSetOptions | undefined) => void;
+  cookies: {
+    auth?: any;
+  };
 };
 
 export default function DrawerComponent({
   drawerState,
   setDrawerState,
   removeCookie,
+  cookies,
 }: Props) {
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -70,42 +78,72 @@ export default function DrawerComponent({
               <ListItemText primary='Scoreboard' />
             </ListItemButton>
           </ListItem>
-
-          <ListItem
-            disablePadding
-            onClick={() => {
-              window.location.href = "/checks";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
-              <ListItemText primary='Edits Checks' />
-            </ListItemButton>
-          </ListItem>
+          {cookies.auth &&
+          (jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
+            <ListItem
+              disablePadding
+              onClick={() => {
+                window.location.href = "/admin";
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{<AdminPanelSettingsIcon />}</ListItemIcon>
+                <ListItemText primary='Admin Panel' />
+              </ListItemButton>
+            </ListItem>
+          ) : (
+            <ListItem
+              disablePadding
+              onClick={() => {
+                window.location.href = "/checks";
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
+                <ListItemText primary='Edits Checks' />
+              </ListItemButton>
+            </ListItem>
+          )}
           <Divider />
-          <ListItem
-            disablePadding
-            onClick={() => {
-              window.location.href = "/login";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<LoginIcon />}</ListItemIcon>
-              <ListItemText primary='Login' />
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            disablePadding
-            onClick={() => {
-              removeCookie("auth");
-              window.location.href = "/";
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
-              <ListItemText primary='Logout' />
-            </ListItemButton>
-          </ListItem>
+          {cookies.auth ? (
+            <>
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  removeCookie("auth");
+                  window.location.href = "/";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<AssignmentIndIcon />}</ListItemIcon>
+                  <ListItemText primary='Logout' />
+                </ListItemButton>
+              </ListItem>
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  window.location.href = "/password";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<PasswordIcon />}</ListItemIcon>
+                  <ListItemText primary='Change Password' />
+                </ListItemButton>
+              </ListItem>
+            </>
+          ) : (
+            <ListItem
+              disablePadding
+              onClick={() => {
+                window.location.href = "/login";
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon>{<LoginIcon />}</ListItemIcon>
+                <ListItemText primary='Login' />
+              </ListItemButton>
+            </ListItem>
+          )}
         </List>
       </Box>
     </Drawer>

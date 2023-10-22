@@ -5,8 +5,11 @@ import (
 
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/grpc/client"
+	"github.com/compscore/compscore/pkg/web/admin"
 	"github.com/compscore/compscore/pkg/web/check"
 	"github.com/compscore/compscore/pkg/web/credential"
+	"github.com/compscore/compscore/pkg/web/engine"
 	"github.com/compscore/compscore/pkg/web/round"
 	"github.com/compscore/compscore/pkg/web/scoreboard"
 	"github.com/compscore/compscore/pkg/web/status"
@@ -48,6 +51,9 @@ func Start() {
 
 	LoadRoutes()
 
+	client.Open()
+	defer client.Close()
+
 	Router.Run(fmt.Sprintf("%s:%d", config.Web.Hostname, config.Web.Port))
 }
 
@@ -55,6 +61,16 @@ func LoadRoutes() {
 	// General Endpoints
 	API.POST("/login", login)
 	API.POST("/info", info)
+	API.POST("/password", password)
+
+	// Admin Endpoints
+	API.POST("/admin/password", admin.Password)
+	API.POST("/admin/login", admin.Login)
+
+	// Engine Endpoints
+	API.GET("/engine", engine.Get)
+	API.POST("/engine/start", engine.Start)
+	API.POST("/engine/stop", engine.Stop)
 
 	// Scoreboard Endpoints
 	API.GET("/scoreboard", scoreboard.Scoreboard)

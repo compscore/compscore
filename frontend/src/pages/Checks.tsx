@@ -2,6 +2,7 @@ import {
   Box,
   Container,
   Paper,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -51,6 +52,8 @@ export default function Checks({ cookies }: Props) {
     );
   }
 
+  const [showPasswordlessChecks, setShowPasswordlessChecks] =
+    useState<boolean>(false);
   const [credentials, setCredentials] = useState<[Credential] | undefined>(
     undefined
   );
@@ -115,7 +118,19 @@ export default function Checks({ cookies }: Props) {
         <Typography component='h1' variant='h3' fontWeight={700}>
           Check Editor
         </Typography>
-        <Box sx={{ m: 1 }} />
+        <Box
+          sx={{ m: 1 }}
+          display='flex'
+          flexDirection='row'
+          alignItems='center'
+        >
+          <Switch
+            onChange={(e) => {
+              setShowPasswordlessChecks(e.target.checked);
+            }}
+          />
+          <Typography>Show checks without passwords</Typography>
+        </Box>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -129,29 +144,35 @@ export default function Checks({ cookies }: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {credentials?.map((credential) => (
-                <TableRow key={credential.edges.check?.name}>
-                  <TableCell>
-                    <Typography variant='body1' component='h1'>
-                      {credential.edges.check?.name}
-                    </Typography>
-                  </TableCell>
+              {credentials
+                ?.filter(
+                  (credential) =>
+                    credential.password !== "" || showPasswordlessChecks
+                )
+                .map((credential) => (
+                  <TableRow key={credential.edges.check?.name}>
+                    <TableCell>
+                      <Typography variant='body1' component='h1'>
+                        {credential.edges.check?.name}
+                      </Typography>
+                    </TableCell>
 
-                  <TableCell>
-                    <PasswordInput
-                      value={credential.password}
-                      onBlur={(e) => {
-                        if (credential.edges.check) {
-                          updatePassword(
-                            e.target.value,
-                            credential.edges.check?.name
-                          );
-                        }
-                      }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell>
+                      <PasswordInput
+                        value={credential.password}
+                        variant='standard'
+                        onBlur={(e) => {
+                          if (credential.edges.check) {
+                            updatePassword(
+                              e.target.value,
+                              credential.edges.check?.name
+                            );
+                          }
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
