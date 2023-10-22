@@ -1,11 +1,11 @@
-compscore.local {
+dev.compscore.org {
     handle /api/* {
         reverse_proxy engine:8080
     }
 
     handle {
-        root * app
-        type_files {path} /index.html
+        root * /app
+        try_files {path} /index.html
         encode gzip zstd
         file_server
     }
