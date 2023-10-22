@@ -3,12 +3,6 @@ name: Competition
 users:
   - username: admin
     password: changeme123!
-web:
-  hostname: dev.compscore.org
-  port: 8080
-  apiPath: /api
-  jwtKey: REPLACE_ME
-  timeout: 6 # hours
 teams:
   amount: 15
   nameFormat: Team {{ .Team }}

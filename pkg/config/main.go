@@ -2,6 +2,8 @@ package config
 
 import (
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
@@ -51,7 +53,7 @@ func UpdateConfiguration() {
 		logrus.WithError(err).Fatal("Failed to unmarshal engine config")
 	}
 
-	err = viper.UnmarshalKey("web", &Web)
+	Web, err = web()
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal web config")
 	}
@@ -75,6 +77,34 @@ func UpdateConfiguration() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal users config")
 	}
+}
+
+func web() (structs.Web_s, error) {
+	hostname := os.Getenv("DOMAIN")
+	portStr := os.Getenv("PORT")
+	jwtKey := os.Getenv("JWT_SECRET")
+	timeoutStr := os.Getenv("TIMEOUT")
+	releaseStr := os.Getenv("RELEASE")
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return structs.Web_s{}, err
+	}
+
+	timeout, err := strconv.Atoi(timeoutStr)
+	if err != nil {
+		return structs.Web_s{}, err
+	}
+
+	release := strings.ToLower(releaseStr) == "true" || strings.ToLower(releaseStr) == "yes" || releaseStr == "1"
+
+	return structs.Web_s{
+		Hostname: hostname,
+		Port:     port,
+		JWTKey:   jwtKey,
+		Timeout:  timeout,
+		Release:  release,
+	}, nil
 }
 
 func FileExists(path string) (bool, error) {

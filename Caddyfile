@@ -1,4 +1,4 @@
-dev.compscore.org {
+{$DOMAIN} {
     handle /api/* {
         reverse_proxy engine:8080
     }

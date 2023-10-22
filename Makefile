@@ -20,3 +20,6 @@ cloc:
 
 generate:
 	go generate .
+
+docker: generate build
+	./$(OUT_FILE) server

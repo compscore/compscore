@@ -24,7 +24,9 @@ var (
 )
 
 func Start() {
-	// gin.SetMode(gin.ReleaseMode)
+	if config.Web.Release {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	Router = gin.Default()
 	Router.SetTrustedProxies(nil)
@@ -47,7 +49,7 @@ func Start() {
 
 	Router.Use(auth.JWTMiddleware)
 
-	API = Router.Group(config.Web.APIPath)
+	API = Router.Group("/api")
 
 	LoadRoutes()
 

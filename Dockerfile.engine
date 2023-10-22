@@ -4,9 +4,6 @@ workdir /app
 
 COPY . .
 
-RUN make generate
-RUN make build
-
 EXPOSE 8080
 
-CMD ["./build/compscore", "server"]
+CMD ["make", "docker"]

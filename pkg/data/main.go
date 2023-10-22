@@ -3,7 +3,9 @@ package data
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"sync"
 	"text/template"
 
@@ -19,7 +21,17 @@ var (
 )
 
 func Init() {
-	c, err := ent.Open("postgres", "host=db port=5432 user=compscore dbname=compscore password=compscore sslmode=disable")
+	c, err := ent.Open(
+		"postgres",
+		fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			os.Getenv("POSTGRES_HOST"),
+			os.Getenv("POSTGRES_PORT"),
+			os.Getenv("POSTGRES_USER"),
+			os.Getenv("POSTGRES_PASSWORD"),
+			os.Getenv("POSTGRES_DB"),
+		),
+	)
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
