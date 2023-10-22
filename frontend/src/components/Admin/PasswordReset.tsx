@@ -21,7 +21,7 @@ export default function PasswordReset() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/teams`, {
+      fetch(`/api/teams`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +46,7 @@ export default function PasswordReset() {
   }, []);
 
   const changePassword = (password: string) => {
-    fetch(`http://localhost:8080/api/admin/password`, {
+    fetch(`/api/admin/password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

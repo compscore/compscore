@@ -3,9 +3,9 @@ package structs
 type Web_s struct {
 	Hostname string `yaml:"hostname"`
 	Port     int    `yaml:"port"`
-	APIPath  string `yaml:"apiPath"`
 	JWTKey   string `yaml:"jwtKey"`
 	Timeout  int    `yaml:"timeout"`
+	Release  bool   `yaml:"release"`
 }
 
 type Teams_s struct {
@@ -43,29 +43,6 @@ type Check_s struct {
 	ExpectedOutput string                 `yaml:"expectedOutput"`
 	Weight         int                    `yaml:"weight"`
 	Options        map[string]interface{} `yaml:"options"`
-}
-
-type Team_s struct {
-	Name     string `yaml:"name"`
-	Password string `yaml:"password"`
-	Number   int8   `yaml:"number"`
-}
-
-type Config_s struct {
-	Name    string    `yaml:"name"`
-	Web     Web_s     `yaml:"web"`
-	Teams   Teams_s   `yaml:"teams"`
-	Scoring Scoring_s `yaml:"scoring"`
-	Engine  Engine_s  `yaml:"engine"`
-	Checks  []Check_s `yaml:"checks"`
-}
-
-type RunningConfig_s struct {
-	Name    string    `yaml:"name"`
-	Web     Web_s     `yaml:"web"`
-	Scoring Scoring_s `yaml:"scoring"`
-	Engine  Engine_s  `yaml:"engine"`
-	Teams   []Team_s  `yaml:"teams"`
 }
 
 type AdminUser_s struct {

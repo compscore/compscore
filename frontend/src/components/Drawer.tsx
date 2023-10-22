@@ -17,6 +17,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import jwt_decode from "jwt-decode";
+import { domain, path } from "../config";
 import { cookies, removeCookie, setCookie } from "../models/Cookies";
 import { JWT } from "../models/JWT";
 
@@ -79,31 +80,34 @@ export default function DrawerComponent({
               <ListItemText primary='Scoreboard' />
             </ListItemButton>
           </ListItem>
-          {cookies.auth &&
-          (jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
-            <ListItem
-              disablePadding
-              onClick={() => {
-                window.location.href = "/admin";
-              }}
-            >
-              <ListItemButton>
-                <ListItemIcon>{<AdminPanelSettingsIcon />}</ListItemIcon>
-                <ListItemText primary='Admin Panel' />
-              </ListItemButton>
-            </ListItem>
+          {cookies.auth ? (
+            (jwt_decode(cookies.auth) as JWT).Role === "admin" ? (
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  window.location.href = "/admin";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<AdminPanelSettingsIcon />}</ListItemIcon>
+                  <ListItemText primary='Admin Panel' />
+                </ListItemButton>
+              </ListItem>
+            ) : (
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  window.location.href = "/checks";
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
+                  <ListItemText primary='Edits Checks' />
+                </ListItemButton>
+              </ListItem>
+            )
           ) : (
-            <ListItem
-              disablePadding
-              onClick={() => {
-                window.location.href = "/checks";
-              }}
-            >
-              <ListItemButton>
-                <ListItemIcon>{<EditNoteIcon />}</ListItemIcon>
-                <ListItemText primary='Edits Checks' />
-              </ListItemButton>
-            </ListItem>
+            <></>
           )}
           <Divider />
           {cookies.auth ? (
@@ -112,8 +116,11 @@ export default function DrawerComponent({
                 <ListItem
                   disablePadding
                   onClick={() => {
-                    setCookie("auth", cookies.admin);
-                    removeCookie("admin");
+                    setCookie("auth", cookies.admin, {
+                      path: path,
+                      domain: domain,
+                    });
+                    removeCookie("admin", { path: path, domain: domain });
                     window.location.href = "/";
                   }}
                 >
@@ -126,7 +133,7 @@ export default function DrawerComponent({
                 <ListItem
                   disablePadding
                   onClick={() => {
-                    removeCookie("auth");
+                    removeCookie("auth", { path: path, domain: domain });
                     window.location.href = "/";
                   }}
                 >

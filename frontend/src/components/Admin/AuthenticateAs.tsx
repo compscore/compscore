@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { setCookie } from "../../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../../models/Login";
 import { Team } from "../../models/ent";
+import { domain, path } from "../../config";
 
 type Props = {
   setCookie: setCookie;
@@ -27,7 +28,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/teams`, {
+      fetch(`/api/teams`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +53,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
   }, []);
 
   const authenticateAs = () => {
-    fetch(`http://localhost:8080/api/admin/login`, {
+    fetch(`/api/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,8 +68,8 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
         if (res.status === 200) {
           let response = (await res.json()) as LoginSuccess;
 
-          setCookie("admin", cookies.auth);
-          setCookie("auth", response.token);
+          setCookie("admin", cookies.auth, { path: path, domain: domain });
+          setCookie("auth", response.token, { path: path, domain: domain });
 
           window.location.href = "/";
         } else {
@@ -84,7 +85,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
   };
 
   const loginAs = () => {
-    fetch(`http://localhost:8080/api/admin/login`, {
+    fetch(`/api/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -100,8 +101,8 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
           let response = (await res.json()) as LoginSuccess;
 
           setCookie("auth", response.token, {
-            path: response.path,
-            domain: response.domain,
+            path: path,
+            domain: domain,
             secure: response.secure,
             httpOnly: response.httpOnly,
             expires: new Date(response.expiration * 1000),

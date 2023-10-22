@@ -20,7 +20,7 @@ export default function ScoreBoard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch("http://localhost:8080/api/scoreboard", {
+      fetch("/api/scoreboard", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

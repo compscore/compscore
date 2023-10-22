@@ -12,6 +12,7 @@ import React from "react";
 import PasswordInput from "../components/PasswordInput";
 import { setCookie } from "../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../models/Login";
+import { domain, path } from "../config";
 
 type props = {
   setCookie: setCookie;
@@ -26,7 +27,7 @@ export default function Login({ setCookie }: props) {
       password: event.currentTarget.password.value,
     });
 
-    fetch("http://localhost:8080/api/login", {
+    fetch("/api/login", {
       method: "POST",
       body: data,
       headers: {
@@ -39,8 +40,8 @@ export default function Login({ setCookie }: props) {
           enqueueSnackbar("Logged in", { variant: "success" });
 
           setCookie("auth", response.token, {
-            path: response.path,
-            domain: response.domain,
+            path: path,
+            domain: domain,
             secure: response.secure,
             httpOnly: response.httpOnly,
             expires: new Date(response.expiration * 1000),

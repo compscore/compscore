@@ -29,7 +29,7 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/round/latest`, {
+      fetch(`/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export default function CheckRoundScoreboardComponent({ check, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/check/${check}/${round}`, {
+      fetch(`/api/scoreboard/check/${check}/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

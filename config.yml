@@ -2,19 +2,13 @@
 name: Competition
 users:
   - username: admin
-    password: admin
-web:
-  hostname: localhost
-  port: 8080
-  apiPath: /api
-  jwtKey: REPLACE_ME
-  timeout: 6 # hours
+    password: changeme123!
 teams:
   amount: 15
   nameFormat: Team {{ .Team }}
-  password: password
+  password: changeme123!
 scoring:
-  interval: 10 # seconds 
+  interval: 30 # seconds 
 engine:
   socket: /tmp/compscore.sock
   timeout: 5 # seconds

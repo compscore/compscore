@@ -57,7 +57,7 @@ export default function Checks({ cookies }: Props) {
     undefined
   );
   const fetchChecks = () => {
-    fetch("http://localhost:8080/api/credentials", {
+    fetch("/api/credentials", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -82,7 +82,7 @@ export default function Checks({ cookies }: Props) {
   }, []);
 
   const updatePassword = (password: string, check: string) => {
-    fetch(`http://localhost:8080/api/credential/${check}`, {
+    fetch(`/api/credential/${check}`, {
       method: "POST",
       credentials: "include",
       headers: {

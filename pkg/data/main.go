@@ -3,13 +3,15 @@ package data
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
+	"os"
 	"sync"
 	"text/template"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -19,9 +21,19 @@ var (
 )
 
 func Init() {
-	c, err := ent.Open("sqlite3", "file:database.sqlite?_loc=auto&cache=shared&_fk=1")
+	c, err := ent.Open(
+		"postgres",
+		fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			os.Getenv("POSTGRES_HOST"),
+			os.Getenv("POSTGRES_PORT"),
+			os.Getenv("POSTGRES_USER"),
+			os.Getenv("POSTGRES_PASSWORD"),
+			os.Getenv("POSTGRES_DB"),
+		),
+	)
 	if err != nil {
-		log.Fatalf("failed opening connection to sqlite: %v", err)
+		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
 
 	client = c

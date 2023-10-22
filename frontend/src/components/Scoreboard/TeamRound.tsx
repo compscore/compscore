@@ -29,7 +29,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/round/latest`, {
+      fetch(`/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`http://localhost:8080/api/scoreboard/team/${team}/${round}`, {
+      fetch(`/api/scoreboard/team/${team}/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
