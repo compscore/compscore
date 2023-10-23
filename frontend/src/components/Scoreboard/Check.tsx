@@ -14,6 +14,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { CheckScoreboard } from "../../models/Scoreboard/Check";
+import { api_url } from "../../config";
 
 type props = {
   check: string;
@@ -24,7 +25,7 @@ export default function CheckScoreboardComponent({ check }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`/api/scoreboard/check/${check}`, {
+      fetch(`${api_url}/api/scoreboard/check/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

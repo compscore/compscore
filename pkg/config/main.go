@@ -1,20 +1,24 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 var (
 	ConfigFile string = "config.yml"
+	EnvFile    string = ".env"
 
 	Name       string
+	Production bool
 	Engine     structs.Engine_s
 	Web        structs.Web_s
 	Teams      structs.Teams_s
@@ -24,9 +28,14 @@ var (
 )
 
 func Init() {
+	err := godotenv.Load(EnvFile)
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to load env file")
+	}
+
 	viper.SetConfigFile(ConfigFile)
 
-	err := viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to read config file")
 	}
@@ -46,9 +55,16 @@ func Init() {
 }
 
 func UpdateConfiguration() {
+	var err error
+
 	Name = viper.GetString("name")
 
-	err := viper.UnmarshalKey("engine", &Engine)
+	Production, err = deploy()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to parse deploy config")
+	}
+
+	err = viper.UnmarshalKey("engine", &Engine)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal engine config")
 	}
@@ -77,6 +93,20 @@ func UpdateConfiguration() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal users config")
 	}
+}
+
+func deploy() (bool, error) {
+	arg := strings.ToLower(os.Getenv("DEPLOY"))
+
+	if arg == "production" || arg == "prod" || arg == "release" {
+		return true, nil
+	}
+
+	if arg == "development" || arg == "dev" || arg == "debug" {
+		return false, nil
+	}
+
+	return false, fmt.Errorf("invalid deploy argument: %s", arg)
 }
 
 func web() (structs.Web_s, error) {

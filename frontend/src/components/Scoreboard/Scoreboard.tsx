@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { api_url } from "../../config";
 import { Scoreboard } from "../../models/Scoreboard/Scoreboard";
 
 export default function ScoreBoard() {
@@ -20,7 +21,7 @@ export default function ScoreBoard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch("/api/scoreboard", {
+      fetch(`${api_url}/api/scoreboard`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
