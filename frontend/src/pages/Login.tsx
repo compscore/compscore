@@ -12,13 +12,15 @@ import React from "react";
 import PasswordInput from "../components/PasswordInput";
 import { setCookie } from "../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../models/Login";
-import { domain, path } from "../config";
+import { api_url, domain, path } from "../config";
 
 type props = {
   setCookie: setCookie;
 };
 
 export default function Login({ setCookie }: props) {
+  console.log(import.meta.env);
+  console.log(domain, path, api_url);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -27,7 +29,7 @@ export default function Login({ setCookie }: props) {
       password: event.currentTarget.password.value,
     });
 
-    fetch("/api/login", {
+    fetch(`${api_url}/api/login`, {
       method: "POST",
       body: data,
       headers: {

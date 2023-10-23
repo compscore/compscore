@@ -18,6 +18,7 @@ import { enqueueSnackbar } from "notistack";
 import jwt_decode from "jwt-decode";
 import { JWT } from "../models/JWT";
 import { cookies } from "../models/Cookies";
+import { api_url } from "../config";
 
 type Props = {
   cookies: cookies;
@@ -57,7 +58,7 @@ export default function Checks({ cookies }: Props) {
     undefined
   );
   const fetchChecks = () => {
-    fetch("/api/credentials", {
+    fetch(`${api_url}/api/credentials`, {
       method: "GET",
       credentials: "include",
       headers: {
@@ -82,7 +83,7 @@ export default function Checks({ cookies }: Props) {
   }, []);
 
   const updatePassword = (password: string, check: string) => {
-    fetch(`/api/credential/${check}`, {
+    fetch(`${api_url}/api/credential/${check}`, {
       method: "POST",
       credentials: "include",
       headers: {

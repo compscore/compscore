@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/Scoreboard/Status";
+import { api_url } from "../../config";
 
 type props = {
   check: string;
@@ -24,7 +25,7 @@ export default function StatusScoreboardComponent({ check, team }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`/api/scoreboard/status/${team}/${check}`, {
+      fetch(`${api_url}/api/scoreboard/status/${team}/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

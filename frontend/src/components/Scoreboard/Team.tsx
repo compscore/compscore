@@ -14,6 +14,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { TeamScoreboard } from "../../models/Scoreboard/Team";
+import { api_url } from "../../config";
 
 type props = {
   team: string;
@@ -24,7 +25,7 @@ export default function TeamScoreboardComponent({ team }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`/api/scoreboard/team/${team}`, {
+      fetch(`${api_url}/api/scoreboard/team/${team}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

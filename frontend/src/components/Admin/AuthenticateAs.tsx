@@ -10,10 +10,10 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { api_url, domain, path } from "../../config";
 import { setCookie } from "../../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../../models/Login";
 import { Team } from "../../models/ent";
-import { domain, path } from "../../config";
 
 type Props = {
   setCookie: setCookie;
@@ -28,7 +28,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`/api/teams`, {
+      fetch(`${api_url}/api/teams`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
   }, []);
 
   const authenticateAs = () => {
-    fetch(`/api/admin/login`, {
+    fetch(`${api_url}/api/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
   };
 
   const loginAs = () => {
-    fetch(`/api/admin/login`, {
+    fetch(`${api_url}/api/admin/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
