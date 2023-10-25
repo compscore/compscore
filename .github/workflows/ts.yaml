@@ -1,0 +1,28 @@
+name: Run Typescript Code Checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check TypeScript Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Compile TypeScript
+        run: npm run build
+
+      - name: Run ESLint
+        run: npx eslint 'src/**/*.{ts,tsx}' --quiet
