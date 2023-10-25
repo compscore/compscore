@@ -1,6 +1,16 @@
 name: Run Typescript Code Checks
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "frontend/**"
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "frontend/**"
+    branches:
+      - main
 
 permissions:
   contents: read

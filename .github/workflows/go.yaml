@@ -1,6 +1,16 @@
 name: Run GoLang Code Checks
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "pkg/**"
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "pkg/**"
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -9,6 +19,9 @@ jobs:
   check:
     name: Code Checks
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
