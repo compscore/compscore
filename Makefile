@@ -20,6 +20,11 @@ cloc:
 
 generate:
 	go generate .
+	go mod tidy
 
-docker: generate build
+run:
 	./$(OUT_FILE) server
+
+docker: 
+	docker compose build
+	docker compose up -d
