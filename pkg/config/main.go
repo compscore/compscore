@@ -106,7 +106,7 @@ func deploy() (bool, error) {
 		return false, nil
 	}
 
-	return false, fmt.Errorf("invalid deploy argument: %s", arg)
+	return false, fmt.Errorf("invalid deploy argument: \"%s\"docker", arg)
 }
 
 func web() (structs.Web_s, error) {
