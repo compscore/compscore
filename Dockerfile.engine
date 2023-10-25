@@ -6,4 +6,7 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["make", "docker"]
+RUN make generate
+RUN make build
+
+CMD ["make", "run"]
