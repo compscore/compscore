@@ -28,9 +28,8 @@ export default function ScoreBoard() {
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as Scoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as Scoreboard);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
