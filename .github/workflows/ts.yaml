@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   check:
-    name: Check TypeScript Code
+    name: Typescript Code Checks
     runs-on: ubuntu-latest
     defaults:
       run:
