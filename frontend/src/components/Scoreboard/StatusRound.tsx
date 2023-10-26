@@ -43,7 +43,7 @@ export default function StatusRoundScoreboardComponent({
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as Round;
+            const response = (await res.json()) as Round;
 
             setLatestRound(response);
 
@@ -72,9 +72,8 @@ export default function StatusRoundScoreboardComponent({
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as StatusScoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as StatusScoreboard);
           } else {
             console.log("Encountered an error");
           }
