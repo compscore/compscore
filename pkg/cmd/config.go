@@ -1,6 +1,9 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+)
 
 var configCmd = &cobra.Command{
 	Use:     "config",
@@ -15,5 +18,8 @@ func init() {
 }
 
 func configRun(cmd *cobra.Command, args []string) {
-	cmd.Help()
+	err := cmd.Help()
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to print help")
+	}
 }
