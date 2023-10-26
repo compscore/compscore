@@ -32,9 +32,8 @@ export default function CheckScoreboardComponent({ check }: props) {
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as CheckScoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as CheckScoreboard);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
