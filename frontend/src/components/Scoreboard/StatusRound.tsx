@@ -75,10 +75,11 @@ export default function StatusRoundScoreboardComponent({
           if (res.status === 200) {
             setData((await res.json()) as StatusScoreboard);
           } else {
-            console.log("Encountered an error");
+            enqueueSnackbar("Encountered an error", { variant: "error" });
           }
         })
         .catch((err) => {
+          enqueueSnackbar("Encountered an error: " + err, { variant: "error" });
           console.log("Encountered an error: " + err);
         });
     };

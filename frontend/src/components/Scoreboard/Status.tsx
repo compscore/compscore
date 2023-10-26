@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/Scoreboard/Status";
 import { api_url } from "../../config";
+import { enqueueSnackbar } from "notistack";
 
 type props = {
   check: string;
@@ -35,11 +36,12 @@ export default function StatusScoreboardComponent({ check, team }: props) {
           if (res.status === 200) {
             setData((await res.json()) as StatusScoreboard);
           } else {
-            console.log("Encountered an error");
+            enqueueSnackbar("Encountered an error", { variant: "error" });
           }
         })
         .catch((err) => {
-          console.log("Encountered an error: " + err);
+          enqueueSnackbar("Encountered an error: " + err, { variant: "error" });
+          console.log(err);
         });
     };
 

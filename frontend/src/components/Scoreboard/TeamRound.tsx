@@ -83,7 +83,6 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
     const pollingInterval = setInterval(fetchData, 5000);
 
-    console.log(data);
     return () => clearInterval(pollingInterval);
   }, []);
 

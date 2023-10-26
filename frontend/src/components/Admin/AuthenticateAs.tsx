@@ -60,7 +60,6 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
       }),
     })
       .then(async (res) => {
-        console.log(res);
         if (res.status === 200) {
           setCookie("admin", cookies.auth, { path: path, domain: domain });
           setCookie("auth", ((await res.json()) as LoginSuccess).token, {
@@ -93,7 +92,6 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
       }),
     })
       .then(async (res) => {
-        console.log(res);
         if (res.status === 200) {
           const response = (await res.json()) as LoginSuccess;
 

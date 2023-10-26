@@ -44,10 +44,13 @@ export default function Checks({ cookies }: Props) {
         if (res.status === 200) {
           setCredentials(response);
         } else {
-          console.log(response);
+          enqueueSnackbar("Failed to fetch checks", { variant: "error" });
         }
       })
       .catch((err) => {
+        enqueueSnackbar("Failed to fetch checks: " + err, {
+          variant: "error",
+        });
         console.log(err);
       });
   };
