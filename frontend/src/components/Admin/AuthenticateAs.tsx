@@ -11,20 +11,18 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { api_url, domain, path } from "../../config";
-import { setCookie } from "../../models/Cookies";
+import { setCookie, cookies } from "../../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../../models/Login";
 import { Team } from "../../models/ent";
 
 type Props = {
   setCookie: setCookie;
-  cookies: any;
+  cookies: cookies;
 };
 
 export default function AuthenticateAs({ setCookie, cookies }: Props) {
   const [users, setUsers] = useState<[Team]>();
   const [selectedUser, setSelectedUser] = useState<number>();
-
-  console.log(cookies.auth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,9 +34,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as [Team];
-
-            setUsers(response);
+            setUsers((await res.json()) as [Team]);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
@@ -66,16 +62,17 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
       .then(async (res) => {
         console.log(res);
         if (res.status === 200) {
-          let response = (await res.json()) as LoginSuccess;
-
           setCookie("admin", cookies.auth, { path: path, domain: domain });
-          setCookie("auth", response.token, { path: path, domain: domain });
+          setCookie("auth", ((await res.json()) as LoginSuccess).token, {
+            path: path,
+            domain: domain,
+          });
 
           window.location.href = "/";
         } else {
-          let response = (await res.json()) as LoginFailure;
-
-          enqueueSnackbar(response.error, { variant: "error" });
+          enqueueSnackbar(((await res.json()) as LoginFailure).error, {
+            variant: "error",
+          });
         }
       })
       .catch((err) => {
@@ -98,7 +95,7 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
       .then(async (res) => {
         console.log(res);
         if (res.status === 200) {
-          let response = (await res.json()) as LoginSuccess;
+          const response = (await res.json()) as LoginSuccess;
 
           setCookie("auth", response.token, {
             path: path,
@@ -110,9 +107,9 @@ export default function AuthenticateAs({ setCookie, cookies }: Props) {
 
           window.location.href = "/";
         } else {
-          let response = (await res.json()) as LoginFailure;
-
-          enqueueSnackbar(response.error, { variant: "error" });
+          enqueueSnackbar(((await res.json()) as LoginFailure).error, {
+            variant: "error",
+          });
         }
       })
       .catch((err) => {
