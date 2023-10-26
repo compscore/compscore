@@ -179,7 +179,10 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 
 	for i := 0; i < config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
-		teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		if err != nil {
+			return nil, err
+		}
 
 		entStatus, err := Status.getAllByCheckAndTeamWithLimit(check_name, int(i+1), rounds)
 		if err != nil {
@@ -225,7 +228,10 @@ func (*scoreboard_s) checkRound(check_name string, round_number int, rounds int)
 
 	for i := 0; i < config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
-		teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		if err != nil {
+			return nil, err
+		}
 
 		entStatus, err := Status.getAllByCheckAndTeamFromRoundWithLimit(check_name, int(i+1), round_number, rounds)
 		if err != nil {
