@@ -37,7 +37,7 @@ export default function RoundScoreboardComponent({ round }: props) {
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as Round;
+            const response = (await res.json()) as Round;
 
             setLatestRound(response);
 
@@ -66,9 +66,8 @@ export default function RoundScoreboardComponent({ round }: props) {
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as Scoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as Scoreboard);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
