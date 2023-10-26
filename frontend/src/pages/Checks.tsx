@@ -25,6 +25,37 @@ type Props = {
 };
 
 export default function Checks({ cookies }: Props) {
+  const [showPasswordlessChecks, setShowPasswordlessChecks] =
+    useState<boolean>(false);
+  const [credentials, setCredentials] = useState<[Credential] | undefined>(
+    undefined
+  );
+
+  const fetchChecks = () => {
+    fetch(`${api_url}/api/credentials`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(async (res) => {
+        const response = (await res.json()) as [Credential];
+        if (res.status === 200) {
+          setCredentials(response);
+        } else {
+          console.log(response);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    fetchChecks();
+  }, []);
+
   if (cookies.auth == undefined) {
     window.location.href = "/login";
   }
@@ -51,36 +82,6 @@ export default function Checks({ cookies }: Props) {
       </Container>
     );
   }
-
-  const [showPasswordlessChecks, setShowPasswordlessChecks] =
-    useState<boolean>(false);
-  const [credentials, setCredentials] = useState<[Credential] | undefined>(
-    undefined
-  );
-  const fetchChecks = () => {
-    fetch(`${api_url}/api/credentials`, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (res) => {
-        let response = await res.json();
-        if (res.status === 200) {
-          setCredentials(response);
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  useEffect(() => {
-    fetchChecks();
-  }, []);
 
   const updatePassword = (password: string, check: string) => {
     fetch(`${api_url}/api/credential/${check}`, {
