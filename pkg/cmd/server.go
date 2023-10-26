@@ -33,7 +33,7 @@ func serverRun(cmd *cobra.Command, args []string) {
 	go server.Serve()
 
 	// close procedure
-	force := false
+	var force bool = false
 	<-sigChannel
 	if force {
 		server.ForceClose()
