@@ -33,15 +33,16 @@ func serverRun(cmd *cobra.Command, args []string) {
 	go server.Serve()
 
 	// close procedure
-	var force bool
-	<-sigChannel
-	if force {
-		server.ForceClose()
-	} else {
-		force = true
-		server.Close()
+	force := false
+	for {
+		<-sigChannel
+		if force {
+			server.ForceClose()
+		} else {
+			force = true
+			server.Close()
+		}
 	}
-
 }
 
 func init() {
