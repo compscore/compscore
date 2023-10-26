@@ -16,6 +16,7 @@ import (
 	"github.com/compscore/compscore/pkg/web/team"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -29,7 +30,10 @@ func Start() {
 	}
 
 	Router = gin.Default()
-	Router.SetTrustedProxies(nil)
+	err := Router.SetTrustedProxies(nil)
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to set trusted proxies")
+	}
 
 	cors_urls := []string{
 		fmt.Sprintf("http://%s:%d", config.Web.Hostname, config.Web.Port),
@@ -56,7 +60,10 @@ func Start() {
 	client.Open()
 	defer client.Close()
 
-	Router.Run(fmt.Sprintf(":%d", config.Web.Port))
+	err = Router.Run(fmt.Sprintf(":%d", config.Web.Port))
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to start web server")
+	}
 }
 
 func LoadRoutes() {

@@ -27,9 +27,7 @@ export default function EngineState() {
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as EngineStatus;
-
-            setEngineState(response);
+            setEngineState((await res.json()) as EngineStatus);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
@@ -70,16 +68,21 @@ export default function EngineState() {
     })
       .then(async (res) => {
         if (res.status === 200) {
-          let response = (await res.json()) as EngineMessage;
-          enqueueSnackbar(`Engine started: ${response.message}`, {
-            variant: "success",
-          });
+          enqueueSnackbar(
+            `Engine started: ${((await res.json()) as EngineMessage).message}`,
+            {
+              variant: "success",
+            }
+          );
         } else {
-          let response = (await res.json()) as { error: string };
-
-          enqueueSnackbar(`Encountered an error: ${response.error}`, {
-            variant: "error",
-          });
+          enqueueSnackbar(
+            `Encountered an error: ${
+              ((await res.json()) as { error: string }).error
+            }`,
+            {
+              variant: "error",
+            }
+          );
         }
       })
       .catch((err) => {
@@ -98,16 +101,21 @@ export default function EngineState() {
     })
       .then(async (res) => {
         if (res.status === 200) {
-          let response = (await res.json()) as EngineMessage;
-          enqueueSnackbar(`Engine started: ${response.message}`, {
-            variant: "success",
-          });
+          enqueueSnackbar(
+            `Engine started: ${((await res.json()) as EngineMessage).message}`,
+            {
+              variant: "success",
+            }
+          );
         } else {
-          let response = (await res.json()) as { error: string };
-
-          enqueueSnackbar(`Encountered an error: ${response.error}`, {
-            variant: "error",
-          });
+          enqueueSnackbar(
+            `Encountered an error: ${
+              ((await res.json()) as { error: string }).error
+            }`,
+            {
+              variant: "error",
+            }
+          );
         }
       })
       .catch((err) => {

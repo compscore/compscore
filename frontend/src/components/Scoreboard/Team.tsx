@@ -32,9 +32,8 @@ export default function TeamScoreboardComponent({ team }: props) {
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as TeamScoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as TeamScoreboard);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
@@ -49,7 +48,6 @@ export default function TeamScoreboardComponent({ team }: props) {
 
     const pollingInterval = setInterval(fetchData, 5000);
 
-    console.log(data);
     return () => clearInterval(pollingInterval);
   }, []);
 

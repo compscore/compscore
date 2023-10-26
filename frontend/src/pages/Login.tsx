@@ -19,8 +19,6 @@ type props = {
 };
 
 export default function Login({ setCookie }: props) {
-  console.log(import.meta.env);
-  console.log(domain, path, api_url);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -38,7 +36,7 @@ export default function Login({ setCookie }: props) {
     })
       .then(async (res) => {
         if (res.status === 200) {
-          let response = (await res.json()) as LoginSuccess;
+          const response = (await res.json()) as LoginSuccess;
           enqueueSnackbar("Logged in", { variant: "success" });
 
           setCookie("auth", response.token, {
@@ -51,9 +49,9 @@ export default function Login({ setCookie }: props) {
 
           window.location.href = "/";
         } else {
-          let response = (await res.json()) as LoginFailure;
-
-          enqueueSnackbar(response.error, { variant: "error" });
+          enqueueSnackbar(((await res.json()) as LoginFailure).error, {
+            variant: "error",
+          });
         }
       })
       .catch((err) => {

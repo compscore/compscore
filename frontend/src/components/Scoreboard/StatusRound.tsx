@@ -43,7 +43,7 @@ export default function StatusRoundScoreboardComponent({
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as Round;
+            const response = (await res.json()) as Round;
 
             setLatestRound(response);
 
@@ -72,14 +72,14 @@ export default function StatusRoundScoreboardComponent({
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as StatusScoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as StatusScoreboard);
           } else {
-            console.log("Encountered an error");
+            enqueueSnackbar("Encountered an error", { variant: "error" });
           }
         })
         .catch((err) => {
+          enqueueSnackbar("Encountered an error: " + err, { variant: "error" });
           console.log("Encountered an error: " + err);
         });
     };

@@ -38,7 +38,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as Round;
+            const response = (await res.json()) as Round;
 
             setLatestRound(response);
 
@@ -67,9 +67,8 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
         },
       })
         .then(async (res) => {
-          let response = (await res.json()) as TeamScoreboard;
           if (res.status === 200) {
-            setData(response);
+            setData((await res.json()) as TeamScoreboard);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
@@ -84,7 +83,6 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
     const pollingInterval = setInterval(fetchData, 5000);
 
-    console.log(data);
     return () => clearInterval(pollingInterval);
   }, []);
 
