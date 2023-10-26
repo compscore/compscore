@@ -80,7 +80,10 @@ func Init() {
 			log.Fatalf("failed checking for team %d: %v", i, err)
 		}
 		output := bytes.NewBuffer([]byte{})
-		teamNameTemplate.Execute(output, struct{ Team int }{Team: i})
+		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i})
+		if err != nil {
+			log.Fatalf("failed executing team name template: %v", err)
+		}
 		if !exists {
 			_, err := Team.Create(i, output.String(), config.Teams.Password)
 			if err != nil {
