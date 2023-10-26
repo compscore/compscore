@@ -2,7 +2,7 @@ name: Run Typescript Code Checks
 
 on:
   push:
-    # paths:
+    # paths:https://github.com/1nv8rzim/ops-bot-iii/tree/slash-command-delete-birthday
     #   - "frontend/**"
     branches:
       - main
@@ -19,6 +19,9 @@ jobs:
   check:
     name: Check TypeScript Code
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
