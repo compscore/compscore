@@ -30,9 +30,7 @@ export default function PasswordReset() {
       })
         .then(async (res) => {
           if (res.status === 200) {
-            let response = (await res.json()) as [Team];
-
-            setUsers(response);
+            setUsers((await res.json()) as [Team]);
           } else {
             enqueueSnackbar("Encountered an error", { variant: "error" });
           }
