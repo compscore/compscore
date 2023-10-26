@@ -2,13 +2,13 @@ name: Run Typescript Code Checks
 
 on:
   push:
-    # paths:https://github.com/1nv8rzim/ops-bot-iii/tree/slash-command-delete-birthday
-    #   - "frontend/**"
+    paths:
+      - "frontend/**"
     branches:
       - main
   pull_request:
-    # paths:
-    #   - "frontend/**"
+    paths:
+      - "frontend/**"
     branches:
       - main
 

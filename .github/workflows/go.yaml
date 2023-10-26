@@ -2,13 +2,15 @@ name: Run GoLang Code Checks
 
 on:
   push:
-    # paths:
-    #   - "pkg/**"
+    paths:
+      - "pkg/**"
+      - "main.go"
     branches:
       - main
   pull_request:
-    # paths:
-    #   - "pkg/**"
+    paths:
+      - "pkg/**"
+      - "main.go"
     branches:
       - main
 
