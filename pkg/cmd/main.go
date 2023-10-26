@@ -20,5 +20,8 @@ func run(cmd *cobra.Command, args []string) {
 }
 
 func Execute() {
-	rootCmd.Execute()
+	err := rootCmd.Execute()
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to execute root command")
+	}
 }
