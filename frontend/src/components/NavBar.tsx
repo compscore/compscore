@@ -10,11 +10,10 @@ import {
 } from "@mui/material";
 import jwt_decode from "jwt-decode";
 import { JWT } from "../models/JWT";
+import { cookies } from "../models/Cookies";
 
 type Props = {
-  cookies: {
-    auth?: any;
-  };
+  cookies: cookies;
   setDrawerState: React.Dispatch<React.SetStateAction<boolean>>;
   mobile: boolean;
 };
