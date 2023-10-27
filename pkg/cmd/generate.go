@@ -31,6 +31,9 @@ func generateRun(cmd *cobra.Command, args []string) {
 	var releases = make(map[structs.Release_s]bool)
 
 	for _, check := range config.Checks {
+		if check.Release.Tag == "" {
+			check.Release.Tag = "latest"
+		}
 		releases[check.Release] = true
 	}
 

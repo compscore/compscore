@@ -17,7 +17,7 @@ checks:
     release:
       org: compscore
       repo: ssh
-      tag: v1.0.6
+      tag: latest
     credentials:
       username: ubuntu
       password: changeme
@@ -29,7 +29,7 @@ checks:
     release:
       org: compscore
       repo: dns
-      tag: v1.0.6
+      tag: latest
     target: 8.8.8.8
     command: A example.com
     expectedOutput: 93.184.216.34
@@ -38,14 +38,14 @@ checks:
     release:
       org: compscore
       repo: ping
-      tag: v1.0.7
+      tag: latest
     target: 10.{{ .Team }}.1.1
     weight: 1
   - name: host_a-web
     release:
       org: compscore
       repo: web
-      tag: v1.0.9
+      tag: latest
     target: https://google.com
     weight: 2
     command: GET
@@ -55,7 +55,7 @@ checks:
     release:
       org: compscore
       repo: winrm
-      tag: v1.0.4
+      tag: latest
     credentials:
       username: Administrator
       password: changeme
@@ -70,7 +70,7 @@ checks:
     release:
       org: compscore
       repo: ftp
-      tag: v1.0.6
+      tag: latest
     credentials:
       username: demo
       password: password
@@ -85,7 +85,7 @@ checks:
     release:
       org: compscore
       repo: ldap
-      tag: v1.0.7
+      tag: latest
     credentials:
       username: cn=admin,dc=example.com,dc=local
       password: password
@@ -97,7 +97,7 @@ checks:
     release:
       org: compscore
       repo: smb
-      tag: v1.0.3
+      tag: latest
     credentials:
       username: Administrator
       password: changeme
@@ -112,7 +112,7 @@ checks:
     release:
       org: compscore
       repo: mysql
-      tag: v1.0.3
+      tag: latest
     credentials:
       username: root
       password: changeme
