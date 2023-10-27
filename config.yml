@@ -125,7 +125,7 @@ checks:
       connect:
       database_exists:
       row_exists:
-      substring:_match:
+      substring_match:
 
 
 
