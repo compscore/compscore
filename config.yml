@@ -126,6 +126,3 @@ checks:
       database_exists:
       row_exists:
       substring_match:
-
-
-
