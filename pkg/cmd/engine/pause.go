@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// pauseCmd represents the pause command
 var pauseCmd = &cobra.Command{
 	Use:     "pause",
 	Short:   "Pause the engine",
@@ -17,6 +18,7 @@ var pauseCmd = &cobra.Command{
 	Run:     pauseRun,
 }
 
+// pauseRun pauses the engine
 func pauseRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
