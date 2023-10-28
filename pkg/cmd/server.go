@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:     "server",
 	Short:   "Run the server",
@@ -21,6 +22,7 @@ var serverCmd = &cobra.Command{
 	Run: serverRun,
 }
 
+// serverRun runs the server
 func serverRun(cmd *cobra.Command, args []string) {
 	config.Init()
 	data.Init()
