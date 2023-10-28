@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:     "status",
 	Short:   "Get the status of the engine",
@@ -17,6 +18,7 @@ var statusCmd = &cobra.Command{
 	Run:     statusRun,
 }
 
+// statusRun gets the status of the engine
 func statusRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
