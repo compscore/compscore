@@ -1,4 +1,4 @@
-package cmd
+package engine
 
 import (
 	"context"
@@ -12,15 +12,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var engineStartCmd = &cobra.Command{
+var startCmd = &cobra.Command{
 	Use:     "start",
 	Aliases: []string{"run", "r"},
 	Short:   "Start the compscore server",
 	Long:    `Start the compscore server`,
-	Run:     engineStartRun,
+	Run:     startRun,
 }
 
-func engineStartRun(cmd *cobra.Command, args []string) {
+func startRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
 	exists, err := engine.UnixSocketExists()
@@ -77,8 +77,4 @@ func engineStartRun(cmd *cobra.Command, args []string) {
 			logrus.Info("Compscore engine spawned")
 		}
 	}
-}
-
-func init() {
-	engineCmd.AddCommand(engineStartCmd)
 }

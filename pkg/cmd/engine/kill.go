@@ -1,4 +1,4 @@
-package cmd
+package engine
 
 import (
 	"context"
@@ -9,14 +9,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var engineKillCmd = &cobra.Command{
+var killCmd = &cobra.Command{
 	Use:   "kill",
 	Short: "Kill the engine",
 	Long:  "Kill the engine",
-	Run:   engineKillRun,
+	Run:   killRun,
 }
 
-func engineKillRun(cmd *cobra.Command, args []string) {
+func killRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
 	client.Open()
@@ -28,8 +28,4 @@ func engineKillRun(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info(message)
-}
-
-func init() {
-	engineCmd.AddCommand(engineKillCmd)
 }

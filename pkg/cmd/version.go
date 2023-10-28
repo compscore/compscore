@@ -45,10 +45,6 @@ func versionRun(cmd *cobra.Command, args []string) {
 	fmt.Println("OS/Arch:", runtime.GOOS+"/"+runtime.GOARCH)
 }
 
-func init() {
-	rootCmd.AddCommand(versionCmd)
-}
-
 // gitCommit gets the current git commit hash
 func gitCommit() string {
 	command, _ := exec.Command("git", "rev-parse", "HEAD").Output()

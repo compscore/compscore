@@ -21,10 +21,6 @@ var generateCmd = &cobra.Command{
 	Run:   generateRun,
 }
 
-func init() {
-	rootCmd.AddCommand(generateCmd)
-}
-
 func generateRun(cmd *cobra.Command, args []string) {
 	config.Init()
 

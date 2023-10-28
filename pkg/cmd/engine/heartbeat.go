@@ -1,4 +1,4 @@
-package cmd
+package engine
 
 import (
 	"context"
@@ -9,15 +9,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var engineHeartbeatCmd = &cobra.Command{
+var heartbeatCmd = &cobra.Command{
 	Use:     "heartbeat",
 	Short:   "Send a heartbeat to the engine",
 	Long:    "Send a heartbeat to the engine",
 	Aliases: []string{"ping", "p", "h"},
-	Run:     enginePingRun,
+	Run:     heartbeatRun,
 }
 
-func enginePingRun(cmd *cobra.Command, args []string) {
+func heartbeatRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
 	client.Open()
@@ -29,8 +29,4 @@ func enginePingRun(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Heartbeat successful")
-}
-
-func init() {
-	engineCmd.AddCommand(engineHeartbeatCmd)
 }

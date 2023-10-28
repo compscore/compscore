@@ -44,7 +44,3 @@ func serverRun(cmd *cobra.Command, args []string) {
 		}
 	}
 }
-
-func init() {
-	rootCmd.AddCommand(serverCmd)
-}

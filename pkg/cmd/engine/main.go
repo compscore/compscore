@@ -1,17 +1,17 @@
-package cmd
+package engine
 
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var engineCmd = &cobra.Command{
+var Cmd = &cobra.Command{
 	Use:     "engine",
 	Aliases: []string{"e", "eng"},
-	Run:     engineRun,
+	Run:     cmdRun,
 }
 
-func engineRun(cmd *cobra.Command, args []string) {
+func cmdRun(cmd *cobra.Command, args []string) {
 	err := cmd.Help()
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to print help")
@@ -19,5 +19,11 @@ func engineRun(cmd *cobra.Command, args []string) {
 }
 
 func init() {
-	rootCmd.AddCommand(engineCmd)
+	Cmd.AddCommand(
+		heartbeatCmd,
+		killCmd,
+		pauseCmd,
+		startCmd,
+		statusCmd,
+	)
 }

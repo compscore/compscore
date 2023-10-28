@@ -1,4 +1,4 @@
-package cmd
+package engine
 
 import (
 	"context"
@@ -9,15 +9,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var enginePauseCmd = &cobra.Command{
+var pauseCmd = &cobra.Command{
 	Use:     "pause",
 	Short:   "Pause the engine",
 	Long:    "Pause the engine",
 	Aliases: []string{"p", "stop"},
-	Run:     enginePauseRun,
+	Run:     pauseRun,
 }
 
-func enginePauseRun(cmd *cobra.Command, args []string) {
+func pauseRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
 	client.Open()
@@ -29,8 +29,4 @@ func enginePauseRun(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info(message)
-}
-
-func init() {
-	engineCmd.AddCommand(enginePauseCmd)
 }

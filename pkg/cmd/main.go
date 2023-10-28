@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/compscore/compscore/pkg/cmd/engine"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -27,4 +28,13 @@ func Execute() {
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to execute root command")
 	}
+}
+
+func init() {
+	rootCmd.AddCommand(
+		engine.Cmd,
+		generateCmd,
+		serverCmd,
+		versionCmd,
+	)
 }
