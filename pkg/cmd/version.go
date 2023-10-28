@@ -16,6 +16,7 @@ var (
 	BuildDate string
 )
 
+// versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:     "version",
 	Aliases: []string{"v"},
