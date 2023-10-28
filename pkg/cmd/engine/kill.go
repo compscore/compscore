@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// killCmd represents the kill command
 var killCmd = &cobra.Command{
 	Use:   "kill",
 	Short: "Kill the engine",
@@ -16,6 +17,7 @@ var killCmd = &cobra.Command{
 	Run:   killRun,
 }
 
+// killRun kills the engine
 func killRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
