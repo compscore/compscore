@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// heartbeatCmd represents the heartbeat command
 var heartbeatCmd = &cobra.Command{
 	Use:     "heartbeat",
 	Short:   "Send a heartbeat to the engine",
@@ -17,6 +18,7 @@ var heartbeatCmd = &cobra.Command{
 	Run:     heartbeatRun,
 }
 
+// heartbeatRun sends a heartbeat to the engine
 func heartbeatRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
