@@ -30,6 +30,7 @@ func Execute() {
 	}
 }
 
+// registers all commands
 func init() {
 	rootCmd.AddCommand(
 		engine.Cmd,
