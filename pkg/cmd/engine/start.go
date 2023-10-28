@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:     "start",
 	Aliases: []string{"run", "r"},
@@ -20,6 +21,7 @@ var startCmd = &cobra.Command{
 	Run:     startRun,
 }
 
+// startRun starts the compscore server
 func startRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
