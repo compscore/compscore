@@ -1,6 +1,7 @@
 package data
 
 import (
+	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/sirupsen/logrus"
@@ -19,9 +20,11 @@ func (*round_s) get(number int) (*ent.Round, error) {
 }
 
 func (*round_s) Get(number int) (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.Get: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Get: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.get(number)
 }
@@ -36,9 +39,11 @@ func (*round_s) getWithStatus(number int) (*ent.Round, error) {
 }
 
 func (*round_s) GetWithStatus(number int) (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetWithStatus: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetWithStatus: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getWithStatus(number)
 }
@@ -50,9 +55,11 @@ func (*round_s) getAll() ([]*ent.Round, error) {
 }
 
 func (*round_s) GetAll() ([]*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetAll: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetAll: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getAll()
 }
@@ -65,9 +72,11 @@ func (*round_s) getAllWithStatus() ([]*ent.Round, error) {
 }
 
 func (*round_s) GetAllWithStatus() ([]*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetAllWithStatus: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetAllWithStatus: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getAllWithStatus()
 }
@@ -84,9 +93,11 @@ func (*round_s) getLastRound() (*ent.Round, error) {
 }
 
 func (*round_s) GetLastRound() (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetLastRound: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetLastRound: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getLastRound()
 }
@@ -104,9 +115,11 @@ func (*round_s) getLastRoundWithStatus() (*ent.Round, error) {
 }
 
 func (*round_s) GetLastRoundWithStatus() (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetLastRoundWithStatus: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetLastRoundWithStatus: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getLastRoundWithStatus()
 }
@@ -118,9 +131,11 @@ func (*round_s) complete(entRound *ent.Round) (*ent.Round, error) {
 }
 
 func (*round_s) Complete(number int) (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.Complete: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Complete: lock")
+		defer mutex.Unlock()
+	}
 
 	entRound, err := Round.get(number)
 	if err != nil {
@@ -131,9 +146,11 @@ func (*round_s) Complete(number int) (*ent.Round, error) {
 }
 
 func (*round_s) CompleteComplex(entRound *ent.Round) (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.CompleteComplex: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.CompleteComplex: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.complete(entRound)
 }
@@ -153,9 +170,11 @@ func (*round_s) getLastCompleteRound() (*ent.Round, error) {
 }
 
 func (*round_s) GetLastCompleteRound() (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetLastCompleteRound: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetLastCompleteRound: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getLastCompleteRound()
 }
@@ -176,9 +195,11 @@ func (*round_s) getLastCompleteRoundWithStatus() (*ent.Round, error) {
 }
 
 func (*round_s) GetLastCompleteRoundWithStatus() (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetLastCompleteRoundWithStatus: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetLastCompleteRoundWithStatus: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getLastCompleteRoundWithStatus()
 }
@@ -196,9 +217,11 @@ func (*round_s) getPreviousXRounds(amount int) ([]*ent.Round, error) {
 }
 
 func (*round_s) GetPreviousXRounds(amount int) ([]*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetPreviousXRounds: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetPreviousXRounds: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getPreviousXRounds(amount)
 }
@@ -217,9 +240,11 @@ func (*round_s) getPreviousXRoundsWithStatus(amount int) ([]*ent.Round, error) {
 }
 
 func (*round_s) GetPreviousXRoundsWithStatus(amount int) ([]*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.GetPreviousXRoundsWithStatus: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.GetPreviousXRoundsWithStatus: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.getPreviousXRoundsWithStatus(amount)
 }
@@ -233,9 +258,11 @@ func (*round_s) exists(number int) (bool, error) {
 }
 
 func (*round_s) Exists(number int) (bool, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.Exists: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Exists: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.exists(number)
 }
@@ -257,9 +284,11 @@ func (*round_s) create(number int) (*ent.Round, error) {
 }
 
 func (*round_s) Create(number int) (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.Create: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Create: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.create(number)
 }
@@ -271,9 +300,11 @@ func (*round_s) count() (int, error) {
 }
 
 func (*round_s) Count() (int, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.Count: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Count: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.count()
 }
@@ -297,9 +328,11 @@ func (*round_s) createNextRound() (*ent.Round, error) {
 }
 
 func (*round_s) CreateNextRound() (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.CreateNextRound: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.CreateNextRound: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.createNextRound()
 }
@@ -311,9 +344,11 @@ func (*round_s) delete(round *ent.Round) error {
 }
 
 func (*round_s) Delete(round *ent.Round) error {
-	mutex.Lock()
-	logrus.Trace("round_s.Delete: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Delete: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.delete(round)
 }
@@ -326,9 +361,11 @@ func (*round_s) update(round *ent.Round, number int, complete bool) (*ent.Round,
 }
 
 func (*round_s) Update(round *ent.Round, number int, complete bool) (*ent.Round, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.Update: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.Update: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.update(round, number, complete)
 }
@@ -340,9 +377,11 @@ func (*round_s) deleteAll() (int, error) {
 }
 
 func (*round_s) DeleteAll() (int, error) {
-	mutex.Lock()
-	logrus.Trace("round_s.DeleteAll: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("round_s.DeleteAll: lock")
+		defer mutex.Unlock()
+	}
 
 	return Round.deleteAll()
 }
