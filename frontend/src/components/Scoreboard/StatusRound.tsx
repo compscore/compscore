@@ -17,7 +17,7 @@ import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/Scoreboard/Status";
 import { Round } from "../../models/ent";
-import { api_url, long_refresh } from "../../config";
+import { api_url, fetchWithTimeout, long_refresh } from "../../config";
 
 type props = {
   check: string;
@@ -35,7 +35,7 @@ export default function StatusRoundScoreboardComponent({
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/round/latest`, {
+      fetchWithTimeout(`${api_url}/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -65,12 +65,15 @@ export default function StatusRoundScoreboardComponent({
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/scoreboard/status/${team}/${check}/${round}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      fetchWithTimeout(
+        `${api_url}/api/scoreboard/status/${team}/${check}/${round}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
         .then(async (res) => {
           if (res.status === 200) {
             setData((await res.json()) as StatusScoreboard);

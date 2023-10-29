@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/Scoreboard/Status";
-import { api_url, short_refresh } from "../../config";
+import { api_url, fetchWithTimeout, short_refresh } from "../../config";
 import { enqueueSnackbar } from "notistack";
 
 type props = {
@@ -26,7 +26,7 @@ export default function StatusScoreboardComponent({ check, team }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/scoreboard/status/${team}/${check}`, {
+      fetchWithTimeout(`${api_url}/api/scoreboard/status/${team}/${check}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -12,7 +12,7 @@ import React from "react";
 import PasswordInput from "../components/PasswordInput";
 import { setCookie } from "../models/Cookies";
 import { LoginFailure, LoginSuccess } from "../models/Login";
-import { api_url, domain, path } from "../config";
+import { api_url, domain, fetchWithTimeout, path } from "../config";
 
 type props = {
   setCookie: setCookie;
@@ -27,7 +27,7 @@ export default function Login({ setCookie }: props) {
       password: event.currentTarget.password.value,
     });
 
-    fetch(`${api_url}/api/login`, {
+    fetchWithTimeout(`${api_url}/api/login`, {
       method: "POST",
       body: data,
       headers: {

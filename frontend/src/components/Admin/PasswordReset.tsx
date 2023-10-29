@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { api_url } from "../../config";
+import { api_url, fetchWithTimeout } from "../../config";
 import { Team } from "../../models/ent";
 import PasswordInput from "../PasswordInput";
 
@@ -22,7 +22,7 @@ export default function PasswordReset() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/teams`, {
+      fetchWithTimeout(`${api_url}/api/teams`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function PasswordReset() {
   }, []);
 
   const changePassword = (password: string) => {
-    fetch(`${api_url}/api/admin/password`, {
+    fetchWithTimeout(`${api_url}/api/admin/password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

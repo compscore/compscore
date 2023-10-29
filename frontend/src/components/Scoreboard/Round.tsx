@@ -17,7 +17,7 @@ import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { api_url, long_refresh } from "../../config";
+import { api_url, fetchWithTimeout, long_refresh } from "../../config";
 
 type props = {
   round: string;
@@ -29,7 +29,7 @@ export default function RoundScoreboardComponent({ round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/round/latest`, {
+      fetchWithTimeout(`${api_url}/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export default function RoundScoreboardComponent({ round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/scoreboard/round/${round}`, {
+      fetchWithTimeout(`${api_url}/api/scoreboard/round/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

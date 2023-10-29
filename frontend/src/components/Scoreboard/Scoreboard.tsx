@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { api_url, short_refresh } from "../../config";
+import { api_url, fetchWithTimeout, short_refresh } from "../../config";
 import { Scoreboard } from "../../models/Scoreboard/Scoreboard";
 
 export default function ScoreBoard() {
@@ -21,7 +21,7 @@ export default function ScoreBoard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/scoreboard`, {
+      fetchWithTimeout(`${api_url}/api/scoreboard`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
