@@ -2,7 +2,7 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 import PasswordInput from "../components/PasswordInput";
-import { api_url, domain, path } from "../config";
+import { api_url, domain, fetchWithTimeout, path } from "../config";
 import { removeCookie } from "../models/Cookies";
 
 type props = {
@@ -15,7 +15,7 @@ export default function ChangePassword({ removeCookie }: props) {
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
 
   const changePassword = (oldPassword: string, newPassword: string) => {
-    fetch(`${api_url}/api/password`, {
+    fetchWithTimeout(`${api_url}/api/password`, {
       method: "POST",
       credentials: "include",
       headers: {

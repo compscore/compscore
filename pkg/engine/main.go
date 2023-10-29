@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"text/template"
 	"time"
@@ -191,7 +192,7 @@ func runRound(roundMutex *sync.Mutex) error {
 		}
 		for i := 1; i <= config.Teams.Amount; i++ {
 			target := bytes.NewBuffer([]byte{})
-			err = targetTemplate.Execute(target, struct{ Team int }{Team: i})
+			err = targetTemplate.Execute(target, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 			if err != nil {
 				_, err = data.Status.Update(
 					i,
@@ -275,8 +276,165 @@ func runScoreCheck(round int, check structs.Check_s, team int, target string, pa
 
 	returnChan := make(chan checkResult)
 
+	var (
+		command        string
+		username       string
+		expectedOutput string
+	)
+
+	if strings.Contains(check.Command, "{{") {
+		commandTemplate, err := template.New(check.Name).Parse(check.Command)
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse command template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		output := bytes.NewBuffer([]byte{})
+		err = commandTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", team)})
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse command template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		command = output.String()
+	} else {
+		command = check.Command
+	}
+
+	if strings.Contains(check.ExpectedOutput, "{{") {
+		expectedOutputTemplate, err := template.New(check.Name).Parse(check.ExpectedOutput)
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse expected output template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		output := bytes.NewBuffer([]byte{})
+		err = expectedOutputTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", team)})
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse expected output template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		expectedOutput = output.String()
+	} else {
+		expectedOutput = check.ExpectedOutput
+	}
+
+	if strings.Contains(check.Credentials.Username, "{{") {
+		usernameTemplate, err := template.New(check.Name).Parse(check.Credentials.Username)
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse username template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		output := bytes.NewBuffer([]byte{})
+		err = usernameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", team)})
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse username template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		username = output.String()
+	} else {
+		username = check.Credentials.Username
+	}
+
+	if strings.Contains(check.Credentials.Password, "{{") {
+		passwordTemplate, err := template.New(check.Name).Parse(check.Credentials.Password)
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse password template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		output := bytes.NewBuffer([]byte{})
+		err = passwordTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", team)})
+		if err != nil {
+			resultsChan <- checkResult{
+				Success: false,
+				Message: fmt.Sprintf("failed to parse password template: %v", err),
+				Team:    team,
+				Check:   check,
+			}
+			return
+		}
+
+		password = output.String()
+	} else {
+		password = check.Credentials.Password
+	}
+
+	for key, option := range check.Options {
+		optionStr, isStr := option.(string)
+		if !isStr {
+			continue
+		}
+
+		if strings.Contains(optionStr, "{{") {
+			optionTemplate, err := template.New(check.Name).Parse(optionStr)
+			if err != nil {
+				resultsChan <- checkResult{
+					Success: false,
+					Message: fmt.Sprintf("failed to parse option template: %v", err),
+					Team:    team,
+					Check:   check,
+				}
+				return
+			}
+
+			output := bytes.NewBuffer([]byte{})
+
+			err = optionTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", team)})
+			if err != nil {
+				resultsChan <- checkResult{
+					Success: false,
+					Message: fmt.Sprintf("failed to parse option template: %v", err),
+					Team:    team,
+					Check:   check,
+				}
+				return
+			}
+
+			check.Options[key] = output.String()
+		}
+	}
+
 	go func() {
-		success, message := runFunc(checkCtx, target, check.Command, check.ExpectedOutput, check.Credentials.Username, password, check.Options)
+		success, message := runFunc(checkCtx, target, command, expectedOutput, username, password, check.Options)
 		err := recover()
 		if err != nil {
 			logrus.WithError(err.(error)).Errorf("Failed to run check: %v, due to panic: %v", check, err)

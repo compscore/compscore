@@ -2,6 +2,7 @@ package data
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/compscore/compscore/pkg/config"
@@ -56,9 +57,11 @@ func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 }
 
 func (*scoreboard_s) Round(round_number int) (*structs.Scoreboard, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.Round: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.Round: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.round(round_number)
 }
@@ -72,9 +75,11 @@ func (*scoreboard_s) main() (*structs.Scoreboard, error) {
 }
 
 func (*scoreboard_s) Main() (*structs.Scoreboard, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.Main: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.Main: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.main()
 }
@@ -116,9 +121,11 @@ func (*scoreboard_s) team(team_number int, rounds int) (*structs.TeamScoreboard,
 }
 
 func (*scoreboard_s) Team(team_number int, rounds int) (*structs.TeamScoreboard, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.Team: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.Team: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.team(team_number, rounds)
 }
@@ -154,9 +161,11 @@ func (*scoreboard_s) teamRound(team_number int, round_number int, rounds int) (*
 }
 
 func (*scoreboard_s) TeamRound(team_number int, round_number int, rounds int) (*structs.TeamScoreboard, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.TeamRound: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.TeamRound: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.teamRound(team_number, round_number, rounds)
 }
@@ -179,7 +188,7 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 
 	for i := 0; i < config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
-		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		err = teamNameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 		if err != nil {
 			return nil, err
 		}
@@ -208,9 +217,11 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 }
 
 func (*scoreboard_s) Check(check_name string, rounds int) (*structs.CheckScoreboard, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.Check: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.Check: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.check(check_name, rounds)
 }
@@ -228,7 +239,7 @@ func (*scoreboard_s) checkRound(check_name string, round_number int, rounds int)
 
 	for i := 0; i < config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
-		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		err = teamNameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 		if err != nil {
 			return nil, err
 		}
@@ -257,9 +268,11 @@ func (*scoreboard_s) checkRound(check_name string, round_number int, rounds int)
 }
 
 func (*scoreboard_s) CheckRound(check_name string, round_number int, rounds int) (*structs.CheckScoreboard, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.CheckRound: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.CheckRound: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.checkRound(check_name, round_number, rounds)
 }
@@ -290,9 +303,11 @@ func (*scoreboard_s) history(check_name string, team_number int, rounds int) (*[
 }
 
 func (*scoreboard_s) History(check_name string, team_number int, rounds int) (*[]structs.Status, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.History: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.History: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.history(check_name, team_number, rounds)
 }
@@ -323,9 +338,11 @@ func (*scoreboard_s) historyRound(check_name string, team_number int, round_numb
 }
 
 func (*scoreboard_s) HistoryRound(check_name string, team_number int, round_number int, rounds int) (*[]structs.Status, error) {
-	mutex.Lock()
-	logrus.Trace("scoreboard_s.HistoryRound: lock")
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		logrus.Trace("scoreboard_s.HistoryRound: lock")
+		defer mutex.Unlock()
+	}
 
 	return Scoreboard.historyRound(check_name, team_number, round_number, rounds)
 }

@@ -9,7 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { EngineMessage, EngineStatus } from "../../models/Engine";
-import { api_url } from "../../config";
+import { api_url, fetchWithTimeout, long_refresh } from "../../config";
 
 export default function EngineState() {
   const [engineState, setEngineState] = useState<EngineStatus>({
@@ -19,7 +19,7 @@ export default function EngineState() {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/engine`, {
+      fetchWithTimeout(`${api_url}/api/engine`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function EngineState() {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 5000);
+    const pollingInterval = setInterval(fetchData, long_refresh);
 
     return () => clearInterval(pollingInterval);
   }, []);
@@ -59,7 +59,7 @@ export default function EngineState() {
   };
 
   const startEngine = () => {
-    fetch(`${api_url}/api/engine/start`, {
+    fetchWithTimeout(`${api_url}/api/engine/start`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -92,7 +92,7 @@ export default function EngineState() {
   };
 
   const stopEngine = () => {
-    fetch(`${api_url}/api/engine/stop`, {
+    fetchWithTimeout(`${api_url}/api/engine/stop`, {
       method: "POST",
       credentials: "include",
       headers: {

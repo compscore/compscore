@@ -17,7 +17,7 @@ import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { api_url } from "../../config";
+import { api_url, fetchWithTimeout, long_refresh } from "../../config";
 
 type props = {
   team: string;
@@ -30,7 +30,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/round/latest`, {
+      fetchWithTimeout(`${api_url}/api/round/latest`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
   useEffect(() => {
     const fetchData = async () => {
-      fetch(`${api_url}/api/scoreboard/team/${team}/${round}`, {
+      fetchWithTimeout(`${api_url}/api/scoreboard/team/${team}/${round}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 5000);
+    const pollingInterval = setInterval(fetchData, long_refresh);
 
     return () => clearInterval(pollingInterval);
   }, []);

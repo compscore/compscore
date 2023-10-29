@@ -80,7 +80,7 @@ func Init() {
 			log.Fatalf("failed checking for team %d: %v", i, err)
 		}
 		output := bytes.NewBuffer([]byte{})
-		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i})
+		err = teamNameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 		if err != nil {
 			log.Fatalf("failed executing team name template: %v", err)
 		}
@@ -126,8 +126,10 @@ func Init() {
 }
 
 func Client(function func(*ent.Client) (interface{}, error)) (interface{}, error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+	if !config.Production {
+		mutex.Lock()
+		defer mutex.Unlock()
+	}
 
 	return function(client)
 }
