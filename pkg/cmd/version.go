@@ -16,6 +16,7 @@ var (
 	BuildDate string
 )
 
+// versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:     "version",
 	Aliases: []string{"v"},
@@ -43,10 +44,6 @@ func versionRun(cmd *cobra.Command, args []string) {
 
 	fmt.Println("Go Version:", runtime.Version())
 	fmt.Println("OS/Arch:", runtime.GOOS+"/"+runtime.GOARCH)
-}
-
-func init() {
-	rootCmd.AddCommand(versionCmd)
 }
 
 // gitCommit gets the current git commit hash

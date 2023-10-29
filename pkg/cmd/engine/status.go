@@ -1,4 +1,4 @@
-package cmd
+package engine
 
 import (
 	"context"
@@ -9,15 +9,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var engineStatusCmd = &cobra.Command{
+// statusCmd represents the status command
+var statusCmd = &cobra.Command{
 	Use:     "status",
 	Short:   "Get the status of the engine",
 	Long:    "Get the status of the engine",
 	Aliases: []string{"stat"},
-	Run:     engineStatusRun,
+	Run:     statusRun,
 }
 
-func engineStatusRun(cmd *cobra.Command, args []string) {
+// statusRun gets the status of the engine
+func statusRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
 	client.Open()
@@ -29,8 +31,4 @@ func engineStatusRun(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.WithField("status", status).Info(message)
-}
-
-func init() {
-	engineCmd.AddCommand(engineStatusCmd)
 }

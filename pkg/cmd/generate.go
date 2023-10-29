@@ -14,22 +14,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// generateCmd represents the generate command
 var generateCmd = &cobra.Command{
 	Use:   "generate",
-	Short: "Generate code for current checks",
-	Long:  "Generate code for current checks",
+	Short: "Generate code for configured checks",
+	Long:  "Generate code for configured checks",
 	Run:   generateRun,
 }
 
-func init() {
-	rootCmd.AddCommand(generateCmd)
-}
-
+// generate code required for configured checks
 func generateRun(cmd *cobra.Command, args []string) {
 	config.Init()
 
+	// deduplicate and get releases
 	var releases = make(map[structs.Release_s]bool)
-
 	for _, check := range config.Checks {
 		if check.Release.Tag == "" {
 			check.Release.Tag = "latest"
@@ -37,21 +35,25 @@ func generateRun(cmd *cobra.Command, args []string) {
 		releases[check.Release] = true
 	}
 
-	err := deleteImports("pkg/checks/imports")
+	// delete existing generated code
+	err := deleteFiles("pkg/checks/imports")
 	if err != nil {
 		logrus.Fatalf("Failed to delete imports: %s", err.Error())
 	}
 
+	// write new code to main.go
 	err = writeMain()
 	if err != nil {
 		logrus.Fatalf("Failed to write main: %s", err.Error())
 	}
 
+	// generate code for each release
 	err = writeChecks(releases)
 	if err != nil {
 		logrus.Fatalf("Failed to write checks: %s", err.Error())
 	}
 
+	// run go fmt
 	fmtCmd := exec.Command("go", "fmt", "./...")
 	fmtCmd.Stdout = os.Stdout
 	fmtCmd.Stderr = os.Stderr
@@ -60,6 +62,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 		logrus.Fatalf("Failed to run go fmt: %s", err.Error())
 	}
 
+	// run go get for each release
 	for release := range releases {
 		getCmd := exec.Command("go", "get", fmt.Sprintf("github.com/%s/%s@%s", release.Org, release.Repo, release.Tag))
 		getCmd.Stdout = os.Stdout
@@ -71,6 +74,7 @@ func generateRun(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	// run go mod tidy
 	tidyCmd := exec.Command("go", "mod", "tidy")
 	tidyCmd.Stdout = os.Stdout
 	tidyCmd.Stderr = os.Stderr
@@ -80,7 +84,8 @@ func generateRun(cmd *cobra.Command, args []string) {
 	}
 }
 
-func deleteImports(path string) error {
+// deleteFiles deletes all files in a directory
+func deleteFiles(path string) error {
 	path = strings.TrimSuffix(path, "/")
 
 	dir, err := os.Open(path)
@@ -103,6 +108,7 @@ func deleteImports(path string) error {
 	return nil
 }
 
+// writeMain writes the main.go file
 func writeMain() error {
 	outputFile, err := os.Create("pkg/checks/imports/main.go")
 	if err != nil {
@@ -129,6 +135,7 @@ func writeMain() error {
 	return tmpl.Execute(outputFile, nil)
 }
 
+// writeChecks writes check files for each release
 func writeChecks(releases map[structs.Release_s]bool) error {
 	tmplFile, err := os.Open("pkg/checks/template/check.go.tmpl")
 	if err != nil {
