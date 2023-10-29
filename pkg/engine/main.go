@@ -191,7 +191,7 @@ func runRound(roundMutex *sync.Mutex) error {
 		}
 		for i := 1; i <= config.Teams.Amount; i++ {
 			target := bytes.NewBuffer([]byte{})
-			err = targetTemplate.Execute(target, struct{ Team int }{Team: i})
+			err = targetTemplate.Execute(target, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 			if err != nil {
 				_, err = data.Status.Update(
 					i,

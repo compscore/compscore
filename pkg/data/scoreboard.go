@@ -2,6 +2,7 @@ package data
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/compscore/compscore/pkg/config"
@@ -179,7 +180,7 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 
 	for i := 0; i < config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
-		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		err = teamNameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 		if err != nil {
 			return nil, err
 		}
@@ -228,7 +229,7 @@ func (*scoreboard_s) checkRound(check_name string, round_number int, rounds int)
 
 	for i := 0; i < config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
-		err = teamNameTemplate.Execute(output, struct{ Team int }{Team: i + 1})
+		err = teamNameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 		if err != nil {
 			return nil, err
 		}
