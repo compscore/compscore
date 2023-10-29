@@ -14,7 +14,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { CheckScoreboard } from "../../models/Scoreboard/Check";
-import { api_url } from "../../config";
+import { api_url, medium_refresh } from "../../config";
 
 type props = {
   check: string;
@@ -46,7 +46,7 @@ export default function CheckScoreboardComponent({ check }: props) {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 5000);
+    const pollingInterval = setInterval(fetchData, medium_refresh);
 
     return () => clearInterval(pollingInterval);
   }, []);

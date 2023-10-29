@@ -9,7 +9,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { EngineMessage, EngineStatus } from "../../models/Engine";
-import { api_url } from "../../config";
+import { api_url, long_refresh } from "../../config";
 
 export default function EngineState() {
   const [engineState, setEngineState] = useState<EngineStatus>({
@@ -40,7 +40,7 @@ export default function EngineState() {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 5000);
+    const pollingInterval = setInterval(fetchData, long_refresh);
 
     return () => clearInterval(pollingInterval);
   }, []);

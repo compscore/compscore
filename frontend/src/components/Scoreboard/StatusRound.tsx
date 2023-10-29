@@ -17,7 +17,7 @@ import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import { StatusScoreboard } from "../../models/Scoreboard/Status";
 import { Round } from "../../models/ent";
-import { api_url } from "../../config";
+import { api_url, long_refresh } from "../../config";
 
 type props = {
   check: string;
@@ -86,7 +86,7 @@ export default function StatusRoundScoreboardComponent({
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 1000);
+    const pollingInterval = setInterval(fetchData, long_refresh);
 
     return () => clearInterval(pollingInterval);
   }, []);

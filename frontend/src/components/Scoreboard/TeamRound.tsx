@@ -17,7 +17,7 @@ import ArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import DoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import { api_url } from "../../config";
+import { api_url, long_refresh } from "../../config";
 
 type props = {
   team: string;
@@ -81,7 +81,7 @@ export default function TeamRoundScoreboardComponent({ team, round }: props) {
 
     fetchData();
 
-    const pollingInterval = setInterval(fetchData, 5000);
+    const pollingInterval = setInterval(fetchData, long_refresh);
 
     return () => clearInterval(pollingInterval);
   }, []);
