@@ -23,7 +23,7 @@ func Check(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.JSON(200, cachedData)
+			ctx.String(200, cachedData)
 			return
 		}
 	}
@@ -63,7 +63,7 @@ func CheckRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.JSON(200, cachedData)
+			ctx.String(200, cachedData)
 			return
 		}
 	}

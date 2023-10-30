@@ -26,7 +26,7 @@ func GetByTeamCheck(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.JSON(200, cachedData)
+			ctx.String(200, cachedData)
 			return
 		}
 	}

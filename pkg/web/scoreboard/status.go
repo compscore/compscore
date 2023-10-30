@@ -25,7 +25,7 @@ func Status(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.JSON(http.StatusOK, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -72,7 +72,7 @@ func StatusRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.JSON(http.StatusOK, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
