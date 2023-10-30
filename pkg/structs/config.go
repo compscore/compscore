@@ -8,6 +8,11 @@ type Web_s struct {
 	Release  bool   `yaml:"release"`
 }
 
+type Redis_s struct {
+	Url      string `yaml:"url"`
+	Password string `yaml:"password"`
+}
+
 type Teams_s struct {
 	Amount     int    `yaml:"amount"`
 	NameFormat string `yaml:"nameFormat"`
