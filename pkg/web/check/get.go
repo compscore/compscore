@@ -17,7 +17,7 @@ func Get(ctx *gin.Context) {
 	if err != nil {
 		entCheck, err = data.Check.Get(check)
 	} else {
-		entCheck, err = data.Check.GetWithTeamCredenital(check, entTeam.Number)
+		entCheck, err = data.Check.GetWithTeamCredential(check, entTeam.Number)
 	}
 
 	if err != nil {
