@@ -39,12 +39,24 @@ services:
       - compscore-db:/var/lib/postgresql/data
     env_file: .env
 
+  redis:
+    image: redis:7-alpine
+    container_name: compscore-redis
+    restart: unless-stopped
+    networks:
+      - compscore-backend
+    volumes:
+      - compscore-redis:/data
+    env_file: .env
+
 volumes:
   compscore-db:
     driver: local
   compscore-caddy-data:
     driver: local
   compscore-caddy-config:
+    driver: local
+  compscore-redis:
     driver: local
 
 networks:
