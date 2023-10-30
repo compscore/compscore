@@ -39,7 +39,7 @@ func serverRun(cmd *cobra.Command, args []string) {
 	for {
 		<-sigChannel
 		if force {
-			server.ForceClose()
+			os.Exit(1)
 		} else {
 			force = true
 			server.Close()
