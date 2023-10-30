@@ -1,14 +1,16 @@
 package structs
 
+import "github.com/compscore/compscore/pkg/ent"
+
 type Check struct {
 	Name   string `json:"name"`
 	Status []int  `json:"status"`
 }
 
 type Scoreboard struct {
-	Round  int     `json:"round"`
-	Scores []int   `json:"scores"`
-	Checks []Check `json:"checks"`
+	Round  int          `json:"round"`
+	Scores []int        `json:"scores"`
+	Checks []*ent.Check `json:"checks"`
 }
 
 type TeamScoreboard struct {

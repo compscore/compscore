@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"text/template"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/compscore/compscore/pkg/config"
+	"github.com/compscore/compscore/pkg/ent"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/compscore/compscore/pkg/ent/team"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/sirupsen/logrus"
 )
@@ -17,34 +22,43 @@ var Scoreboard scoreboard_s
 
 func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 	scoreboard := structs.Scoreboard{}
-	scoreboard.Scores = make([]int, config.Teams.Amount)
-
 	scoreboard.Round = round_number
-	for _, configCheck := range config.Checks {
-		scoreboardCheck := structs.Check{}
-		scoreboardCheck.Name = configCheck.Name
 
-		entStatus, err := Status.getAllByRoundAndCheckWithEdges(round_number, configCheck.Name)
-		if err != nil {
-			return nil, err
-		}
-
-		statuses := make([]int, config.Teams.Amount)
-		for i := 0; i < config.Teams.Amount; i++ {
-			statuses[i] = 2
-		}
-		for i, entStat := range entStatus {
-			switch entStat.Status {
-			case status.StatusDown:
-				statuses[i] = 0
-			case status.StatusUp:
-				statuses[i] = 1
-			}
-		}
-		scoreboardCheck.Status = statuses
-		scoreboard.Checks = append(scoreboard.Checks, scoreboardCheck)
+	entChecks, err := client.Check.Query().
+		WithStatus(
+			func(entStatusQuery *ent.StatusQuery) {
+				entStatusQuery.Where(
+					status.HasRoundWith(
+						round.NumberEQ(round_number),
+					),
+				).
+					WithTeam().
+					Order(
+						status.ByTeamField(
+							team.FieldID,
+							sql.OrderAsc(),
+						),
+					)
+			},
+		).
+		Where(
+			check.HasStatusWith(
+				status.HasRoundWith(
+					round.NumberEQ(round_number),
+				),
+			),
+		).
+		Order(
+			ent.Asc(check.FieldName),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
 	}
 
+	scoreboard.Checks = entChecks
+
+	scoreboard.Scores = make([]int, config.Teams.Amount)
 	for i := 0; i < config.Teams.Amount; i++ {
 		score, err := Team.getScoreBeforeRound(i+1, round_number)
 		if err != nil {
