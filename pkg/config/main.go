@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
@@ -25,6 +26,7 @@ var (
 	Scoring    structs.Scoring_s
 	Checks     []structs.Check_s
 	AdminUsers []structs.AdminUser_s
+	Redis      structs.Redis_s
 )
 
 func Init() {
@@ -63,6 +65,8 @@ func UpdateConfiguration() {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to parse deploy config")
 	}
+
+	Redis = redis()
 
 	err = viper.UnmarshalKey("engine", &Engine)
 	if err != nil {
@@ -107,6 +111,19 @@ func deploy() (bool, error) {
 	}
 
 	return false, fmt.Errorf("invalid deploy argument: \"%s\"docker", arg)
+}
+
+func redis() structs.Redis_s {
+	url := os.Getenv("REDIS_URL")
+	password := os.Getenv("REDIS_PASSWORD")
+
+	return structs.Redis_s{
+		Url:           url,
+		Password:      password,
+		FastRefresh:   5 * time.Second,
+		MediumRefresh: 30 * time.Second,
+		SlowRefresh:   time.Minute,
+	}
 }
 
 func web() (structs.Web_s, error) {

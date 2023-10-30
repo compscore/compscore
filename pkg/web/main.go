@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/compscore/compscore/pkg/auth"
+	"github.com/compscore/compscore/pkg/cache"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/client"
 	"github.com/compscore/compscore/pkg/web/admin"
@@ -27,6 +28,8 @@ var (
 func Start() {
 	if config.Web.Release {
 		gin.SetMode(gin.ReleaseMode)
+
+		cache.Init()
 	}
 
 	Router = gin.Default()
