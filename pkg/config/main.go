@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/fsnotify/fsnotify"
@@ -117,8 +118,11 @@ func redis() structs.Redis_s {
 	password := os.Getenv("REDIS_PASSWORD")
 
 	return structs.Redis_s{
-		Url:      url,
-		Password: password,
+		Url:           url,
+		Password:      password,
+		FastRefresh:   5 * time.Second,
+		MediumRefresh: 30 * time.Second,
+		SlowRefresh:   time.Minute,
 	}
 }
 

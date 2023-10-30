@@ -1,5 +1,7 @@
 package structs
 
+import "time"
+
 type Web_s struct {
 	Hostname string `yaml:"hostname"`
 	Port     int    `yaml:"port"`
@@ -9,8 +11,11 @@ type Web_s struct {
 }
 
 type Redis_s struct {
-	Url      string `yaml:"url"`
-	Password string `yaml:"password"`
+	Url           string        `yaml:"url"`
+	Password      string        `yaml:"password"`
+	FastRefresh   time.Duration `yaml:"fastRefresh"`
+	MediumRefresh time.Duration `yaml:"mediumRefresh"`
+	SlowRefresh   time.Duration `yaml:"slowRefresh"`
 }
 
 type Teams_s struct {
