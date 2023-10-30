@@ -1,6 +1,8 @@
 package status
 
 import (
+	"encoding/json"
+
 	"github.com/compscore/compscore/pkg/cache"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
@@ -30,6 +32,24 @@ func Statuses(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 		return
+	}
+
+	if config.Production {
+		redisObject, err := json.Marshal(entStatuses)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		err = cache.Client.Set(ctx, "statuses", string(redisObject), config.Redis.SlowRefresh).Err()
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 	}
 
 	ctx.JSON(200, entStatuses)

@@ -1,6 +1,8 @@
 package check
 
 import (
+	"encoding/json"
+
 	"github.com/compscore/compscore/pkg/cache"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
@@ -33,7 +35,15 @@ func Checks(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, "checks", entChecks, config.Redis.SlowRefresh).Err()
+		redisObject, err := json.Marshal(entChecks)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		err = cache.Client.Set(ctx, "checks", string(redisObject), config.Redis.SlowRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{
 				"error": err.Error(),

@@ -1,6 +1,7 @@
 package scoreboard
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -40,7 +41,13 @@ func Round(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/round/%s", roundStr), scoreboard, config.Redis.SlowRefresh).Err()
+		redisObject, err := json.Marshal(scoreboard)
+		if err != nil {
+			ctx.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/round/%s", roundStr), string(redisObject), config.Redis.SlowRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{"error": err.Error()})
 			return

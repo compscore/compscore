@@ -1,6 +1,8 @@
 package scoreboard
 
 import (
+	"encoding/json"
+
 	"github.com/compscore/compscore/pkg/cache"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
@@ -29,7 +31,13 @@ func Scoreboard(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, "scoreboard", scoreboard, config.Redis.MediumRefresh).Err()
+		redisObject, err := json.Marshal(scoreboard)
+		if err != nil {
+			ctx.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = cache.Client.Set(ctx, "scoreboard", string(redisObject), config.Redis.MediumRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{"error": err.Error()})
 			return

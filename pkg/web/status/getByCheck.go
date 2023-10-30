@@ -1,6 +1,7 @@
 package status
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/compscore/compscore/pkg/cache"
@@ -37,7 +38,15 @@ func GetByCheck(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, fmt.Sprintf("status/check/%s", check), entStatus, config.Redis.FastRefresh).Err()
+		redisObject, err := json.Marshal(entStatus)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		err = cache.Client.Set(ctx, fmt.Sprintf("status/check/%s", check), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{
 				"error": err.Error(),

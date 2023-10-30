@@ -1,6 +1,7 @@
 package status
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -47,7 +48,15 @@ func GetByCheckRound(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, fmt.Sprintf("status/check/%s/round/%s", check, roundStr), entStatus, config.Redis.FastRefresh).Err()
+		redisObject, err := json.Marshal(entStatus)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		err = cache.Client.Set(ctx, fmt.Sprintf("status/check/%s/round/%s", check, roundStr), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{
 				"error": err.Error(),

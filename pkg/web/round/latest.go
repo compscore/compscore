@@ -1,6 +1,8 @@
 package round
 
 import (
+	"encoding/json"
+
 	"github.com/compscore/compscore/pkg/cache"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
@@ -33,7 +35,15 @@ func Latest(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, "round/latest", round, config.Redis.FastRefresh).Err()
+		redisObject, err := json.Marshal(round)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		err = cache.Client.Set(ctx, "round/latest", string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{
 				"error": err.Error(),

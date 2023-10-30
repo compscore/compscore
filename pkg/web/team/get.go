@@ -1,6 +1,7 @@
 package team
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -46,7 +47,15 @@ func Get(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, fmt.Sprintf("team/%s", teamStr), entTeam, config.Redis.SlowRefresh).Err()
+		redisObject, err := json.Marshal(entTeam)
+		if err != nil {
+			ctx.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		err = cache.Client.Set(ctx, fmt.Sprintf("team/%s", teamStr), string(redisObject), config.Redis.SlowRefresh).Err()
 		if err != nil {
 			ctx.JSON(500, gin.H{
 				"error": err.Error(),

@@ -1,6 +1,7 @@
 package scoreboard
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -42,7 +43,13 @@ func Status(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/status/%s/%s", check, teamStr), statusHistory, config.Redis.FastRefresh).Err()
+		redisObject, err := json.Marshal(statusHistory)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/status/%s/%s", check, teamStr), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -89,7 +96,13 @@ func StatusRound(ctx *gin.Context) {
 	}
 
 	if config.Production {
-		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/status/%s/%s/%s", check, teamStr, roundStr), statusHistory, config.Redis.FastRefresh).Err()
+		redisObject, err := json.Marshal(statusHistory)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/status/%s/%s/%s", check, teamStr, roundStr), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
