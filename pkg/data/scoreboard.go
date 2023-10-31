@@ -56,7 +56,23 @@ func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 		return nil, err
 	}
 
-	scoreboard.Checks = entChecks
+	scoreboard.Checks = make([]structs.Check, len(entChecks))
+	for i, entCheck := range entChecks {
+		scoreboard.Checks[i].Name = entCheck.Name
+		scoreboard.Checks[i].Status = make([]int, len(entCheck.Edges.Status))
+		for j := range scoreboard.Checks[i].Status {
+			scoreboard.Checks[i].Status[j] = 2
+		}
+
+		for _, entStat := range entCheck.Edges.Status {
+			switch entStat.Status {
+			case status.StatusDown:
+				scoreboard.Checks[i].Status[entStat.Edges.Team.Number-1] = 0
+			case status.StatusUp:
+				scoreboard.Checks[i].Status[entStat.Edges.Team.Number-1] = 1
+			}
+		}
+	}
 
 	scoreboard.Scores = make([]int, config.Teams.Amount)
 	for i := 0; i < config.Teams.Amount; i++ {

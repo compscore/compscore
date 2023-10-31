@@ -154,11 +154,11 @@ func Init() {
 	}
 }
 
-func Client(function func(*ent.Client) (interface{}, error)) (interface{}, error) {
+func Client(function func(*ent.Client, context.Context) (interface{}, error)) (interface{}, error) {
 	if !config.Production {
 		mutex.Lock()
 		defer mutex.Unlock()
 	}
 
-	return function(client)
+	return function(client, ctx)
 }

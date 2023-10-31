@@ -155,7 +155,7 @@ func runRound(roundMutex *sync.Mutex) error {
 	checks := config.Teams.Amount * len(config.Checks)
 
 	_, err = data.Client(
-		func(client *ent.Client) (interface{}, error) {
+		func(client *ent.Client, ctx context.Context) (interface{}, error) {
 			bulkStatusCreate := make([]*ent.StatusCreate, checks)
 
 			entTeams, err := client.Team.Query().
@@ -185,13 +185,17 @@ func runRound(roundMutex *sync.Mutex) error {
 						SetRound(entRound).
 						SetTeam(entTeam).
 						SetCheck(entCheck).
+						SetPoints(0).
 						SetStatus(status.StatusUnknown)
 				}
 			}
 
-			return client.Status.CreateBulk(bulkStatusCreate...).Save(context.Background())
+			return client.Status.CreateBulk(bulkStatusCreate...).Save(ctx)
 		},
 	)
+	if err != nil {
+		return err
+	}
 
 	wgRound := &sync.WaitGroup{}
 	wgRound.Add(checks)
@@ -479,7 +483,6 @@ func runScoreCheck(round int, check structs.Check_s, team int, target string, pa
 			Team:    team,
 			Check:   check,
 		}
-
 	}()
 
 	select {
