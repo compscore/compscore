@@ -515,30 +515,21 @@ func (*team_s) GetScore(teamNumber int) (score int, err error) {
 }
 
 func (*team_s) getScoreBeforeRound(team_number int, round_number int) (score int, err error) {
-	for _, configCheck := range config.Checks {
-		count, err := client.Status.
-			Query().
-			Where(
-				status.HasCheckWith(
-					check.NameEQ(configCheck.Name),
-				),
-				status.HasTeamWith(
-					team.NumberEQ(team_number),
-				),
-				status.StatusEQ(status.StatusUp),
-				status.HasRoundWith(
-					round.NumberLT(round_number),
-				),
-			).
-			Count(ctx)
-		if err != nil {
-			return 0, err
-		}
+	return client.Status.
+		Query().
+		Where(
+			status.HasTeamWith(
+				team.NumberEQ(team_number),
+			),
+			status.StatusEQ(status.StatusUp),
+			status.HasRoundWith(
+				round.NumberLT(round_number),
+			),
+		).
+		Aggregate(
+			ent.Sum(status.FieldPoints),
+		).Int(ctx)
 
-		score += count * configCheck.Weight
-	}
-
-	return score, nil
 }
 
 func (*team_s) GetScoreBeforeRound(team_number int, round_number int) (score int, err error) {
