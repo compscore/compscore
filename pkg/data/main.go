@@ -11,8 +11,11 @@ import (
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/status"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -93,16 +96,42 @@ func Init() {
 	}
 
 	// Create checks if they do not exist
-	for _, check := range config.Checks {
-		exists, err := Check.Exists(check.Name)
+	for _, configCheck := range config.Checks {
+		exists, err := Check.Exists(configCheck.Name)
 		if err != nil {
-			log.Fatalf("failed checking for check %s: %v", check.Name, err)
+			logrus.WithError(err).Fatalf("failed checking for check: %s", configCheck.Name)
 		}
 
 		if !exists {
-			_, err := Check.Create(check.Name)
+			_, err := Check.Create(configCheck.Name, configCheck.Weight)
 			if err != nil {
-				log.Fatalf("failed creating check %s: %v", check.Name, err)
+				logrus.WithError(err).Fatalf("failed creating check: %s", configCheck.Name)
+			}
+		} else {
+			_, err := client.Status.Update().
+				Where(
+					status.HasCheckWith(
+						check.NameEQ(configCheck.Name),
+					),
+					status.StatusEQ(status.StatusUp),
+				).
+				SetPoints(configCheck.Weight).
+				Save(ctx)
+			if err != nil {
+				logrus.WithError(err).Fatalf("failed updating point values of up statuses of check: %v", configCheck.Name)
+			}
+
+			_, err = client.Status.Update().
+				Where(
+					status.HasCheckWith(
+						check.NameEQ(configCheck.Name),
+					),
+					status.StatusNEQ(status.StatusUp),
+				).
+				SetPoints(0).
+				Save(ctx)
+			if err != nil {
+				logrus.WithError(err).Fatalf("failed updating point values of down statuses of check: %v", configCheck.Name)
 			}
 		}
 	}
