@@ -152,13 +152,16 @@ func runRound(roundMutex *sync.Mutex) error {
 		}
 	}()
 
-	checks := 0
+	checks := config.Teams.Amount * len(config.Checks)
 
 	_, err = data.Client(
 		func(client *ent.Client) (interface{}, error) {
-			bulkStatusCreate := make([]*ent.StatusCreate, config.Teams.Amount*len(config.Checks))
+			bulkStatusCreate := make([]*ent.StatusCreate, checks)
 
 			entTeams, err := client.Team.Query().
+				Where(
+					team.NumberGTE(1),
+				).
 				Order(
 					ent.Asc(team.FieldNumber),
 				).
