@@ -12,7 +12,10 @@ import (
 	"github.com/compscore/compscore/pkg/checks/imports"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
+	"github.com/compscore/compscore/pkg/ent"
+	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/compscore/compscore/pkg/ent/team"
 	"github.com/compscore/compscore/pkg/grpc/proto"
 	"github.com/compscore/compscore/pkg/structs"
 	"github.com/sirupsen/logrus"
@@ -151,21 +154,41 @@ func runRound(roundMutex *sync.Mutex) error {
 
 	checks := 0
 
-	for i := 1; i <= config.Teams.Amount; i++ {
-		for _, check := range config.Checks {
-			_, err := data.Status.Create(
-				entRound.Number,
-				check.Name,
-				i,
-				status.StatusUnknown,
-			)
+	_, err = data.Client(
+		func(client *ent.Client) (interface{}, error) {
+			bulkStatusCreate := make([]*ent.StatusCreate, config.Teams.Amount*len(config.Checks))
+
+			entTeams, err := client.Team.Query().
+				Order(
+					ent.Asc(team.FieldNumber),
+				).
+				All(context.Background())
 			if err != nil {
-				return err
+				return nil, err
 			}
 
-			checks++
-		}
-	}
+			entChecks, err := client.Check.Query().
+				Order(
+					ent.Asc(check.FieldName),
+				).
+				All(context.Background())
+			if err != nil {
+				return nil, err
+			}
+
+			for i, entCheck := range entChecks {
+				for j, entTeam := range entTeams {
+					bulkStatusCreate[i*len(entTeams)+j] = client.Status.Create().
+						SetRound(entRound).
+						SetTeam(entTeam).
+						SetCheck(entCheck).
+						SetStatus(status.StatusUnknown)
+				}
+			}
+
+			return client.Status.CreateBulk(bulkStatusCreate...).Save(context.Background())
+		},
+	)
 
 	wgRound := &sync.WaitGroup{}
 	wgRound.Add(checks)
