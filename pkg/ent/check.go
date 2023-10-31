@@ -18,6 +18,8 @@ type Check struct {
 	ID int `json:"-"`
 	// Check name
 	Name string `json:"name"`
+	// Weight holds the value of the "weight" field.
+	Weight int `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CheckQuery when eager-loading is set.
 	Edges        CheckEdges `json:"edges"`
@@ -58,7 +60,7 @@ func (*Check) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case check.FieldID:
+		case check.FieldID, check.FieldWeight:
 			values[i] = new(sql.NullInt64)
 		case check.FieldName:
 			values[i] = new(sql.NullString)
@@ -88,6 +90,12 @@ func (c *Check) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				c.Name = value.String
+			}
+		case check.FieldWeight:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field weight", values[i])
+			} else if value.Valid {
+				c.Weight = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -137,6 +145,9 @@ func (c *Check) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
+	builder.WriteString(", ")
+	builder.WriteString("weight=")
+	builder.WriteString(fmt.Sprintf("%v", c.Weight))
 	builder.WriteByte(')')
 	return builder.String()
 }

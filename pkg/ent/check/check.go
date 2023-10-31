@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldWeight holds the string denoting the weight field in the database.
+	FieldWeight = "weight"
 	// EdgeStatus holds the string denoting the status edge name in mutations.
 	EdgeStatus = "status"
 	// EdgeCredential holds the string denoting the credential edge name in mutations.
@@ -40,6 +42,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldWeight,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -55,6 +58,8 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// WeightValidator is a validator for the "weight" field. It is called by the builders before save.
+	WeightValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Check queries.
@@ -68,6 +73,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByWeight orders the results by the weight field.
+func ByWeight(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeight, opts...).ToFunc()
 }
 
 // ByStatusCount orders the results by status count.

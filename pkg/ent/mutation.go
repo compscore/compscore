@@ -42,6 +42,8 @@ type CheckMutation struct {
 	typ               string
 	id                *int
 	name              *string
+	weight            *int
+	addweight         *int
 	clearedFields     map[string]struct{}
 	status            map[int]struct{}
 	removedstatus     map[int]struct{}
@@ -194,6 +196,62 @@ func (m *CheckMutation) ResetName() {
 	m.name = nil
 }
 
+// SetWeight sets the "weight" field.
+func (m *CheckMutation) SetWeight(i int) {
+	m.weight = &i
+	m.addweight = nil
+}
+
+// Weight returns the value of the "weight" field in the mutation.
+func (m *CheckMutation) Weight() (r int, exists bool) {
+	v := m.weight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWeight returns the old "weight" field's value of the Check entity.
+// If the Check object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CheckMutation) OldWeight(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWeight is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWeight requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWeight: %w", err)
+	}
+	return oldValue.Weight, nil
+}
+
+// AddWeight adds i to the "weight" field.
+func (m *CheckMutation) AddWeight(i int) {
+	if m.addweight != nil {
+		*m.addweight += i
+	} else {
+		m.addweight = &i
+	}
+}
+
+// AddedWeight returns the value that was added to the "weight" field in this mutation.
+func (m *CheckMutation) AddedWeight() (r int, exists bool) {
+	v := m.addweight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWeight resets all changes to the "weight" field.
+func (m *CheckMutation) ResetWeight() {
+	m.weight = nil
+	m.addweight = nil
+}
+
 // AddStatuIDs adds the "status" edge to the Status entity by ids.
 func (m *CheckMutation) AddStatuIDs(ids ...int) {
 	if m.status == nil {
@@ -336,9 +394,12 @@ func (m *CheckMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CheckMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.name != nil {
 		fields = append(fields, check.FieldName)
+	}
+	if m.weight != nil {
+		fields = append(fields, check.FieldWeight)
 	}
 	return fields
 }
@@ -350,6 +411,8 @@ func (m *CheckMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case check.FieldName:
 		return m.Name()
+	case check.FieldWeight:
+		return m.Weight()
 	}
 	return nil, false
 }
@@ -361,6 +424,8 @@ func (m *CheckMutation) OldField(ctx context.Context, name string) (ent.Value, e
 	switch name {
 	case check.FieldName:
 		return m.OldName(ctx)
+	case check.FieldWeight:
+		return m.OldWeight(ctx)
 	}
 	return nil, fmt.Errorf("unknown Check field %s", name)
 }
@@ -377,6 +442,13 @@ func (m *CheckMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
+	case check.FieldWeight:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWeight(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Check field %s", name)
 }
@@ -384,13 +456,21 @@ func (m *CheckMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *CheckMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addweight != nil {
+		fields = append(fields, check.FieldWeight)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *CheckMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case check.FieldWeight:
+		return m.AddedWeight()
+	}
 	return nil, false
 }
 
@@ -399,6 +479,13 @@ func (m *CheckMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CheckMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case check.FieldWeight:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWeight(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Check numeric field %s", name)
 }
@@ -428,6 +515,9 @@ func (m *CheckMutation) ResetField(name string) error {
 	switch name {
 	case check.FieldName:
 		m.ResetName()
+		return nil
+	case check.FieldWeight:
+		m.ResetWeight()
 		return nil
 	}
 	return fmt.Errorf("unknown Check field %s", name)
@@ -1525,6 +1615,8 @@ type StatusMutation struct {
 	error         *string
 	status        *status.Status
 	time          *time.Time
+	points        *int
+	addpoints     *int
 	clearedFields map[string]struct{}
 	check         *int
 	clearedcheck  bool
@@ -1762,6 +1854,62 @@ func (m *StatusMutation) ResetTime() {
 	m.time = nil
 }
 
+// SetPoints sets the "points" field.
+func (m *StatusMutation) SetPoints(i int) {
+	m.points = &i
+	m.addpoints = nil
+}
+
+// Points returns the value of the "points" field in the mutation.
+func (m *StatusMutation) Points() (r int, exists bool) {
+	v := m.points
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPoints returns the old "points" field's value of the Status entity.
+// If the Status object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *StatusMutation) OldPoints(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPoints is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPoints requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPoints: %w", err)
+	}
+	return oldValue.Points, nil
+}
+
+// AddPoints adds i to the "points" field.
+func (m *StatusMutation) AddPoints(i int) {
+	if m.addpoints != nil {
+		*m.addpoints += i
+	} else {
+		m.addpoints = &i
+	}
+}
+
+// AddedPoints returns the value that was added to the "points" field in this mutation.
+func (m *StatusMutation) AddedPoints() (r int, exists bool) {
+	v := m.addpoints
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPoints resets all changes to the "points" field.
+func (m *StatusMutation) ResetPoints() {
+	m.points = nil
+	m.addpoints = nil
+}
+
 // SetCheckID sets the "check" edge to the Check entity by id.
 func (m *StatusMutation) SetCheckID(id int) {
 	m.check = &id
@@ -1913,7 +2061,7 @@ func (m *StatusMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *StatusMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.error != nil {
 		fields = append(fields, status.FieldError)
 	}
@@ -1922,6 +2070,9 @@ func (m *StatusMutation) Fields() []string {
 	}
 	if m.time != nil {
 		fields = append(fields, status.FieldTime)
+	}
+	if m.points != nil {
+		fields = append(fields, status.FieldPoints)
 	}
 	return fields
 }
@@ -1937,6 +2088,8 @@ func (m *StatusMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case status.FieldTime:
 		return m.Time()
+	case status.FieldPoints:
+		return m.Points()
 	}
 	return nil, false
 }
@@ -1952,6 +2105,8 @@ func (m *StatusMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldStatus(ctx)
 	case status.FieldTime:
 		return m.OldTime(ctx)
+	case status.FieldPoints:
+		return m.OldPoints(ctx)
 	}
 	return nil, fmt.Errorf("unknown Status field %s", name)
 }
@@ -1982,6 +2137,13 @@ func (m *StatusMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTime(v)
 		return nil
+	case status.FieldPoints:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPoints(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Status field %s", name)
 }
@@ -1989,13 +2151,21 @@ func (m *StatusMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *StatusMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpoints != nil {
+		fields = append(fields, status.FieldPoints)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *StatusMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case status.FieldPoints:
+		return m.AddedPoints()
+	}
 	return nil, false
 }
 
@@ -2004,6 +2174,13 @@ func (m *StatusMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *StatusMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case status.FieldPoints:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPoints(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Status numeric field %s", name)
 }
@@ -2048,6 +2225,9 @@ func (m *StatusMutation) ResetField(name string) error {
 		return nil
 	case status.FieldTime:
 		m.ResetTime()
+		return nil
+	case status.FieldPoints:
+		m.ResetPoints()
 		return nil
 	}
 	return fmt.Errorf("unknown Status field %s", name)

@@ -12,6 +12,7 @@ var (
 	ChecksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "weight", Type: field.TypeInt},
 	}
 	// ChecksTable holds the schema information for the "checks" table.
 	ChecksTable = &schema.Table{
@@ -64,6 +65,7 @@ var (
 		{Name: "error", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"up", "down", "unknown"}, Default: "unknown"},
 		{Name: "time", Type: field.TypeTime},
+		{Name: "points", Type: field.TypeInt},
 		{Name: "status_check", Type: field.TypeInt},
 		{Name: "status_team", Type: field.TypeInt},
 		{Name: "status_round", Type: field.TypeInt},
@@ -76,19 +78,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "status_checks_check",
-				Columns:    []*schema.Column{StatusColumns[4]},
+				Columns:    []*schema.Column{StatusColumns[5]},
 				RefColumns: []*schema.Column{ChecksColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "status_teams_team",
-				Columns:    []*schema.Column{StatusColumns[5]},
+				Columns:    []*schema.Column{StatusColumns[6]},
 				RefColumns: []*schema.Column{TeamsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "status_rounds_round",
-				Columns:    []*schema.Column{StatusColumns[6]},
+				Columns:    []*schema.Column{StatusColumns[7]},
 				RefColumns: []*schema.Column{RoundsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

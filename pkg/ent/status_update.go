@@ -79,6 +79,19 @@ func (su *StatusUpdate) SetNillableTime(t *time.Time) *StatusUpdate {
 	return su
 }
 
+// SetPoints sets the "points" field.
+func (su *StatusUpdate) SetPoints(i int) *StatusUpdate {
+	su.mutation.ResetPoints()
+	su.mutation.SetPoints(i)
+	return su
+}
+
+// AddPoints adds i to the "points" field.
+func (su *StatusUpdate) AddPoints(i int) *StatusUpdate {
+	su.mutation.AddPoints(i)
+	return su
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
 func (su *StatusUpdate) SetCheckID(id int) *StatusUpdate {
 	su.mutation.SetCheckID(id)
@@ -169,6 +182,11 @@ func (su *StatusUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Status.status": %w`, err)}
 		}
 	}
+	if v, ok := su.mutation.Points(); ok {
+		if err := status.PointsValidator(v); err != nil {
+			return &ValidationError{Name: "points", err: fmt.Errorf(`ent: validator failed for field "Status.points": %w`, err)}
+		}
+	}
 	if _, ok := su.mutation.CheckID(); su.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Status.check"`)
 	}
@@ -204,6 +222,12 @@ func (su *StatusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Time(); ok {
 		_spec.SetField(status.FieldTime, field.TypeTime, value)
+	}
+	if value, ok := su.mutation.Points(); ok {
+		_spec.SetField(status.FieldPoints, field.TypeInt, value)
+	}
+	if value, ok := su.mutation.AddedPoints(); ok {
+		_spec.AddField(status.FieldPoints, field.TypeInt, value)
 	}
 	if su.mutation.CheckCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -360,6 +384,19 @@ func (suo *StatusUpdateOne) SetNillableTime(t *time.Time) *StatusUpdateOne {
 	return suo
 }
 
+// SetPoints sets the "points" field.
+func (suo *StatusUpdateOne) SetPoints(i int) *StatusUpdateOne {
+	suo.mutation.ResetPoints()
+	suo.mutation.SetPoints(i)
+	return suo
+}
+
+// AddPoints adds i to the "points" field.
+func (suo *StatusUpdateOne) AddPoints(i int) *StatusUpdateOne {
+	suo.mutation.AddPoints(i)
+	return suo
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
 func (suo *StatusUpdateOne) SetCheckID(id int) *StatusUpdateOne {
 	suo.mutation.SetCheckID(id)
@@ -463,6 +500,11 @@ func (suo *StatusUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Status.status": %w`, err)}
 		}
 	}
+	if v, ok := suo.mutation.Points(); ok {
+		if err := status.PointsValidator(v); err != nil {
+			return &ValidationError{Name: "points", err: fmt.Errorf(`ent: validator failed for field "Status.points": %w`, err)}
+		}
+	}
 	if _, ok := suo.mutation.CheckID(); suo.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Status.check"`)
 	}
@@ -515,6 +557,12 @@ func (suo *StatusUpdateOne) sqlSave(ctx context.Context) (_node *Status, err err
 	}
 	if value, ok := suo.mutation.Time(); ok {
 		_spec.SetField(status.FieldTime, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.Points(); ok {
+		_spec.SetField(status.FieldPoints, field.TypeInt, value)
+	}
+	if value, ok := suo.mutation.AddedPoints(); ok {
+		_spec.AddField(status.FieldPoints, field.TypeInt, value)
 	}
 	if suo.mutation.CheckCleared() {
 		edge := &sqlgraph.EdgeSpec{
