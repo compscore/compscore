@@ -35,7 +35,7 @@ func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 					WithTeam().
 					Order(
 						status.ByTeamField(
-							team.FieldID,
+							team.FieldNumber,
 							sql.OrderAsc(),
 						),
 					)
