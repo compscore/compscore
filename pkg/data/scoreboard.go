@@ -74,13 +74,38 @@ func (*scoreboard_s) round(round_number int) (*structs.Scoreboard, error) {
 		}
 	}
 
+	var Teams []struct {
+		Team interface{} `json:"status_team"`
+		Sum  int         `json:"sum"`
+	}
+
+	err = client.Status.
+		Query().
+		Where(
+			status.StatusEQ(status.StatusUp),
+			status.HasRoundWith(
+				round.NumberLT(round_number),
+			),
+			status.HasTeamWith(
+				team.NumberGT(0),
+			),
+		).
+		Order(
+			ent.Asc(status.TeamColumn),
+		).
+		GroupBy(
+			status.TeamColumn,
+		).
+		Aggregate(
+			ent.Sum(status.FieldPoints),
+		).Scan(ctx, &Teams)
+	if err != nil {
+		return nil, err
+	}
+
 	scoreboard.Scores = make([]int, config.Teams.Amount)
-	for i := 0; i < config.Teams.Amount; i++ {
-		score, err := Team.getScoreBeforeRound(i+1, round_number)
-		if err != nil {
-			return nil, err
-		}
-		scoreboard.Scores[i] = score
+	for i, team := range Teams {
+		scoreboard.Scores[i] = team.Sum
 	}
 
 	return &scoreboard, nil
