@@ -43,7 +43,7 @@ func (*status_s) Exists(roundNumber int, checkNumber string, teamNumber int) (bo
 	return Status.exists(roundNumber, checkNumber, teamNumber)
 }
 
-func (*status_s) create(roundNumber int, checkNumber string, teamNumber int, status status.Status) (*ent.Status, error) {
+func (*status_s) create(roundNumber int, checkNumber string, teamNumber int, entStatus status.Status) (*ent.Status, error) {
 	entRound, err := Round.get(roundNumber)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,15 @@ func (*status_s) create(roundNumber int, checkNumber string, teamNumber int, sta
 			entTeam,
 		).
 		SetStatus(
-			status,
+			entStatus,
+		).
+		SetPoints(
+			func() int {
+				if entStatus == status.StatusUp {
+					return entCheck.Weight
+				}
+				return 0
+			}(),
 		).
 		Save(ctx)
 }
@@ -86,7 +94,7 @@ func (*status_s) Create(roundNumber int, checkNumber string, teamNumber int, sta
 	return Status.create(roundNumber, checkNumber, teamNumber, status)
 }
 
-func (*status_s) createComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *ent.Team) (*ent.Status, error) {
+func (*status_s) createComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *ent.Team, entStatus status.Status) (*ent.Status, error) {
 	return client.Status.
 		Create().
 		SetRound(
@@ -98,17 +106,28 @@ func (*status_s) createComplex(entRound *ent.Round, entCheck *ent.Check, entTeam
 		SetTeam(
 			entTeam,
 		).
+		SetStatus(
+			entStatus,
+		).
+		SetPoints(
+			func() int {
+				if entStatus == status.StatusUp {
+					return entCheck.Weight
+				}
+				return 0
+			}(),
+		).
 		Save(ctx)
 }
 
-func (*status_s) CreateComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *ent.Team) (*ent.Status, error) {
+func (*status_s) CreateComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *ent.Team, entStatus status.Status) (*ent.Status, error) {
 	if !config.Production {
 		mutex.Lock()
 		logrus.Trace("status_s.CreateComplex: lock")
 		defer mutex.Unlock()
 	}
 
-	return Status.createComplex(entRound, entCheck, entTeam)
+	return Status.createComplex(entRound, entCheck, entTeam, entStatus)
 }
 
 func (*status_s) get(roundNumber int, checkNumber string, teamNumber int) (*ent.Status, error) {
@@ -192,7 +211,7 @@ func (*status_s) getComplex(entRound *ent.Round, entCheck *ent.Check, entTeam *e
 	}
 
 	if !exists {
-		return Status.createComplex(entRound, entCheck, entTeam)
+		return Status.createComplex(entRound, entCheck, entTeam, status.StatusUnknown)
 	}
 
 	return client.Status.
@@ -228,7 +247,7 @@ func (*status_s) getComplexWithEdges(entRound *ent.Round, entCheck *ent.Check, e
 	}
 
 	if !exists {
-		return Status.createComplex(entRound, entCheck, entTeam)
+		return Status.createComplex(entRound, entCheck, entTeam, status.StatusUnknown)
 	}
 
 	return client.Status.
@@ -846,6 +865,21 @@ func (*status_s) update(teamNumber int, roundNumber int, checkName string, statu
 			),
 		).
 		SetStatus(statusEnum).
+		SetPoints(
+			func() int {
+				if statusEnum != status.StatusUp {
+					return 0
+				}
+
+				for _, configCheck := range config.Checks {
+					if checkName == configCheck.Name {
+						return configCheck.Weight
+					}
+				}
+
+				return 0
+			}(),
+		).
 		SetError(message).
 		SetTime(time.Now()).
 		Save(ctx)
@@ -862,9 +896,15 @@ func (*status_s) Update(teamNumber int, roundNumber int, checkName string, statu
 }
 
 func (*status_s) updateComplex(entStatus *ent.Status, statusEnum status.Status, message string) (*ent.Status, error) {
+	entCheck, err := entStatus.QueryCheck().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return entStatus.Update().
 		SetStatus(statusEnum).
 		SetError(message).
+		SetPoints(entCheck.Weight).
 		SetTime(time.Now()).
 		Save(ctx)
 }

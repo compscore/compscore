@@ -22,6 +22,10 @@ func init() {
 	checkDescName := checkFields[0].Descriptor()
 	// check.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	check.NameValidator = checkDescName.Validators[0].(func(string) error)
+	// checkDescWeight is the schema descriptor for weight field.
+	checkDescWeight := checkFields[2].Descriptor()
+	// check.WeightValidator is a validator for the "weight" field. It is called by the builders before save.
+	check.WeightValidator = checkDescWeight.Validators[0].(func(int) error)
 	roundFields := schema.Round{}.Fields()
 	_ = roundFields
 	// roundDescNumber is the schema descriptor for number field.
@@ -38,6 +42,10 @@ func init() {
 	statusDescTime := statusFields[2].Descriptor()
 	// status.DefaultTime holds the default value on creation for the time field.
 	status.DefaultTime = statusDescTime.Default.(func() time.Time)
+	// statusDescPoints is the schema descriptor for points field.
+	statusDescPoints := statusFields[4].Descriptor()
+	// status.PointsValidator is a validator for the "points" field. It is called by the builders before save.
+	status.PointsValidator = statusDescPoints.Validators[0].(func(int) error)
 	teamFields := schema.Team{}.Fields()
 	_ = teamFields
 	// teamDescNumber is the schema descriptor for number field.

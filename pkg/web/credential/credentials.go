@@ -1,6 +1,7 @@
 package credential
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/compscore/compscore/pkg/auth"
@@ -21,7 +22,7 @@ func Credentials(ctx *gin.Context) {
 	}
 
 	entCredentials_i, err := data.Client(
-		func(client *ent.Client) (interface{}, error) {
+		func(client *ent.Client, ctx context.Context) (interface{}, error) {
 			return client.Credential.Query().
 				WithCheck().
 				Where(

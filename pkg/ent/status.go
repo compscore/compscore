@@ -26,6 +26,8 @@ type Status struct {
 	Status status.Status `json:"status"`
 	// Time of check
 	Time time.Time `json:"time"`
+	// Points holds the value of the "points" field.
+	Points int `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StatusQuery when eager-loading is set.
 	Edges        StatusEdges `json:"edges"`
@@ -92,7 +94,7 @@ func (*Status) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case status.FieldID:
+		case status.FieldID, status.FieldPoints:
 			values[i] = new(sql.NullInt64)
 		case status.FieldError, status.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -142,6 +144,12 @@ func (s *Status) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field time", values[i])
 			} else if value.Valid {
 				s.Time = value.Time
+			}
+		case status.FieldPoints:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field points", values[i])
+			} else if value.Valid {
+				s.Points = int(value.Int64)
 			}
 		case status.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -223,6 +231,9 @@ func (s *Status) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("time=")
 	builder.WriteString(s.Time.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("points=")
+	builder.WriteString(fmt.Sprintf("%v", s.Points))
 	builder.WriteByte(')')
 	return builder.String()
 }

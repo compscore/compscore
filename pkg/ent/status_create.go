@@ -65,6 +65,12 @@ func (sc *StatusCreate) SetNillableTime(t *time.Time) *StatusCreate {
 	return sc
 }
 
+// SetPoints sets the "points" field.
+func (sc *StatusCreate) SetPoints(i int) *StatusCreate {
+	sc.mutation.SetPoints(i)
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *StatusCreate) SetID(i int) *StatusCreate {
 	sc.mutation.SetID(i)
@@ -162,6 +168,14 @@ func (sc *StatusCreate) check() error {
 	if _, ok := sc.mutation.Time(); !ok {
 		return &ValidationError{Name: "time", err: errors.New(`ent: missing required field "Status.time"`)}
 	}
+	if _, ok := sc.mutation.Points(); !ok {
+		return &ValidationError{Name: "points", err: errors.New(`ent: missing required field "Status.points"`)}
+	}
+	if v, ok := sc.mutation.Points(); ok {
+		if err := status.PointsValidator(v); err != nil {
+			return &ValidationError{Name: "points", err: fmt.Errorf(`ent: validator failed for field "Status.points": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.CheckID(); !ok {
 		return &ValidationError{Name: "check", err: errors.New(`ent: missing required edge "Status.check"`)}
 	}
@@ -214,6 +228,10 @@ func (sc *StatusCreate) createSpec() (*Status, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Time(); ok {
 		_spec.SetField(status.FieldTime, field.TypeTime, value)
 		_node.Time = value
+	}
+	if value, ok := sc.mutation.Points(); ok {
+		_spec.SetField(status.FieldPoints, field.TypeInt, value)
+		_node.Points = value
 	}
 	if nodes := sc.mutation.CheckIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

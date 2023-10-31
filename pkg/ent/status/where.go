@@ -65,6 +65,11 @@ func Time(v time.Time) predicate.Status {
 	return predicate.Status(sql.FieldEQ(FieldTime, v))
 }
 
+// Points applies equality check predicate on the "points" field. It's identical to PointsEQ.
+func Points(v int) predicate.Status {
+	return predicate.Status(sql.FieldEQ(FieldPoints, v))
+}
+
 // ErrorEQ applies the EQ predicate on the "error" field.
 func ErrorEQ(v string) predicate.Status {
 	return predicate.Status(sql.FieldEQ(FieldError, v))
@@ -198,6 +203,46 @@ func TimeLT(v time.Time) predicate.Status {
 // TimeLTE applies the LTE predicate on the "time" field.
 func TimeLTE(v time.Time) predicate.Status {
 	return predicate.Status(sql.FieldLTE(FieldTime, v))
+}
+
+// PointsEQ applies the EQ predicate on the "points" field.
+func PointsEQ(v int) predicate.Status {
+	return predicate.Status(sql.FieldEQ(FieldPoints, v))
+}
+
+// PointsNEQ applies the NEQ predicate on the "points" field.
+func PointsNEQ(v int) predicate.Status {
+	return predicate.Status(sql.FieldNEQ(FieldPoints, v))
+}
+
+// PointsIn applies the In predicate on the "points" field.
+func PointsIn(vs ...int) predicate.Status {
+	return predicate.Status(sql.FieldIn(FieldPoints, vs...))
+}
+
+// PointsNotIn applies the NotIn predicate on the "points" field.
+func PointsNotIn(vs ...int) predicate.Status {
+	return predicate.Status(sql.FieldNotIn(FieldPoints, vs...))
+}
+
+// PointsGT applies the GT predicate on the "points" field.
+func PointsGT(v int) predicate.Status {
+	return predicate.Status(sql.FieldGT(FieldPoints, v))
+}
+
+// PointsGTE applies the GTE predicate on the "points" field.
+func PointsGTE(v int) predicate.Status {
+	return predicate.Status(sql.FieldGTE(FieldPoints, v))
+}
+
+// PointsLT applies the LT predicate on the "points" field.
+func PointsLT(v int) predicate.Status {
+	return predicate.Status(sql.FieldLT(FieldPoints, v))
+}
+
+// PointsLTE applies the LTE predicate on the "points" field.
+func PointsLTE(v int) predicate.Status {
+	return predicate.Status(sql.FieldLTE(FieldPoints, v))
 }
 
 // HasCheck applies the HasEdge predicate on the "check" edge.

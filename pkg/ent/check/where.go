@@ -58,6 +58,11 @@ func Name(v string) predicate.Check {
 	return predicate.Check(sql.FieldEQ(FieldName, v))
 }
 
+// Weight applies equality check predicate on the "weight" field. It's identical to WeightEQ.
+func Weight(v int) predicate.Check {
+	return predicate.Check(sql.FieldEQ(FieldWeight, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Check {
 	return predicate.Check(sql.FieldEQ(FieldName, v))
@@ -121,6 +126,46 @@ func NameEqualFold(v string) predicate.Check {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Check {
 	return predicate.Check(sql.FieldContainsFold(FieldName, v))
+}
+
+// WeightEQ applies the EQ predicate on the "weight" field.
+func WeightEQ(v int) predicate.Check {
+	return predicate.Check(sql.FieldEQ(FieldWeight, v))
+}
+
+// WeightNEQ applies the NEQ predicate on the "weight" field.
+func WeightNEQ(v int) predicate.Check {
+	return predicate.Check(sql.FieldNEQ(FieldWeight, v))
+}
+
+// WeightIn applies the In predicate on the "weight" field.
+func WeightIn(vs ...int) predicate.Check {
+	return predicate.Check(sql.FieldIn(FieldWeight, vs...))
+}
+
+// WeightNotIn applies the NotIn predicate on the "weight" field.
+func WeightNotIn(vs ...int) predicate.Check {
+	return predicate.Check(sql.FieldNotIn(FieldWeight, vs...))
+}
+
+// WeightGT applies the GT predicate on the "weight" field.
+func WeightGT(v int) predicate.Check {
+	return predicate.Check(sql.FieldGT(FieldWeight, v))
+}
+
+// WeightGTE applies the GTE predicate on the "weight" field.
+func WeightGTE(v int) predicate.Check {
+	return predicate.Check(sql.FieldGTE(FieldWeight, v))
+}
+
+// WeightLT applies the LT predicate on the "weight" field.
+func WeightLT(v int) predicate.Check {
+	return predicate.Check(sql.FieldLT(FieldWeight, v))
+}
+
+// WeightLTE applies the LTE predicate on the "weight" field.
+func WeightLTE(v int) predicate.Check {
+	return predicate.Check(sql.FieldLTE(FieldWeight, v))
 }
 
 // HasStatus applies the HasEdge predicate on the "status" edge.

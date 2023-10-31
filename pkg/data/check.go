@@ -13,21 +13,22 @@ type check_s struct{}
 
 var Check = check_s{}
 
-func (*check_s) create(name string) (*ent.Check, error) {
+func (*check_s) create(name string, weight int) (*ent.Check, error) {
 	return client.Check.
 		Create().
 		SetName(name).
+		SetWeight(weight).
 		Save(ctx)
 }
 
-func (*check_s) Create(name string) (*ent.Check, error) {
+func (*check_s) Create(name string, weight int) (*ent.Check, error) {
 	if !config.Production {
 		mutex.Lock()
 		logrus.Trace("check_s.Create: lock")
 		defer mutex.Unlock()
 	}
 
-	return Check.create(name)
+	return Check.create(name, weight)
 }
 
 func (*check_s) exists(name string) (bool, error) {
@@ -56,7 +57,11 @@ func (*check_s) get(name string) (*ent.Check, error) {
 	}
 
 	if !exists {
-		return Check.create(name)
+		for _, check := range config.Checks {
+			if name == check.Name {
+				return Check.create(name, check.Weight)
+			}
+		}
 	}
 
 	return client.Check.

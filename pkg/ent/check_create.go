@@ -27,6 +27,12 @@ func (cc *CheckCreate) SetName(s string) *CheckCreate {
 	return cc
 }
 
+// SetWeight sets the "weight" field.
+func (cc *CheckCreate) SetWeight(i int) *CheckCreate {
+	cc.mutation.SetWeight(i)
+	return cc
+}
+
 // SetID sets the "id" field.
 func (cc *CheckCreate) SetID(i int) *CheckCreate {
 	cc.mutation.SetID(i)
@@ -105,6 +111,14 @@ func (cc *CheckCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Check.name": %w`, err)}
 		}
 	}
+	if _, ok := cc.mutation.Weight(); !ok {
+		return &ValidationError{Name: "weight", err: errors.New(`ent: missing required field "Check.weight"`)}
+	}
+	if v, ok := cc.mutation.Weight(); ok {
+		if err := check.WeightValidator(v); err != nil {
+			return &ValidationError{Name: "weight", err: fmt.Errorf(`ent: validator failed for field "Check.weight": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -140,6 +154,10 @@ func (cc *CheckCreate) createSpec() (*Check, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(check.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := cc.mutation.Weight(); ok {
+		_spec.SetField(check.FieldWeight, field.TypeInt, value)
+		_node.Weight = value
 	}
 	if nodes := cc.mutation.StatusIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

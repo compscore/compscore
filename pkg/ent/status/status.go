@@ -21,6 +21,8 @@ const (
 	FieldStatus = "status"
 	// FieldTime holds the string denoting the time field in the database.
 	FieldTime = "time"
+	// FieldPoints holds the string denoting the points field in the database.
+	FieldPoints = "points"
 	// EdgeCheck holds the string denoting the check edge name in mutations.
 	EdgeCheck = "check"
 	// EdgeTeam holds the string denoting the team edge name in mutations.
@@ -58,6 +60,7 @@ var Columns = []string{
 	FieldError,
 	FieldStatus,
 	FieldTime,
+	FieldPoints,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "status"
@@ -86,6 +89,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultTime holds the default value on creation for the "time" field.
 	DefaultTime func() time.Time
+	// PointsValidator is a validator for the "points" field. It is called by the builders before save.
+	PointsValidator func(int) error
 )
 
 // Status defines the type for the "status" enum field.
@@ -136,6 +141,11 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByTime orders the results by the time field.
 func ByTime(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTime, opts...).ToFunc()
+}
+
+// ByPoints orders the results by the points field.
+func ByPoints(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPoints, opts...).ToFunc()
 }
 
 // ByCheckField orders the results by check field.
