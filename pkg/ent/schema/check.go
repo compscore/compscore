@@ -22,6 +22,9 @@ func (Check) Fields() []ent.Field {
 			Unique(),
 		field.Int("id").
 			StructTag(`json:"-"`),
+		field.Int("weight").
+			StructTag(`json:"-"`).
+			NonNegative(),
 	}
 }
 

@@ -31,6 +31,9 @@ func (Status) Fields() []ent.Field {
 			Default(time.Now),
 		field.Int("id").
 			StructTag(`json:"-"`),
+		field.Int("points").
+			StructTag(`json:"-"`).
+			NonNegative(),
 	}
 }
 
