@@ -84,6 +84,14 @@ definitions:
       username:
         type: string
     type: object
+  models.Status:
+    description: status of the engine
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
 info:
   contact:
     name: 1nv8rzim
@@ -296,6 +304,25 @@ paths:
       summary: Get all credentials for a team
       tags:
       - credential
+  /engine/status:
+    get:
+      consumes:
+      - application/json
+      description: Status of the engine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Status of the engine
+      tags:
+      - engine
   /login:
     post:
       consumes:
