@@ -545,6 +545,41 @@ paths:
       summary: Get all rounds
       tags:
       - round
+  /scoreboard/status/{team}/{check}/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of a team for a given check
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the status of a team for a given check
+      tags:
+      - status
   /team/{team}:
     get:
       consumes:
