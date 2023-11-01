@@ -304,6 +304,31 @@ paths:
       summary: Get all credentials for a team
       tags:
       - credential
+  /engine/start:
+    post:
+      consumes:
+      - application/json
+      description: Start the engine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Start the engine
+      tags:
+      - engine
   /engine/status:
     get:
       consumes:

@@ -327,6 +327,46 @@
                 }
             }
         },
+        "/engine/start": {
+            "post": {
+                "security": [
+                    {
+                        "ServiceAuth": []
+                    }
+                ],
+                "description": "Start the engine",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "engine"
+                ],
+                "summary": "Start the engine",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Status"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/engine/status": {
             "get": {
                 "description": "Status of the engine",
