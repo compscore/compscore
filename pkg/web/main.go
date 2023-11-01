@@ -72,7 +72,6 @@ func Start() {
 func LoadRoutes() {
 	// General Endpoints
 	API.POST("/login", login)
-	API.POST("/info", info)
 	API.POST("/password", password)
 
 	// Admin Endpoints
