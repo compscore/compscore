@@ -8,35 +8,9 @@ import (
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
+	"github.com/compscore/compscore/pkg/web/models"
 	"github.com/gin-gonic/gin"
 )
-
-// login_s is the struct used to unmarshal the JSON body of the login request
-// @Summary body of login request
-// @Description body of login request
-// @Tags auth
-type login_s struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-// cookie_s is the struct used to marshal the JSON response of the login request
-// @Summary response of login request
-// @Description response of login request
-// @Tags auth
-type cookie_s struct {
-	Name       string `json:"name"`
-	Token      string `json:"token"`
-	Expiration int    `json:"expiration"`
-	Path       string `json:"path"`
-	Domain     string `json:"domain"`
-	Secure     bool   `json:"secure"`
-	HttpOnly   bool   `json:"httponly"`
-}
-
-type error_s struct {
-	Error string `json:"error"`
-}
 
 // login authenticates a user and returns a JWT
 //
@@ -50,13 +24,13 @@ type error_s struct {
 // @Failure 400 {object} error_s
 // @Router /api/login [post]
 func login(ctx *gin.Context) {
-	var body login_s
+	var body models.Login
 
 	body_bytes, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			error_s{
+			models.Error{
 				Error: err.Error(),
 			},
 		)
@@ -67,7 +41,7 @@ func login(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			error_s{
+			models.Error{
 				Error: err.Error(),
 			},
 		)
@@ -77,7 +51,7 @@ func login(ctx *gin.Context) {
 	if body.Username == "" {
 		ctx.JSON(
 			http.StatusBadRequest,
-			error_s{
+			models.Error{
 				Error: "no username provided",
 			},
 		)
@@ -85,7 +59,7 @@ func login(ctx *gin.Context) {
 	}
 
 	if body.Password == "" {
-		ctx.JSON(http.StatusBadRequest, error_s{
+		ctx.JSON(http.StatusBadRequest, models.Error{
 			Error: "no password provided",
 		})
 		return
@@ -95,7 +69,7 @@ func login(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			error_s{
+			models.Error{
 				Error: err.Error(),
 			},
 		)
@@ -105,7 +79,7 @@ func login(ctx *gin.Context) {
 	if !success {
 		ctx.JSON(
 			http.StatusBadRequest,
-			error_s{
+			models.Error{
 				Error: "invalid username or password",
 			},
 		)
@@ -116,7 +90,7 @@ func login(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,
-			error_s{
+			models.Error{
 				Error: err.Error(),
 			},
 		)
@@ -125,7 +99,7 @@ func login(ctx *gin.Context) {
 
 	ctx.JSON(
 		http.StatusOK,
-		cookie_s{
+		models.Cookie{
 			Name:       "auth",
 			Token:      token,
 			Expiration: expiration,
