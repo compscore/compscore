@@ -223,6 +223,65 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ServiceAuth": []
+                    }
+                ],
+                "description": "Update a credential",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "credential"
+                ],
+                "summary": "Update a credential",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New password",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CredentialEdit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
             }
         },
         "/credentials": {
@@ -450,6 +509,15 @@
                         "team": {}
                     }
                 },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CredentialEdit": {
+            "description": "body of credential edit request",
+            "type": "object",
+            "properties": {
                 "password": {
                     "type": "string"
                 }
