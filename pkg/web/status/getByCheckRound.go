@@ -14,6 +14,18 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// GetByCheckRound returns all status entries for a given check and round
+//
+// @Summary Get all status entries for a given check and round
+// @Description Get all status entries for a given check and round
+// @Tags status
+// @Accept json
+// @Produce json
+// @Param check path string true "Check name"
+// @Param round path int true "Round number"
+// @Success 200 {array} models.Status
+// @Failure 400 {object} models.Error
+// @Router /status/check/{check}/round/{round} [get]
 func GetByCheckRound(ctx *gin.Context) {
 	check := ctx.Param("check")
 	roundStr := ctx.Param("round")

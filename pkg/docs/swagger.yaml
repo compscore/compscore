@@ -607,6 +607,38 @@ paths:
       summary: Get all status entries for a given check
       tags:
       - status
+  /status/check/{check}/round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given check and round
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given check and round
+      tags:
+      - status
   /team/{team}:
     get:
       consumes:
