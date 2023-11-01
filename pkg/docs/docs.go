@@ -9,7 +9,10 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "1nv8rzim",
+            "url": "https://github.com/compsore/compscore/issues"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -44,16 +47,13 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/web.cookie_s"
-                        },
-                        "headers": {
-                            "Set-Cookie": {
-                                "type": "string",
-                                "description": "auth=JWT; Path=/; Domain=hostname; Secure; HttpOnly"
-                            }
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.error_s"
+                        }
                     }
                 }
             }
@@ -87,6 +87,14 @@ const docTemplate = `{
                 }
             }
         },
+        "web.error_s": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "web.login_s": {
             "description": "body of login request",
             "type": "object",
@@ -99,17 +107,25 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ServiceAuth": {
+            "description": "JWT for authentication",
+            "type": "apiKey",
+            "name": "auth",
+            "in": "cookie"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Compscore API",
+	Description:      "This is the API for the Compscore application",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

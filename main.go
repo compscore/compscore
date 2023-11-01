@@ -23,3 +23,19 @@ func init() {
 func main() {
 	cmd.Execute()
 }
+
+// @title Compscore API
+//
+// @version 1.0
+// @BasePath /api
+//
+// @description This is the API for the Compscore application
+//
+// @contact.name 1nv8rzim
+// @contact.url https://github.com/compsore/compscore/issues
+//
+// @securityDefinitions.apiKey ServiceAuth
+// @tokenUrl /api/login
+// @in cookie
+// @name auth
+// @description JWT for authentication

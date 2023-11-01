@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   web.cookie_s:
     description: response of login request
@@ -17,6 +18,11 @@ definitions:
       token:
         type: string
     type: object
+  web.error_s:
+    properties:
+      error:
+        type: string
+    type: object
   web.login_s:
     description: body of login request
     properties:
@@ -26,7 +32,12 @@ definitions:
         type: string
     type: object
 info:
-  contact: {}
+  contact:
+    name: 1nv8rzim
+    url: https://github.com/compsore/compscore/issues
+  description: This is the API for the Compscore application
+  title: Compscore API
+  version: "1.0"
 paths:
   /api/login:
     post:
@@ -45,15 +56,19 @@ paths:
       responses:
         "200":
           description: OK
-          headers:
-            Set-Cookie:
-              description: auth=JWT; Path=/; Domain=hostname; Secure; HttpOnly
-              type: string
           schema:
             $ref: '#/definitions/web.cookie_s'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/web.error_s'
       summary: Authenticate a user
       tags:
       - auth
+securityDefinitions:
+  ServiceAuth:
+    description: JWT for authentication
+    in: cookie
+    name: auth
+    type: apiKey
 swagger: "2.0"

@@ -1,8 +1,15 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is the API for the Compscore application",
+        "title": "Compscore API",
+        "contact": {
+            "name": "1nv8rzim",
+            "url": "https://github.com/compsore/compscore/issues"
+        },
+        "version": "1.0"
     },
+    "basePath": "/api",
     "paths": {
         "/api/login": {
             "post": {
@@ -33,16 +40,13 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/web.cookie_s"
-                        },
-                        "headers": {
-                            "Set-Cookie": {
-                                "type": "string",
-                                "description": "auth=JWT; Path=/; Domain=hostname; Secure; HttpOnly"
-                            }
                         }
                     },
                     "400": {
-                        "description": "Bad Request"
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.error_s"
+                        }
                     }
                 }
             }
@@ -76,6 +80,14 @@
                 }
             }
         },
+        "web.error_s": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "web.login_s": {
             "description": "body of login request",
             "type": "object",
@@ -87,6 +99,14 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ServiceAuth": {
+            "description": "JWT for authentication",
+            "type": "apiKey",
+            "name": "auth",
+            "in": "cookie"
         }
     }
 }

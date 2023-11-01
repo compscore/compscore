@@ -47,8 +47,7 @@ type error_s struct {
 // @Produce json
 // @Param body body login_s true "Username and password"
 // @Success 200 {object} cookie_s
-// @Failure 400
-// @Header 200 {string} Set-Cookie "auth=JWT; Path=/; Domain=hostname; Secure; HttpOnly"
+// @Failure 400 {object} error_s
 // @Router /api/login [post]
 func login(ctx *gin.Context) {
 	var body login_s
