@@ -107,6 +107,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/checks": {
+            "get": {
+                "description": "Get all checks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "check"
+                ],
+                "summary": "Get all checks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Check"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "description": "Authenticate a user and return a JWT",
@@ -227,6 +259,27 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "oldPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Check": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "type": "object",
+                    "properties": {
+                        "credential": {
+                            "type": "array",
+                            "items": {}
+                        },
+                        "status": {
+                            "type": "array",
+                            "items": {}
+                        }
+                    }
+                },
+                "name": {
                     "type": "string"
                 }
             }

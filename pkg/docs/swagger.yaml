@@ -22,6 +22,20 @@ definitions:
       oldPassword:
         type: string
     type: object
+  models.Check:
+    properties:
+      edges:
+        properties:
+          credential:
+            items: {}
+            type: array
+          status:
+            items: {}
+            type: array
+        type: object
+      name:
+        type: string
+    type: object
   models.Cookie:
     description: response of login request
     properties:
@@ -120,6 +134,27 @@ paths:
       summary: Reset password of another team
       tags:
       - admin
+  /api/checks:
+    get:
+      consumes:
+      - application/json
+      description: Get all checks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Check'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all checks
+      tags:
+      - check
   /api/login:
     post:
       consumes:
