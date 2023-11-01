@@ -26,7 +26,7 @@ import (
 // @Param round path int true "Round number"
 // @Success 200 {object} models.Status
 // @Failure 500 {object} models.Error
-// @Router /scoreboard/status/{team}/{check}/{round} [get]
+// @Router /scoreboard/{team}/{check}/{round} [get]
 func Get(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 	check := ctx.Param("check")

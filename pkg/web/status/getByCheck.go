@@ -13,6 +13,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// GetByCheck returns all status entries for a given check
+//
+// @Summary Get all status entries for a given check
+// @Description Get all status entries for a given check
+// @Tags status
+// @Accept json
+// @Produce json
+// @Param check path string true "Check name"
+// @Success 200 {array} models.Status
+// @Failure 400 {object} models.Error
+// @Router /status/check/{check} [get]
 func GetByCheck(ctx *gin.Context) {
 	check := ctx.Param("check")
 

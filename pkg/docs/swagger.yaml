@@ -545,7 +545,7 @@ paths:
       summary: Get all rounds
       tags:
       - round
-  /scoreboard/status/{team}/{check}/{round}:
+  /scoreboard/{team}/{check}/{round}:
     get:
       consumes:
       - application/json
@@ -578,6 +578,33 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get the status of a team for a given check
+      tags:
+      - status
+  /status/check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given check
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given check
       tags:
       - status
   /team/{team}:

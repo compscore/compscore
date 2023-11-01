@@ -637,7 +637,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/scoreboard/status/{team}/{check}/{round}": {
+        "/scoreboard/{team}/{check}/{round}": {
             "get": {
                 "description": "Get the status of a team for a given check",
                 "consumes": [
@@ -682,6 +682,47 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/status/check/{check}": {
+            "get": {
+                "description": "Get all status entries for a given check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "status"
+                ],
+                "summary": "Get all status entries for a given check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Status"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
