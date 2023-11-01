@@ -14,6 +14,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Check returns the scoreboard for a given check
+//
+// @Summary Get the scoreboard for a given check
+// @Description Get the scoreboard for a given check
+// @Tags scoreboard
+// @Accept json
+// @Produce json
+// @Param check path string true "Check name"
+// @Success 200 {object} structs.CheckScoreboard
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/check/{check} [get]
 func Check(ctx *gin.Context) {
 	check := ctx.Param("check")
 
@@ -73,6 +84,18 @@ func Check(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, checkScoreboard)
 }
 
+// CheckRound returns the scoreboard for a given check from a given round
+//
+// @Summary Get the scoreboard for a given check from a given round
+// @Description Get the scoreboard for a given check from a given round
+// @Tags scoreboard
+// @Accept json
+// @Produce json
+// @Param check path string true "Check name"
+// @Param round path string true "Round number"
+// @Success 200 {object} structs.CheckScoreboard
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/check/{check}/{round} [get]
 func CheckRound(ctx *gin.Context) {
 	check := ctx.Param("check")
 	roundStr := ctx.Param("round")

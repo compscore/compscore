@@ -149,6 +149,26 @@ definitions:
     - StatusUp
     - StatusDown
     - StatusUnknown
+  structs.Check:
+    description: Check
+    properties:
+      name:
+        type: string
+      status:
+        items:
+          type: integer
+        type: array
+    type: object
+  structs.CheckScoreboard:
+    description: Check Scoreboard
+    properties:
+      round:
+        type: integer
+      teams:
+        items:
+          $ref: '#/definitions/structs.Check'
+        type: array
+    type: object
 info:
   contact:
     name: 1nv8rzim
@@ -557,6 +577,61 @@ paths:
       summary: Get all rounds
       tags:
       - round
+  /scoreboard/check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get the scoreboard for a given check
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.CheckScoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the scoreboard for a given check
+      tags:
+      - scoreboard
+  /scoreboard/check/{check}/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get the scoreboard for a given check from a given round
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.CheckScoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the scoreboard for a given check from a given round
+      tags:
+      - scoreboard
   /status/{team}/{check}/{round}:
     get:
       consumes:

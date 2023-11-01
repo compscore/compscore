@@ -630,6 +630,89 @@
                 }
             }
         },
+        "/scoreboard/check/{check}": {
+            "get": {
+                "description": "Get the scoreboard for a given check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get the scoreboard for a given check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.CheckScoreboard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/scoreboard/check/{check}/{round}": {
+            "get": {
+                "description": "Get the scoreboard for a given check from a given round",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get the scoreboard for a given check from a given round",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Round number",
+                        "name": "round",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.CheckScoreboard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/status/check/{check}": {
             "get": {
                 "description": "Get all status entries for a given check",
@@ -1270,6 +1353,36 @@
                 "StatusDown",
                 "StatusUnknown"
             ]
+        },
+        "structs.Check": {
+            "description": "Check",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "structs.CheckScoreboard": {
+            "description": "Check Scoreboard",
+            "type": "object",
+            "properties": {
+                "round": {
+                    "type": "integer"
+                },
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.Check"
+                    }
+                }
+            }
         }
     },
     "securityDefinitions": {
