@@ -673,6 +673,7 @@ const docTemplate = `{
             }
         },
         "models.Check": {
+            "description": "score check",
             "type": "object",
             "properties": {
                 "edges": {
@@ -721,6 +722,7 @@ const docTemplate = `{
             }
         },
         "models.Credential": {
+            "description": "credential of a check",
             "type": "object",
             "properties": {
                 "edges": {
@@ -766,6 +768,7 @@ const docTemplate = `{
             }
         },
         "models.Round": {
+            "description": "scoring round",
             "type": "object",
             "properties": {
                 "complete": {
@@ -786,13 +789,27 @@ const docTemplate = `{
             }
         },
         "models.Status": {
-            "description": "status of the engine",
+            "description": "status of a check",
             "type": "object",
             "properties": {
-                "message": {
+                "edges": {
+                    "type": "object",
+                    "properties": {
+                        "check": {},
+                        "round": {},
+                        "team": {}
+                    }
+                },
+                "error": {
                     "type": "string"
                 },
+                "points": {
+                    "type": "integer"
+                },
                 "status": {
+                    "type": "string"
+                },
+                "time": {
                     "type": "string"
                 }
             }

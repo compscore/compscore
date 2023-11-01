@@ -4,7 +4,7 @@ package models
 // @Summary status of the engine
 // @Description status of the engine
 // @Tags engine
-type Status struct {
+type EngineStatus struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }

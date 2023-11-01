@@ -66,7 +66,7 @@ func Start(ctx *gin.Context) {
 
 	ctx.JSON(
 		http.StatusOK,
-		models.Status{
+		models.EngineStatus{
 			Message: message,
 		},
 	)

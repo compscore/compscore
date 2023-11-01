@@ -23,6 +23,7 @@ definitions:
         type: string
     type: object
   models.Check:
+    description: score check
     properties:
       edges:
         properties:
@@ -55,6 +56,7 @@ definitions:
         type: string
     type: object
   models.Credential:
+    description: credential of a check
     properties:
       edges:
         properties:
@@ -85,6 +87,7 @@ definitions:
         type: string
     type: object
   models.Round:
+    description: scoring round
     properties:
       complete:
         type: boolean
@@ -98,11 +101,21 @@ definitions:
         type: integer
     type: object
   models.Status:
-    description: status of the engine
+    description: status of a check
     properties:
-      message:
+      edges:
+        properties:
+          check: {}
+          round: {}
+          team: {}
+        type: object
+      error:
         type: string
+      points:
+        type: integer
       status:
+        type: string
+      time:
         type: string
     type: object
 info:
