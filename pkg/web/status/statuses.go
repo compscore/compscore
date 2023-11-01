@@ -12,6 +12,16 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Statuses returns all status entries
+//
+// @Summary Get all status entries
+// @Description Get all status entries
+// @Tags status
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Status
+// @Failure 500 {object} models.Error
+// @Router /statuses [get]
 func Statuses(ctx *gin.Context) {
 	if config.Production {
 		cachedData, err := cache.Client.Get(ctx, "statuses").Result()
