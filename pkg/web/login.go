@@ -19,9 +19,9 @@ import (
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param body body login_s true "Username and password"
-// @Success 200 {object} cookie_s
-// @Failure 400 {object} error_s
+// @Param body body models.Login true "Username and password"
+// @Success 200 {object} models.Cookie
+// @Failure 400 {object} models.Error
 // @Router /api/login [post]
 func login(ctx *gin.Context) {
 	var body models.Login

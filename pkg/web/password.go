@@ -19,9 +19,9 @@ import (
 // @Produce json
 // @Param body body models.ChangePassword true "Old and new password"
 // @Success 200 "Password changed"
-// @Failure 400 {object} error_s
-// @Failure 401 {object} error_s
-// @Failure 500 {object} error_s
+// @Failure 400 {object} models.Error
+// @Failure 401 {object} models.Error
+// @Failure 500 {object} models.Error
 // @Router /api/password [post]
 func password(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
