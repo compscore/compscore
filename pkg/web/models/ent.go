@@ -15,3 +15,11 @@ type Credential struct {
 		Team  interface{} `json:"team,omitempty"`
 	} `json:"edges"`
 }
+
+type Round struct {
+	Number   int  `json:"number"`
+	Complete bool `json:"complete"`
+	Edges    struct {
+		Status []interface{} `json:"status,omitempty"`
+	} `json:"edges"`
+}

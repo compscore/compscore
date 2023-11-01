@@ -531,6 +531,50 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/round/{round}": {
+            "get": {
+                "description": "Get a round",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "round"
+                ],
+                "summary": "Get a round",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Round number",
+                        "name": "round",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Round"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -657,6 +701,26 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Round": {
+            "type": "object",
+            "properties": {
+                "complete": {
+                    "type": "boolean"
+                },
+                "edges": {
+                    "type": "object",
+                    "properties": {
+                        "status": {
+                            "type": "array",
+                            "items": {}
+                        }
+                    }
+                },
+                "number": {
+                    "type": "integer"
                 }
             }
         },

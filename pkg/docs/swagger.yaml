@@ -84,6 +84,19 @@ definitions:
       username:
         type: string
     type: object
+  models.Round:
+    properties:
+      complete:
+        type: boolean
+      edges:
+        properties:
+          status:
+            items: {}
+            type: array
+        type: object
+      number:
+        type: integer
+    type: object
   models.Status:
     description: status of the engine
     properties:
@@ -431,6 +444,35 @@ paths:
       summary: Change a user's password
       tags:
       - auth
+  /round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get a round
+      parameters:
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Round'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get a round
+      tags:
+      - round
 securityDefinitions:
   ServiceAuth:
     description: JWT for authentication
