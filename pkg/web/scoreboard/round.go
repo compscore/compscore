@@ -14,6 +14,15 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Round returns the scoreboard for a given round
+// @Summary Get scoreboard for a given round
+// @Description Get scoreboard for a given round
+// @Tags scoreboard
+// @Produce json
+// @Param round path int true "Round number"
+// @Success 200 {object} structs.Scoreboard
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/round/{round} [get]
 func Round(ctx *gin.Context) {
 	roundStr := ctx.Param("round")
 

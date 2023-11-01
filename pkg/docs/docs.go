@@ -720,6 +720,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/scoreboard/round/{round}": {
+            "get": {
+                "description": "Get scoreboard for a given round",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get scoreboard for a given round",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Round number",
+                        "name": "round",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.Scoreboard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/status/check/{check}": {
             "get": {
                 "description": "Get all status entries for a given check",
@@ -1387,6 +1422,27 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/structs.Check"
+                    }
+                }
+            }
+        },
+        "structs.Scoreboard": {
+            "description": "Main Scoreboard",
+            "type": "object",
+            "properties": {
+                "checks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.Check"
+                    }
+                },
+                "round": {
+                    "type": "integer"
+                },
+                "scores": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
                     }
                 }
             }

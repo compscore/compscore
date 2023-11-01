@@ -169,6 +169,20 @@ definitions:
           $ref: '#/definitions/structs.Check'
         type: array
     type: object
+  structs.Scoreboard:
+    description: Main Scoreboard
+    properties:
+      checks:
+        items:
+          $ref: '#/definitions/structs.Check'
+        type: array
+      round:
+        type: integer
+      scores:
+        items:
+          type: integer
+        type: array
+    type: object
 info:
   contact:
     name: 1nv8rzim
@@ -630,6 +644,29 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get the scoreboard for a given check from a given round
+      tags:
+      - scoreboard
+  /scoreboard/round/{round}:
+    get:
+      description: Get scoreboard for a given round
+      parameters:
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Scoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get scoreboard for a given round
       tags:
       - scoreboard
   /status/{team}/{check}/{round}:
