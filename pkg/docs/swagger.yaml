@@ -737,6 +737,38 @@ paths:
       summary: Get the status of a team for a given check
       tags:
       - status
+  /status/team/{team}/round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given team and round
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given team and round
+      tags:
+      - status
   /team/{team}:
     get:
       consumes:
