@@ -18,7 +18,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/admin/login": {
+        "/admin/login": {
             "post": {
                 "description": "Authenticate into another team and return a JWT",
                 "consumes": [
@@ -58,7 +58,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/admin/password": {
+        "/admin/password": {
             "post": {
                 "description": "Reset password of another team",
                 "consumes": [
@@ -107,39 +107,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/checks": {
-            "get": {
-                "description": "Get all checks",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "check"
-                ],
-                "summary": "Get all checks",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Check"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/checks/{check}": {
+        "/check/{check}": {
             "get": {
                 "description": "Get a check",
                 "consumes": [
@@ -177,11 +145,98 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/credentials": {
+        "/checks": {
+            "get": {
+                "description": "Get all checks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "check"
+                ],
+                "summary": "Get all checks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Check"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/credential/{check}": {
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "ServiceAuth": []
+                    }
+                ],
+                "description": "Get a credential",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "credential"
+                ],
+                "summary": "Get a credential",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Credential"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/credentials": {
+            "get": {
+                "security": [
+                    {
+                        "ServiceAuth": []
                     }
                 ],
                 "description": "Get all credentials for a team",
@@ -220,7 +275,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/login": {
+        "/login": {
             "post": {
                 "description": "Authenticate a user and return a JWT",
                 "consumes": [
@@ -260,7 +315,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/password": {
+        "/password": {
             "post": {
                 "description": "Change a user's password",
                 "consumes": [

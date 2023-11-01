@@ -24,7 +24,7 @@ import (
 // @Failure 400 {object} models.Error
 // @Failure 401 {object} models.Error
 // @Failure 500 {object} models.Error
-// @Router /api/admin/password [post]
+// @Router /admin/password [post]
 func Password(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
 	if err != nil {

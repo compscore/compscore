@@ -20,7 +20,7 @@ import (
 // @Param check path string true "Check ID"
 // @Success 200 {object} models.Check
 // @Failure 500 {object} models.Error
-// @Router /api/checks/{check} [get]
+// @Router /check/{check} [get]
 func Get(ctx *gin.Context) {
 	check := ctx.Param("check")
 

@@ -21,7 +21,7 @@ import (
 // @Produce json
 // @Success 200 {object} []models.Check
 // @Failure 500 {object} models.Error
-// @Router /api/checks [get]
+// @Router /checks [get]
 func Checks(ctx *gin.Context) {
 	if config.Production {
 		cachedData, err := cache.Client.Get(ctx, "checks").Result()

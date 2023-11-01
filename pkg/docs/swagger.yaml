@@ -86,7 +86,7 @@ info:
   title: Compscore API
   version: "1.0"
 paths:
-  /api/admin/login:
+  /admin/login:
     post:
       consumes:
       - application/json
@@ -112,7 +112,7 @@ paths:
       summary: Authenticate into another team
       tags:
       - admin
-  /api/admin/password:
+  /admin/password:
     post:
       consumes:
       - application/json
@@ -144,28 +144,7 @@ paths:
       summary: Reset password of another team
       tags:
       - admin
-  /api/checks:
-    get:
-      consumes:
-      - application/json
-      description: Get all checks
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Check'
-            type: array
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Error'
-      summary: Get all checks
-      tags:
-      - check
-  /api/checks/{check}:
+  /check/{check}:
     get:
       consumes:
       - application/json
@@ -190,7 +169,63 @@ paths:
       summary: Get a check
       tags:
       - check
-  /api/credentials:
+  /checks:
+    get:
+      consumes:
+      - application/json
+      description: Get all checks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Check'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all checks
+      tags:
+      - check
+  /credential/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get a credential
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Credential'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Get a credential
+      tags:
+      - credential
+  /credentials:
     get:
       consumes:
       - application/json
@@ -213,11 +248,11 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       security:
-      - ApiKeyAuth: []
+      - ServiceAuth: []
       summary: Get all credentials for a team
       tags:
       - credential
-  /api/login:
+  /login:
     post:
       consumes:
       - application/json
@@ -243,7 +278,7 @@ paths:
       summary: Authenticate a user
       tags:
       - auth
-  /api/password:
+  /password:
     post:
       consumes:
       - application/json

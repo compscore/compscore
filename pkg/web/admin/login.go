@@ -22,7 +22,7 @@ import (
 // @Param body body models.AdminLogin true "Team name"
 // @Success 200 {object} models.Cookie
 // @Failure 400 {object} models.Error
-// @Router /api/admin/login [post]
+// @Router /admin/login [post]
 func Login(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
 	if err != nil {

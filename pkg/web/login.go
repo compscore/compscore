@@ -22,7 +22,7 @@ import (
 // @Param body body models.Login true "Username and password"
 // @Success 200 {object} models.Cookie
 // @Failure 400 {object} models.Error
-// @Router /api/login [post]
+// @Router /login [post]
 func login(ctx *gin.Context) {
 	var body models.Login
 

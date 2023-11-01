@@ -20,18 +20,18 @@ import (
 // @Tags credential
 // @Accept json
 // @Produce json
-// @Security ApiKeyAuth
+// @Security ServiceAuth
 // @Success 200 {object} []models.Credential
 // @Failure 401 {object} models.Error
 // @Failure 500 {object} models.Error
-// @Router /api/credentials [get]
+// @Router /credentials [get]
 func Credentials(ctx *gin.Context) {
 	entTeam, err := auth.Parse(ctx)
 	if err != nil {
 		ctx.JSON(
 			http.StatusUnauthorized,
 			models.Error{
-				Error: err.Error(),
+				Error: "user not authenticated",
 			},
 		)
 		return
