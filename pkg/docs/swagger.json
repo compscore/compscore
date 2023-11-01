@@ -51,6 +51,55 @@
                 }
             }
         },
+        "/api/admin/password": {
+            "post": {
+                "description": "Reset password of another team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Reset password of another team",
+                "parameters": [
+                    {
+                        "description": "Team name and new password",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminPasswordReset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "description": "Authenticate a user and return a JWT",
@@ -146,6 +195,18 @@
             "description": "body of admin login request",
             "type": "object",
             "properties": {
+                "team": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AdminPasswordReset": {
+            "description": "body of admin password reset request",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
                 "team": {
                     "type": "string"
                 }
