@@ -3,11 +3,13 @@ package scoreboard
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/compscore/compscore/pkg/cache"
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/data"
+	"github.com/compscore/compscore/pkg/web/models"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
@@ -18,7 +20,12 @@ func Team(ctx *gin.Context) {
 	if config.Production {
 		cachedData, err := cache.Client.Get(ctx, fmt.Sprintf("scoreboard/team/%s", teamStr)).Result()
 		if err != nil && err != redis.Nil {
-			ctx.JSON(500, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 
@@ -30,26 +37,46 @@ func Team(ctx *gin.Context) {
 
 	team, err := strconv.Atoi(teamStr)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(
+			http.StatusBadRequest,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
 		return
 	}
 
 	teamScoreboard, err := data.Scoreboard.Team(team, 15)
 	if err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		ctx.JSON(
+			http.StatusInternalServerError,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
 		return
 	}
 
 	if config.Production {
 		redisObject, err := json.Marshal(teamScoreboard)
 		if err != nil {
-			ctx.JSON(500, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 
 		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/team/%s", teamStr), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
-			ctx.JSON(500, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 	}
@@ -64,7 +91,12 @@ func TeamRound(ctx *gin.Context) {
 	if config.Production {
 		cachedData, err := cache.Client.Get(ctx, fmt.Sprintf("scoreboard/team/%s/%s", teamStr, roundStr)).Result()
 		if err != nil && err != redis.Nil {
-			ctx.JSON(500, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 
@@ -76,32 +108,58 @@ func TeamRound(ctx *gin.Context) {
 
 	team, err := strconv.Atoi(teamStr)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(
+			http.StatusBadRequest,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
 		return
 	}
 
 	round, err := strconv.Atoi(roundStr)
 	if err != nil {
-		ctx.JSON(400, gin.H{"error": err.Error()})
+		ctx.JSON(
+			http.StatusBadRequest,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
+
 		return
 	}
 
 	teamScoreboard, err := data.Scoreboard.TeamRound(team, round, 15)
 	if err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		ctx.JSON(
+			http.StatusInternalServerError,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
 		return
 	}
 
 	if config.Production {
 		redisObject, err := json.Marshal(teamScoreboard)
 		if err != nil {
-			ctx.JSON(500, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 
 		err = cache.Client.Set(ctx, fmt.Sprintf("scoreboard/team/%s/%s", teamStr, roundStr), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
-			ctx.JSON(500, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 	}
