@@ -118,6 +118,25 @@ definitions:
       time:
         type: string
     type: object
+  models.Team:
+    description: team
+    properties:
+      edges:
+        properties:
+          credential:
+            items: {}
+            type: array
+          status:
+            items: {}
+            type: array
+        type: object
+      name:
+        type: string
+      number:
+        type: integer
+      roles:
+        type: string
+    type: object
 info:
   contact:
     name: 1nv8rzim
@@ -526,6 +545,31 @@ paths:
       summary: Get all rounds
       tags:
       - round
+  /team/{team}:
+    get:
+      consumes:
+      - application/json
+      description: Get a team
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Team'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get a team
+      tags:
+      - team
 securityDefinitions:
   ServiceAuth:
     description: JWT for authentication

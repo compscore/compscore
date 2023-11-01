@@ -629,6 +629,44 @@
                     }
                 }
             }
+        },
+        "/team/{team}": {
+            "get": {
+                "description": "Get a team",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "team"
+                ],
+                "summary": "Get a team",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Team"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -803,6 +841,34 @@
                     "type": "string"
                 },
                 "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Team": {
+            "description": "team",
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "type": "object",
+                    "properties": {
+                        "credential": {
+                            "type": "array",
+                            "items": {}
+                        },
+                        "status": {
+                            "type": "array",
+                            "items": {}
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "roles": {
                     "type": "string"
                 }
             }
