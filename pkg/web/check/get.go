@@ -43,6 +43,6 @@ func Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, entCheck)
+	ctx.JSON(http.StatusOK, entCheck)
 
 }

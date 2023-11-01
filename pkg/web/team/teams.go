@@ -36,7 +36,7 @@ func Teams(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -75,5 +75,5 @@ func Teams(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, entTeams)
+	ctx.JSON(http.StatusOK, entTeams)
 }

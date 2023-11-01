@@ -59,9 +59,12 @@ func login(ctx *gin.Context) {
 	}
 
 	if body.Password == "" {
-		ctx.JSON(http.StatusBadRequest, models.Error{
-			Error: "no password provided",
-		})
+		ctx.JSON(
+			http.StatusBadRequest,
+			models.Error{
+				Error: "no password provided",
+			},
+		)
 		return
 	}
 

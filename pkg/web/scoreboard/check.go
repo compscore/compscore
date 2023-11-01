@@ -30,7 +30,7 @@ func Check(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -70,7 +70,7 @@ func Check(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, checkScoreboard)
+	ctx.JSON(http.StatusOK, checkScoreboard)
 }
 
 func CheckRound(ctx *gin.Context) {
@@ -90,7 +90,7 @@ func CheckRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -141,5 +141,5 @@ func CheckRound(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, checkScoreboard)
+	ctx.JSON(http.StatusOK, checkScoreboard)
 }

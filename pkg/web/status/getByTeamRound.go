@@ -31,7 +31,7 @@ func GetByTeamRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -49,9 +49,12 @@ func GetByTeamRound(ctx *gin.Context) {
 
 	round, err := strconv.Atoi(roundStr)
 	if err != nil {
-		ctx.JSON(500, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(
+			http.StatusInternalServerError,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
 		return
 	}
 
@@ -90,5 +93,5 @@ func GetByTeamRound(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, entStatus)
+	ctx.JSON(http.StatusOK, entStatus)
 }

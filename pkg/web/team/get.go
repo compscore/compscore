@@ -41,7 +41,7 @@ func Get(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -92,5 +92,5 @@ func Get(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, entTeam)
+	ctx.JSON(http.StatusOK, entTeam)
 }

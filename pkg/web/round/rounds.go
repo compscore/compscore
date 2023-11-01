@@ -36,7 +36,7 @@ func Rounds(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -76,5 +76,5 @@ func Rounds(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, entRounds)
+	ctx.JSON(http.StatusOK, entRounds)
 }

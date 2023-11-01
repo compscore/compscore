@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/cache"
@@ -78,7 +79,7 @@ func LoadRoutes() {
 	API.POST("/login", login)
 	API.POST("/password", password)
 	API.GET("/docs/*any", func(ctx *gin.Context) {
-		ctx.Redirect(302, "/api/swagger/index.html")
+		ctx.Redirect(http.StatusMovedPermanently, "/api/swagger/index.html")
 	})
 	API.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 

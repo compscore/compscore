@@ -31,7 +31,7 @@ func GetByTeamCheck(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -82,5 +82,5 @@ func GetByTeamCheck(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, entStatus)
+	ctx.JSON(http.StatusOK, entStatus)
 }

@@ -30,7 +30,7 @@ func Team(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -81,7 +81,7 @@ func Team(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, teamScoreboard)
+	ctx.JSON(http.StatusOK, teamScoreboard)
 }
 
 func TeamRound(ctx *gin.Context) {
@@ -101,7 +101,7 @@ func TeamRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -164,5 +164,5 @@ func TeamRound(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, teamScoreboard)
+	ctx.JSON(http.StatusOK, teamScoreboard)
 }

@@ -31,7 +31,7 @@ func GetByCheckRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -49,29 +49,39 @@ func GetByCheckRound(ctx *gin.Context) {
 
 	entStatus, err := data.Status.GetAllByRoundAndCheckWithEdges(round_number, check)
 	if err != nil {
-		ctx.JSON(500, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(
+			http.StatusInternalServerError,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
+
 		return
 	}
 
 	if config.Production {
 		redisObject, err := json.Marshal(entStatus)
 		if err != nil {
-			ctx.JSON(500, gin.H{
-				"error": err.Error(),
-			})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 
 		err = cache.Client.Set(ctx, fmt.Sprintf("status/check/%s/round/%s", check, roundStr), string(redisObject), config.Redis.FastRefresh).Err()
 		if err != nil {
-			ctx.JSON(500, gin.H{
-				"error": err.Error(),
-			})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 	}
 
-	ctx.JSON(200, entStatus)
+	ctx.JSON(http.StatusOK, entStatus)
 }

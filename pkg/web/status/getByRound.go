@@ -30,7 +30,7 @@ func GetByRound(ctx *gin.Context) {
 		}
 
 		if err == nil {
-			ctx.String(200, cachedData)
+			ctx.String(http.StatusOK, cachedData)
 			return
 		}
 	}
@@ -81,5 +81,5 @@ func GetByRound(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(200, entStatus)
+	ctx.JSON(http.StatusOK, entStatus)
 }
