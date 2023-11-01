@@ -14,6 +14,16 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Scoreboard returns the scoreboard of a given team for the current round
+//
+// @Summary Get scoreboard of a given team for the current round
+// @Description Get scoreboard of a given team for the current round
+// @Tags scoreboard
+// @Produce json
+// @Param team path int true "Team number"
+// @Success 200 {object} []structs.TeamScoreboard
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/team/{team} [get]
 func Team(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 
@@ -84,6 +94,17 @@ func Team(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, teamScoreboard)
 }
 
+// TeamRound returns the scoreboard of a given team for a given round
+//
+// @Summary Get scoreboard of a given team for a given round
+// @Description Get scoreboard of a given team for a given round
+// @Tags scoreboard
+// @Produce json
+// @Param team path int true "Team number"
+// @Param round path int true "Round number"
+// @Success 200 {object} []structs.TeamScoreboard
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/team/{team}/{round} [get]
 func TeamRound(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 	roundStr := ctx.Param("round")

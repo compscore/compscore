@@ -878,6 +878,89 @@ const docTemplate = `{
                 }
             }
         },
+        "/scoreboard/team/{team}": {
+            "get": {
+                "description": "Get scoreboard of a given team for the current round",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get scoreboard of a given team for the current round",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team number",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.TeamScoreboard"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/scoreboard/team/{team}/{round}": {
+            "get": {
+                "description": "Get scoreboard of a given team for a given round",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get scoreboard of a given team for a given round",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team number",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Round number",
+                        "name": "round",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.TeamScoreboard"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/status/check/{check}": {
             "get": {
                 "description": "Get all status entries for a given check",
@@ -1585,6 +1668,21 @@ const docTemplate = `{
                 },
                 "time": {
                     "type": "string"
+                }
+            }
+        },
+        "structs.TeamScoreboard": {
+            "description": "Team Scoreboard",
+            "type": "object",
+            "properties": {
+                "checks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/structs.Check"
+                    }
+                },
+                "round": {
+                    "type": "integer"
                 }
             }
         }
