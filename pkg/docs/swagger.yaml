@@ -705,6 +705,38 @@ paths:
       summary: Get the status of a team
       tags:
       - status
+  /status/team/{team}/check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of a team for a given check
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/status.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the status of a team for a given check
+      tags:
+      - status
   /team/{team}:
     get:
       consumes:

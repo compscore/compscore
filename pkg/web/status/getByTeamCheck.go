@@ -14,6 +14,18 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// GetByTeamCheck returns the status of a team for a given check
+//
+// @Summary Get the status of a team for a given check
+// @Description Get the status of a team for a given check
+// @Tags status
+// @Accept json
+// @Produce json
+// @Param team path int true "Team ID"
+// @Param check path string true "Check name"
+// @Success 200 {object} []Status
+// @Failure 500 {object} models.Error
+// @Router /status/team/{team}/check/{check} [get]
 func GetByTeamCheck(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 	check := ctx.Param("check")
