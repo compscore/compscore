@@ -525,6 +525,35 @@
                 }
             }
         },
+        "/round/latest": {
+            "get": {
+                "description": "Get the latest round",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "round"
+                ],
+                "summary": "Get the latest round",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Round"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/round/{round}": {
             "get": {
                 "description": "Get a round",

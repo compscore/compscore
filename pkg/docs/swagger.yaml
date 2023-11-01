@@ -473,6 +473,25 @@ paths:
       summary: Get a round
       tags:
       - round
+  /round/latest:
+    get:
+      consumes:
+      - application/json
+      description: Get the latest round
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Round'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the latest round
+      tags:
+      - round
 securityDefinitions:
   ServiceAuth:
     description: JWT for authentication
