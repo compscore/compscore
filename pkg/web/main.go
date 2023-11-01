@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/compscore/compscore/pkg/auth"
 	"github.com/compscore/compscore/pkg/cache"
@@ -18,6 +19,10 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+
+	_ "github.com/compscore/compscore/pkg/docs"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var (
@@ -72,8 +77,11 @@ func Start() {
 func LoadRoutes() {
 	// General Endpoints
 	API.POST("/login", login)
-	API.POST("/info", info)
 	API.POST("/password", password)
+	API.GET("/docs/*any", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "/api/swagger/index.html")
+	})
+	API.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// Admin Endpoints
 	API.POST("/admin/password", admin.Password)

@@ -9,20 +9,31 @@ import (
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/grpc/client"
 	"github.com/compscore/compscore/pkg/grpc/proto"
+	"github.com/compscore/compscore/pkg/web/models"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
 
-type status_s struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-}
-
+// Get returns the status of the engine
+//
+// @Summary Status of the engine
+// @Description Status of the engine
+// @Tags engine
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Status
+// @Failure 500 {object} models.Error
+// @Router /engine/status [get]
 func Get(ctx *gin.Context) {
 	if config.Production {
 		cachedData, err := cache.Client.Get(ctx, "engine_status").Result()
 		if err != nil && err != redis.Nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 
@@ -40,7 +51,12 @@ func Get(ctx *gin.Context) {
 
 	status, message, err := client.Status(engineCtx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(
+			http.StatusInternalServerError,
+			models.Error{
+				Error: err.Error(),
+			},
+		)
 	}
 
 	var statusString string
@@ -59,14 +75,19 @@ func Get(ctx *gin.Context) {
 	if config.Production {
 		err = cache.Client.Set(ctx, "engine_status", statusString, config.Redis.FastRefresh).Err()
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			ctx.JSON(
+				http.StatusInternalServerError,
+				models.Error{
+					Error: err.Error(),
+				},
+			)
 			return
 		}
 	}
 
 	ctx.JSON(
 		http.StatusOK,
-		status_s{
+		models.EngineStatus{
 			Status:  statusString,
 			Message: message,
 		},

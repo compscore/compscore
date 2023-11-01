@@ -1,0 +1,1116 @@
+basePath: /api
+definitions:
+  models.AdminLogin:
+    description: body of admin login request
+    properties:
+      team:
+        type: string
+    type: object
+  models.AdminPasswordReset:
+    description: body of admin password reset request
+    properties:
+      password:
+        type: string
+      team:
+        type: string
+    type: object
+  models.ChangePassword:
+    description: body of change password request
+    properties:
+      newPassword:
+        type: string
+      oldPassword:
+        type: string
+    type: object
+  models.Check:
+    description: score check
+    properties:
+      edges:
+        properties:
+          credential:
+            items: {}
+            type: array
+          status:
+            items: {}
+            type: array
+        type: object
+      name:
+        type: string
+    type: object
+  models.Cookie:
+    description: response of login request
+    properties:
+      domain:
+        type: string
+      expiration:
+        type: integer
+      httponly:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+      secure:
+        type: boolean
+      token:
+        type: string
+    type: object
+  models.Credential:
+    description: credential of a check
+    properties:
+      edges:
+        properties:
+          check: {}
+          team: {}
+        type: object
+      password:
+        type: string
+    type: object
+  models.CredentialEdit:
+    description: body of credential edit request
+    properties:
+      password:
+        type: string
+    type: object
+  models.Error:
+    description: response of login request
+    properties:
+      error:
+        type: string
+    type: object
+  models.Login:
+    description: body of login request
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Round:
+    description: scoring round
+    properties:
+      complete:
+        type: boolean
+      edges:
+        properties:
+          status:
+            items: {}
+            type: array
+        type: object
+      number:
+        type: integer
+    type: object
+  models.Status:
+    description: status of a check
+    properties:
+      edges:
+        properties:
+          check: {}
+          round: {}
+          team: {}
+        type: object
+      error:
+        type: string
+      points:
+        type: integer
+      status:
+        type: string
+      time:
+        type: string
+    type: object
+  models.Team:
+    description: team
+    properties:
+      edges:
+        properties:
+          credential:
+            items: {}
+            type: array
+          status:
+            items: {}
+            type: array
+        type: object
+      name:
+        type: string
+      number:
+        type: integer
+      roles:
+        type: string
+    type: object
+  status.Status:
+    enum:
+    - unknown
+    - up
+    - down
+    - unknown
+    type: string
+    x-enum-varnames:
+    - DefaultStatus
+    - StatusUp
+    - StatusDown
+    - StatusUnknown
+  structs.Check:
+    description: Check
+    properties:
+      name:
+        type: string
+      status:
+        items:
+          type: integer
+        type: array
+    type: object
+  structs.CheckScoreboard:
+    description: Check Scoreboard
+    properties:
+      round:
+        type: integer
+      teams:
+        items:
+          $ref: '#/definitions/structs.Check'
+        type: array
+    type: object
+  structs.Scoreboard:
+    description: Main Scoreboard
+    properties:
+      checks:
+        items:
+          $ref: '#/definitions/structs.Check'
+        type: array
+      round:
+        type: integer
+      scores:
+        items:
+          type: integer
+        type: array
+    type: object
+  structs.Status:
+    description: Status
+    properties:
+      error:
+        type: string
+      round:
+        type: integer
+      status:
+        type: integer
+      time:
+        type: string
+    type: object
+  structs.TeamScoreboard:
+    description: Team Scoreboard
+    properties:
+      checks:
+        items:
+          $ref: '#/definitions/structs.Check'
+        type: array
+      round:
+        type: integer
+    type: object
+info:
+  contact:
+    name: 1nv8rzim
+    url: https://github.com/compsore/compscore/issues
+  description: This is the API for the Compscore application
+  title: Compscore API
+  version: "1.0"
+paths:
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate into another team and return a JWT
+      parameters:
+      - description: Team name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cookie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Authenticate into another team
+      tags:
+      - admin
+  /admin/password:
+    post:
+      consumes:
+      - application/json
+      description: Reset password of another team
+      parameters:
+      - description: Team name and new password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminPasswordReset'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Reset password of another team
+      tags:
+      - admin
+  /check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get a check
+      parameters:
+      - description: Check ID
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Check'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get a check
+      tags:
+      - check
+  /checks:
+    get:
+      consumes:
+      - application/json
+      description: Get all checks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Check'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all checks
+      tags:
+      - check
+  /credential/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get a credential
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Credential'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Get a credential
+      tags:
+      - credential
+    post:
+      consumes:
+      - application/json
+      description: Update a credential
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: New password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CredentialEdit'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Update a credential
+      tags:
+      - credential
+  /credentials:
+    get:
+      consumes:
+      - application/json
+      description: Get all credentials for a team
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Credential'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Get all credentials for a team
+      tags:
+      - credential
+  /engine/start:
+    post:
+      consumes:
+      - application/json
+      description: Start the engine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Start the engine
+      tags:
+      - engine
+  /engine/status:
+    get:
+      consumes:
+      - application/json
+      description: Status of the engine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Status of the engine
+      tags:
+      - engine
+  /engine/stop:
+    post:
+      consumes:
+      - application/json
+      description: Stop the engine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Stop the engine
+      tags:
+      - engine
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT
+      parameters:
+      - description: Username and password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cookie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Authenticate a user
+      tags:
+      - auth
+  /password:
+    post:
+      consumes:
+      - application/json
+      description: Change a user's password
+      parameters:
+      - description: Old and new password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password changed
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Change a user's password
+      tags:
+      - auth
+  /round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get a round
+      parameters:
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Round'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get a round
+      tags:
+      - round
+  /round/latest:
+    get:
+      consumes:
+      - application/json
+      description: Get the latest round
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Round'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the latest round
+      tags:
+      - round
+  /rounds:
+    get:
+      consumes:
+      - application/json
+      description: Get all rounds
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Round'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all rounds
+      tags:
+      - round
+  /scoreboard:
+    get:
+      description: Get scoreboard for the current round
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Scoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get scoreboard for the current round
+      tags:
+      - scoreboard
+  /scoreboard/check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get the scoreboard for a given check
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.CheckScoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the scoreboard for a given check
+      tags:
+      - scoreboard
+  /scoreboard/check/{check}/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get the scoreboard for a given check from a given round
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.CheckScoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the scoreboard for a given check from a given round
+      tags:
+      - scoreboard
+  /scoreboard/round/{round}:
+    get:
+      description: Get scoreboard for a given round
+      parameters:
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Scoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get scoreboard for a given round
+      tags:
+      - scoreboard
+  /scoreboard/status/{team}/{check}:
+    get:
+      description: Get status scoreboard for a given team and check
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Team number
+        in: path
+        name: team
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/structs.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get status scoreboard for a given team and check
+      tags:
+      - scoreboard
+  /scoreboard/status/{team}/{check}/{round}:
+    get:
+      description: Get status scoreboard for a given team and check from a given round
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Team number
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/structs.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get status scoreboard for a given team and check from a given round
+      tags:
+      - scoreboard
+  /scoreboard/team/{team}:
+    get:
+      description: Get scoreboard of a given team for the current round
+      parameters:
+      - description: Team number
+        in: path
+        name: team
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/structs.TeamScoreboard'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get scoreboard of a given team for the current round
+      tags:
+      - scoreboard
+  /scoreboard/team/{team}/{round}:
+    get:
+      description: Get scoreboard of a given team for a given round
+      parameters:
+      - description: Team number
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/structs.TeamScoreboard'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get scoreboard of a given team for a given round
+      tags:
+      - scoreboard
+  /status/{team}/{check}/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of a team for a given check for a given round
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the status of a team for a given check for a given round
+      tags:
+      - status
+  /status/check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given check
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given check
+      tags:
+      - status
+  /status/check/{check}/round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given check and round
+      parameters:
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given check and round
+      tags:
+      - status
+  /status/round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given round
+      parameters:
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given round
+      tags:
+      - status
+  /status/team/{team}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of a team
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/status.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the status of a team
+      tags:
+      - status
+  /status/team/{team}/check/{check}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of a team for a given check
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Check name
+        in: path
+        name: check
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/status.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the status of a team for a given check
+      tags:
+      - status
+  /status/team/{team}/round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given team and round
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given team and round
+      tags:
+      - status
+  /statuses:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries
+      tags:
+      - status
+  /team/{team}:
+    get:
+      consumes:
+      - application/json
+      description: Get a team
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Team'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get a team
+      tags:
+      - team
+  /teams:
+    get:
+      consumes:
+      - application/json
+      description: Get all teams
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Team'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all teams
+      tags:
+      - team
+securityDefinitions:
+  ServiceAuth:
+    description: JWT for authentication
+    in: cookie
+    name: auth
+    type: apiKey
+swagger: "2.0"
