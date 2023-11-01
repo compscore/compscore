@@ -31,7 +31,7 @@ func Start(ctx *gin.Context) {
 		ctx.JSON(
 			http.StatusUnauthorized,
 			models.Error{
-				Error: "user is not authenticate",
+				Error: "user is not authenticated",
 			},
 		)
 		return

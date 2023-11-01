@@ -348,6 +348,31 @@ paths:
       summary: Status of the engine
       tags:
       - engine
+  /engine/stop:
+    post:
+      consumes:
+      - application/json
+      description: Stop the engine
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
+      summary: Stop the engine
+      tags:
+      - engine
   /login:
     post:
       consumes:
