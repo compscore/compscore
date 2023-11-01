@@ -637,6 +637,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/scoreboard": {
+            "get": {
+                "description": "Get scoreboard for the current round",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get scoreboard for the current round",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/structs.Scoreboard"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/scoreboard/check/{check}": {
             "get": {
                 "description": "Get the scoreboard for a given check",

@@ -12,6 +12,15 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Scoreboard returns the scoreboard for the current round
+//
+// @Summary Get scoreboard for the current round
+// @Description Get scoreboard for the current round
+// @Tags scoreboard
+// @Produce json
+// @Success 200 {object} structs.Scoreboard
+// @Failure 500 {object} models.Error
+// @Router /scoreboard [get]
 func Scoreboard(ctx *gin.Context) {
 	if config.Production {
 		cachedData, err := cache.Client.Get(ctx, "scoreboard").Result()

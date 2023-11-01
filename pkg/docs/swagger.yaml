@@ -591,6 +591,23 @@ paths:
       summary: Get all rounds
       tags:
       - round
+  /scoreboard:
+    get:
+      description: Get scoreboard for the current round
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/structs.Scoreboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get scoreboard for the current round
+      tags:
+      - scoreboard
   /scoreboard/check/{check}:
     get:
       consumes:
