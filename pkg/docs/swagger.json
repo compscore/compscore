@@ -774,6 +774,103 @@
                 }
             }
         },
+        "/scoreboard/status/{team}/{check}": {
+            "get": {
+                "description": "Get status scoreboard for a given team and check",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get status scoreboard for a given team and check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Team number",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.Status"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/scoreboard/status/{team}/{check}/{round}": {
+            "get": {
+                "description": "Get status scoreboard for a given team and check from a given round",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scoreboard"
+                ],
+                "summary": "Get status scoreboard for a given team and check from a given round",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check name",
+                        "name": "check",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Team number",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Round number",
+                        "name": "round",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/structs.Status"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/status/check/{check}": {
             "get": {
                 "description": "Get all status entries for a given check",
@@ -1463,6 +1560,24 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "structs.Status": {
+            "description": "Status",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "round": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "time": {
+                    "type": "string"
                 }
             }
         }

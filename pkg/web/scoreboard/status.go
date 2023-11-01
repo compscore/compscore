@@ -14,6 +14,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Status returns the status scoreboard for a given team and check
+//
+// @Summary Get status scoreboard for a given team and check
+// @Description Get status scoreboard for a given team and check
+// @Tags scoreboard
+// @Produce json
+// @Param check path string true "Check name"
+// @Param team path int true "Team number"
+// @Success 200 {object} []structs.Status
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/status/{team}/{check} [get]
 func Status(ctx *gin.Context) {
 	check := ctx.Param("check")
 	teamStr := ctx.Param("team")
@@ -80,6 +91,18 @@ func Status(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, statusHistory)
 }
 
+// StatusRound returns the status scoreboard for a given team and check from a given round
+//
+// @Summary Get status scoreboard for a given team and check from a given round
+// @Description Get status scoreboard for a given team and check from a given round
+// @Tags scoreboard
+// @Produce json
+// @Param check path string true "Check name"
+// @Param team path int true "Team number"
+// @Param round path int true "Round number"
+// @Success 200 {object} []structs.Status
+// @Failure 500 {object} models.Error
+// @Router /scoreboard/status/{team}/{check}/{round} [get]
 func StatusRound(ctx *gin.Context) {
 	check := ctx.Param("check")
 	teamStr := ctx.Param("team")
