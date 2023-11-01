@@ -14,10 +14,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// GetByTeamCheck returns the status of a team for a given check
+// GetByTeamCheck returns the status of a team for a given check for a given round
 //
-// @Summary Get the status of a team for a given check
-// @Description Get the status of a team for a given check
+// @Summary Get the status of a team for a given check for a given round
+// @Description Get the status of a team for a given check for a given round
 // @Tags status
 // @Accept json
 // @Produce json

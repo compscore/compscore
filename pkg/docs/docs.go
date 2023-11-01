@@ -767,9 +767,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/status/{team}/{check}/{round}": {
+        "/status/team/{team}": {
             "get": {
-                "description": "Get the status of a team for a given check",
+                "description": "Get the status of a team",
                 "consumes": [
                     "application/json"
                 ],
@@ -779,7 +779,48 @@ const docTemplate = `{
                 "tags": [
                     "status"
                 ],
-                "summary": "Get the status of a team for a given check",
+                "summary": "Get the status of a team",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/status.Status"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/status/{team}/{check}/{round}": {
+            "get": {
+                "description": "Get the status of a team for a given check for a given round",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "status"
+                ],
+                "summary": "Get the status of a team for a given check for a given round",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1093,6 +1134,21 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "status.Status": {
+            "type": "string",
+            "enum": [
+                "unknown",
+                "up",
+                "down",
+                "unknown"
+            ],
+            "x-enum-varnames": [
+                "DefaultStatus",
+                "StatusUp",
+                "StatusDown",
+                "StatusUnknown"
+            ]
         }
     },
     "securityDefinitions": {

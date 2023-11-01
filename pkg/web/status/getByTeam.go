@@ -14,6 +14,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// GetByTeam returns the status of a team
+//
+// @Summary Get the status of a team
+// @Description Get the status of a team
+// @Tags status
+// @Accept json
+// @Produce json
+// @Param team path int true "Team ID"
+// @Success 200 {object} []Status
+// @Failure 500 {object} models.Error
+// @Router /status/team/{team} [get]
 func GetByTeam(ctx *gin.Context) {
 	teamStr := ctx.Param("team")
 

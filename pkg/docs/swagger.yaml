@@ -137,6 +137,18 @@ definitions:
       roles:
         type: string
     type: object
+  status.Status:
+    enum:
+    - unknown
+    - up
+    - down
+    - unknown
+    type: string
+    x-enum-varnames:
+    - DefaultStatus
+    - StatusUp
+    - StatusDown
+    - StatusUnknown
 info:
   contact:
     name: 1nv8rzim
@@ -549,7 +561,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get the status of a team for a given check
+      description: Get the status of a team for a given check for a given round
       parameters:
       - description: Team ID
         in: path
@@ -577,7 +589,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
-      summary: Get the status of a team for a given check
+      summary: Get the status of a team for a given check for a given round
       tags:
       - status
   /status/check/{check}:
@@ -664,6 +676,33 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get all status entries for a given round
+      tags:
+      - status
+  /status/team/{team}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status of a team
+      parameters:
+      - description: Team ID
+        in: path
+        name: team
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/status.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get the status of a team
       tags:
       - status
   /team/{team}:
