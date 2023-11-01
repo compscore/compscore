@@ -545,7 +545,7 @@ paths:
       summary: Get all rounds
       tags:
       - round
-  /scoreboard/{team}/{check}/{round}:
+  /status/{team}/{check}/{round}:
     get:
       consumes:
       - application/json
@@ -600,8 +600,8 @@ paths:
             items:
               $ref: '#/definitions/models.Status'
             type: array
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get all status entries for a given check
@@ -632,11 +632,38 @@ paths:
             items:
               $ref: '#/definitions/models.Status'
             type: array
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get all status entries for a given check and round
+      tags:
+      - status
+  /status/round/{round}:
+    get:
+      consumes:
+      - application/json
+      description: Get all status entries for a given round
+      parameters:
+      - description: Round number
+        in: path
+        name: round
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Status'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get all status entries for a given round
       tags:
       - status
   /team/{team}:

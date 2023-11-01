@@ -22,7 +22,7 @@ import (
 // @Produce json
 // @Param check path string true "Check name"
 // @Success 200 {array} models.Status
-// @Failure 400 {object} models.Error
+// @Failure 500 {object} models.Error
 // @Router /status/check/{check} [get]
 func GetByCheck(ctx *gin.Context) {
 	check := ctx.Param("check")

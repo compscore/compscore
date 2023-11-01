@@ -14,6 +14,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// GetByRound returns all status entries for a given round
+//
+// @Summary Get all status entries for a given round
+// @Description Get all status entries for a given round
+// @Tags status
+// @Accept json
+// @Produce json
+// @Param round path int true "Round number"
+// @Success 200 {array} models.Status
+// @Failure 500 {object} models.Error
+// @Router /status/round/{round} [get]
 func GetByRound(ctx *gin.Context) {
 	roundStr := ctx.Param("round")
 

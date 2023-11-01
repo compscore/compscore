@@ -24,7 +24,7 @@ import (
 // @Param check path string true "Check name"
 // @Param round path int true "Round number"
 // @Success 200 {array} models.Status
-// @Failure 400 {object} models.Error
+// @Failure 500 {object} models.Error
 // @Router /status/check/{check}/round/{round} [get]
 func GetByCheckRound(ctx *gin.Context) {
 	check := ctx.Param("check")
