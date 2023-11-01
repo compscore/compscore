@@ -54,6 +54,16 @@ definitions:
       token:
         type: string
     type: object
+  models.Credential:
+    properties:
+      edges:
+        properties:
+          check: {}
+          team: {}
+        type: object
+      password:
+        type: string
+    type: object
   models.Error:
     description: response of login request
     properties:
@@ -180,6 +190,33 @@ paths:
       summary: Get a check
       tags:
       - check
+  /api/credentials:
+    get:
+      consumes:
+      - application/json
+      description: Get all credentials for a team
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Credential'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all credentials for a team
+      tags:
+      - credential
   /api/login:
     post:
       consumes:

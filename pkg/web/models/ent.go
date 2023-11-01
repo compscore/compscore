@@ -7,3 +7,11 @@ type Check struct {
 		Credential []interface{} `json:"credential,omitempty"`
 	} `json:"edges"`
 }
+
+type Credential struct {
+	Password string `json:"password"`
+	Edges    struct {
+		Check interface{} `json:"check,omitempty"`
+		Team  interface{} `json:"team,omitempty"`
+	} `json:"edges"`
+}
