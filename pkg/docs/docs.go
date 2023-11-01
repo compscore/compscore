@@ -18,6 +18,46 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/admin/login": {
+            "post": {
+                "description": "Authenticate into another team and return a JWT",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Authenticate into another team",
+                "parameters": [
+                    {
+                        "description": "Team name",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AdminLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Cookie"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/login": {
             "post": {
                 "description": "Authenticate a user and return a JWT",
@@ -38,7 +78,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/web.login_s"
+                            "$ref": "#/definitions/models.Login"
                         }
                     }
                 ],
@@ -46,13 +86,62 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.cookie_s"
+                            "$ref": "#/definitions/models.Cookie"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.error_s"
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/password": {
+            "post": {
+                "description": "Change a user's password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Change a user's password",
+                "parameters": [
+                    {
+                        "description": "Old and new password",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChangePassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password changed"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -60,7 +149,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "web.cookie_s": {
+        "models.AdminLogin": {
+            "description": "body of admin login request",
+            "type": "object",
+            "properties": {
+                "team": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ChangePassword": {
+            "description": "body of change password request",
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "type": "string"
+                },
+                "oldPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Cookie": {
             "description": "response of login request",
             "type": "object",
             "properties": {
@@ -87,7 +197,8 @@ const docTemplate = `{
                 }
             }
         },
-        "web.error_s": {
+        "models.Error": {
+            "description": "response of login request",
             "type": "object",
             "properties": {
                 "error": {
@@ -95,7 +206,7 @@ const docTemplate = `{
                 }
             }
         },
-        "web.login_s": {
+        "models.Login": {
             "description": "body of login request",
             "type": "object",
             "properties": {

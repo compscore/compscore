@@ -1,6 +1,20 @@
 basePath: /api
 definitions:
-  web.cookie_s:
+  models.AdminLogin:
+    description: body of admin login request
+    properties:
+      team:
+        type: string
+    type: object
+  models.ChangePassword:
+    description: body of change password request
+    properties:
+      newPassword:
+        type: string
+      oldPassword:
+        type: string
+    type: object
+  models.Cookie:
     description: response of login request
     properties:
       domain:
@@ -18,12 +32,13 @@ definitions:
       token:
         type: string
     type: object
-  web.error_s:
+  models.Error:
+    description: response of login request
     properties:
       error:
         type: string
     type: object
-  web.login_s:
+  models.Login:
     description: body of login request
     properties:
       password:
@@ -39,6 +54,32 @@ info:
   title: Compscore API
   version: "1.0"
 paths:
+  /api/admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate into another team and return a JWT
+      parameters:
+      - description: Team name
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cookie'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Authenticate into another team
+      tags:
+      - admin
   /api/login:
     post:
       consumes:
@@ -50,19 +91,51 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/web.login_s'
+          $ref: '#/definitions/models.Login'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.cookie_s'
+            $ref: '#/definitions/models.Cookie'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.error_s'
+            $ref: '#/definitions/models.Error'
       summary: Authenticate a user
+      tags:
+      - auth
+  /api/password:
+    post:
+      consumes:
+      - application/json
+      description: Change a user's password
+      parameters:
+      - description: Old and new password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password changed
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Change a user's password
       tags:
       - auth
 securityDefinitions:
