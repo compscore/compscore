@@ -36,6 +36,79 @@ make generate
 make install
 ```
 
+## Configuration
+
+Configuring Compscore is super easy! There are to two files you will need to edit [config.yml](./config.yml), which is used for configuring Compscore itself, and [.env](./.env), which configured how compscore is deployed.
+
+### config.yml
+
+`config.yml` is used to configure Compscore itself, there are a couple sections you will need to edit:
+
+#### name
+
+This section does not do anything, it just so you can name your configuration.
+
+#### users
+
+Use the following format to define new user:
+
+```yaml
+users:
+    - username: username_1
+      password: password_1
+    - username: username_1
+      password: password_1
+    ...
+```
+
+#### teams
+
+Use the following format for team creation:
+
+```yaml
+teams:
+  # amount of teams to create
+  amount: 15
+
+  # Name of users to create for compeitors
+  # This example use `Team XX` format (`Team 01` - `Team 15`)
+  nameFormat: Team { .Team }
+
+  # Default password of all competition teams
+  password: changeme123!
+```
+
+#### scoring
+
+Use the following format:
+
+```yaml
+scoring:
+  # length of scoring rounds in seconds
+  interval: 30
+```
+
+#### engine
+
+This section defines engine configuration, more than likely you will never have to edit this.
+
+```yaml
+engine:
+  # file location of unix socket for interacting with compscore
+  socket: /tmp/compscore.sock
+
+  # grpc timeout in seconds for server running over unix socket
+  timeout: 5
+```
+
+#### checks
+
+This section is for defining all checks to be ran in Compscore, it is a list of configurations as defined by these check's repositories.
+
+Check out the check here: [# Scorechecks](#scorechecks)
+
+### .env
+
 ## Command Line Usage
 
 |   subcommands   | description                                                                             |
