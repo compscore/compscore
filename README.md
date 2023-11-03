@@ -109,6 +109,26 @@ Check out the check here: [# Scorechecks](#scorechecks)
 
 ### .env
 
+`.env` is an environment variable file which is injected into all container during a production deploy and is pulled locally during a development deploy in order to standardize options across all components on Compscore.
+
+The options for the `.env` and what they do are as follows:
+
+|      variable       |                  options                   | decription                                                                                                                                                                                        |
+| :-----------------: | :----------------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|      `DEPLOY`       | `PRODUCTION`, `PROD`, `DEVELOPMENT`, `DEV` | `type of deploy`                                                                                                                                                                                  |
+|      `DOMAIN`       |      `exmaple.com`, `http://10.0.0.0`      | `domain/ip that Compscore is hosted from. IMPORTANT: Compscore uses ACME for domains that do not start with "http://", if your deploy is not public or does not have a domain use "https://[IP]"` |
+|       `PORT`        |    `default`:`8080`, `<any valid port>`    | `port for Compscore API to run on, this is tunneled via reverse proxy in production deploys to 80/443`                                                                                            |
+|    `JWT_SECRET`     |            `<string password>`             | `secret to use when signing JWT keys (can be any string)`                                                                                                                                         |
+|      `TIMEOUT`      |  `default`:`6`, `<any positive integers>`  | `expiration offset for frontend Compscore sessions in hours`                                                                                                                                      |
+|      `RELEASE`      |         ` default`:`false`,`true`          | `run web API in "release" (API debug printing disabled)`                                                                                                                                          |
+|   `POSTGRES_HOST`   |               `default`:`db`               | `container name of database (do not change without also editing "docker-compose.yml)`                                                                                                             |
+|   `POSTGRES_USER`   |   `default`:`compscore`, `<any string>`    | `user for Compscore to use to access database`                                                                                                                                                    |
+| `POSTGRES_PASSWORD` |            `<strong password>`             | `password for Compscore to authenticate to database with `                                                                                                                                        |
+|   `POSTGRES_PORT`   |    `default`:`5432`, `<any valid port>`    | `port for postgres to listen on`                                                                                                                                                                  |
+| `POSTGRES_DATABASE` |   `default`:`compscore`, `<any string>`    | `postgres database for Compscore to use`                                                                                                                                                          |
+|     `REDIS_URL`     |          `default`: `redis:6379`           | `port for redis to listen on (do not change without editting "docker-compose.yml")`                                                                                                               |
+|  `REDIS_PASSWORD`   |            `<strong password>`             | `password Compscore to authenticate to redis with`                                                                                                                                                |
+
 ## Command Line Usage
 
 |   subcommands   | description                                                                             |
