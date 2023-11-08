@@ -1,0 +1,6 @@
+{
+  "name": "Compscore Development Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
+}
