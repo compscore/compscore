@@ -6,7 +6,12 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "golang.go"
+        "golang.go",
+        "waderyan.gitblame",
+        "GitHub.copilot",
+        "ms-vscode.vscode-typescript-next",
+        "PKief.material-icon-theme",
+        "redhat.vscode-yaml"
       ]
     }
   }
