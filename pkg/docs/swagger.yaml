@@ -236,6 +236,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
       summary: Authenticate into another team
       tags:
       - admin
@@ -268,6 +270,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ServiceAuth: []
       summary: Reset password of another team
       tags:
       - admin
