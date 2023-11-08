@@ -20,6 +20,11 @@ const docTemplate = `{
     "paths": {
         "/admin/login": {
             "post": {
+                "security": [
+                    {
+                        "ServiceAuth": []
+                    }
+                ],
                 "description": "Authenticate into another team and return a JWT",
                 "consumes": [
                     "application/json"
@@ -60,6 +65,11 @@ const docTemplate = `{
         },
         "/admin/password": {
             "post": {
+                "security": [
+                    {
+                        "ServiceAuth": []
+                    }
+                ],
                 "description": "Reset password of another team",
                 "consumes": [
                     "application/json"
