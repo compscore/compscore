@@ -19,6 +19,7 @@ import (
 // @Tags admin
 // @Accept json
 // @Produce json
+// @Security ServiceAuth
 // @Param body body models.AdminLogin true "Team name"
 // @Success 200 {object} models.Cookie
 // @Failure 400 {object} models.Error

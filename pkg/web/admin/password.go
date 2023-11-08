@@ -19,6 +19,7 @@ import (
 // @Tags admin
 // @Accept json
 // @Produce json
+// @Security ServiceAuth
 // @Param body body models.AdminPasswordReset true "Team name and new password"
 // @Success 200
 // @Failure 400 {object} models.Error
