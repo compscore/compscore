@@ -399,35 +399,6 @@ func runScoreCheck(round int, check structs.Check_s, team int, target string, pa
 		username = check.Credentials.Username
 	}
 
-	if strings.Contains(check.Credentials.Password, "{{") {
-		passwordTemplate, err := template.New(check.Name).Parse(check.Credentials.Password)
-		if err != nil {
-			resultsChan <- checkResult{
-				Success: false,
-				Message: fmt.Sprintf("failed to parse password template: %v", err),
-				Team:    team,
-				Check:   check,
-			}
-			return
-		}
-
-		output := bytes.NewBuffer([]byte{})
-		err = passwordTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", team)})
-		if err != nil {
-			resultsChan <- checkResult{
-				Success: false,
-				Message: fmt.Sprintf("failed to parse password template: %v", err),
-				Team:    team,
-				Check:   check,
-			}
-			return
-		}
-
-		password = output.String()
-	} else {
-		password = check.Credentials.Password
-	}
-
 	optionsCopy := make(map[string]interface{})
 
 	for key, option := range check.Options {
