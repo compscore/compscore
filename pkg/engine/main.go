@@ -428,7 +428,11 @@ func runScoreCheck(round int, check structs.Check_s, team int, target string, pa
 		password = check.Credentials.Password
 	}
 
+	optionsCopy := make(map[string]interface{})
+
 	for key, option := range check.Options {
+		optionsCopy[key] = option
+
 		optionStr, isStr := option.(string)
 		if !isStr {
 			continue
@@ -459,12 +463,12 @@ func runScoreCheck(round int, check structs.Check_s, team int, target string, pa
 				return
 			}
 
-			check.Options[key] = output.String()
+			optionsCopy[key] = output.String()
 		}
 	}
 
 	go func() {
-		success, message := runFunc(checkCtx, target, command, expectedOutput, username, password, check.Options)
+		success, message := runFunc(checkCtx, target, command, expectedOutput, username, password, optionsCopy)
 		err := recover()
 		if err != nil {
 			logrus.WithError(err.(error)).Errorf("Failed to run check: %v, due to panic: %v", check, err)
