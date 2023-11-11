@@ -241,7 +241,7 @@ func (*scoreboard_s) check(check_name string, rounds int) (*structs.CheckScorebo
 		return nil, err
 	}
 
-	for i := 0; i < config.Teams.Amount; i++ {
+	for i := 1; i <= config.Teams.Amount; i++ {
 		output := bytes.NewBuffer([]byte{})
 		err = teamNameTemplate.Execute(output, struct{ Team string }{Team: fmt.Sprintf("%02d", i)})
 		if err != nil {
