@@ -40,14 +40,5 @@ func (Round) Edges() []ent.Edge {
 				},
 			).
 			Ref("round"),
-		edge.From("user", User.Type).
-			Comment("User of the round").
-			StructTag(`json:"user,omitempty"`).
-			Annotations(
-				entsql.Annotation{
-					OnDelete: entsql.Cascade,
-				},
-			).
-			Ref("round"),
 	}
 }
