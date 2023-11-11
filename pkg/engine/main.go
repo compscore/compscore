@@ -257,6 +257,10 @@ func runRound(roundMutex *sync.Mutex) error {
 	}
 
 	go func() {
+		clean := func(s string) string {
+			return strings.ReplaceAll(s, "\x00", "")
+		}
+
 		for result := range resultsChan {
 			_, err = data.Status.Update(
 				result.Team,
@@ -268,7 +272,7 @@ func runRound(roundMutex *sync.Mutex) error {
 					}
 					return status.StatusDown
 				}(),
-				result.Message,
+				clean(result.Message),
 			)
 			if err != nil {
 				logrus.WithError(err).Errorf("Failed to update status for check: %v", result.Check)
