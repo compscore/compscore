@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	entgo.io/ent v0.12.4 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
