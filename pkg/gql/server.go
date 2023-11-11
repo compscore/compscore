@@ -7,7 +7,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/compscore/compscore/graph"
+	"github.com/compscore/compscore/pkg/gql/graph"
 )
 
 const defaultPort = "8080"
