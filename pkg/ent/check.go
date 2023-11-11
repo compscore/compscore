@@ -36,6 +36,11 @@ type CheckEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedCredential map[string][]*Credential
+	namedStatus     map[string][]*Status
 }
 
 // CredentialOrErr returns the Credential value or an error if the edge
@@ -151,6 +156,54 @@ func (c *Check) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.Weight))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedCredential returns the Credential named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Check) NamedCredential(name string) ([]*Credential, error) {
+	if c.Edges.namedCredential == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedCredential[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Check) appendNamedCredential(name string, edges ...*Credential) {
+	if c.Edges.namedCredential == nil {
+		c.Edges.namedCredential = make(map[string][]*Credential)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedCredential[name] = []*Credential{}
+	} else {
+		c.Edges.namedCredential[name] = append(c.Edges.namedCredential[name], edges...)
+	}
+}
+
+// NamedStatus returns the Status named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Check) NamedStatus(name string) ([]*Status, error) {
+	if c.Edges.namedStatus == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedStatus[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Check) appendNamedStatus(name string, edges ...*Status) {
+	if c.Edges.namedStatus == nil {
+		c.Edges.namedStatus = make(map[string][]*Status)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedStatus[name] = []*Status{}
+	} else {
+		c.Edges.namedStatus[name] = append(c.Edges.namedStatus[name], edges...)
+	}
 }
 
 // Checks is a parsable slice of Check.

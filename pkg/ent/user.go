@@ -40,6 +40,11 @@ type UserEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedCredential map[string][]*Credential
+	namedStatus     map[string][]*Status
 }
 
 // CredentialOrErr returns the Credential value or an error if the edge
@@ -172,6 +177,54 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedCredential returns the Credential named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedCredential(name string) ([]*Credential, error) {
+	if u.Edges.namedCredential == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedCredential[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedCredential(name string, edges ...*Credential) {
+	if u.Edges.namedCredential == nil {
+		u.Edges.namedCredential = make(map[string][]*Credential)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedCredential[name] = []*Credential{}
+	} else {
+		u.Edges.namedCredential[name] = append(u.Edges.namedCredential[name], edges...)
+	}
+}
+
+// NamedStatus returns the Status named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedStatus(name string) ([]*Status, error) {
+	if u.Edges.namedStatus == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedStatus[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedStatus(name string, edges ...*Status) {
+	if u.Edges.namedStatus == nil {
+		u.Edges.namedStatus = make(map[string][]*Status)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedStatus[name] = []*Status{}
+	} else {
+		u.Edges.namedStatus[name] = append(u.Edges.namedStatus[name], edges...)
+	}
 }
 
 // Users is a parsable slice of User.

@@ -6,26 +6,64 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/gql/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// Credentials is the resolver for the credentials field.
+func (r *checkResolver) Credentials(ctx context.Context, obj *ent.Check) ([]*ent.Credential, error) {
+	return obj.QueryCredential().All(ctx)
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// Statuses is the resolver for the statuses field.
+func (r *checkResolver) Statuses(ctx context.Context, obj *ent.Check) ([]*ent.Status, error) {
+	return obj.QueryStatus().All(ctx)
 }
 
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+// Statuses is the resolver for the statuses field.
+func (r *roundResolver) Statuses(ctx context.Context, obj *ent.Round) ([]*ent.Status, error) {
+	return obj.QueryStatus().All(ctx)
+}
 
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+// Status is the resolver for the status field.
+func (r *statusResolver) Status(ctx context.Context, obj *ent.Status) (model.StatusStatus, error) {
+	return model.StatusStatus(obj.Status), nil
+}
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+// Timestamp is the resolver for the timestamp field.
+func (r *statusResolver) Timestamp(ctx context.Context, obj *ent.Status) (string, error) {
+	return obj.Timestamp.Format("2006-01-02 15:04:05"), nil
+}
+
+// Role is the resolver for the role field.
+func (r *userResolver) Role(ctx context.Context, obj *ent.User) (model.UserRole, error) {
+	return model.UserRole(obj.Role), nil
+}
+
+// Credentials is the resolver for the credentials field.
+func (r *userResolver) Credentials(ctx context.Context, obj *ent.User) ([]*ent.Credential, error) {
+	return obj.QueryCredential().All(ctx)
+}
+
+// Statuses is the resolver for the statuses field.
+func (r *userResolver) Statuses(ctx context.Context, obj *ent.User) ([]*ent.Status, error) {
+	return obj.QueryStatus().All(ctx)
+}
+
+// Check returns CheckResolver implementation.
+func (r *Resolver) Check() CheckResolver { return &checkResolver{r} }
+
+// Round returns RoundResolver implementation.
+func (r *Resolver) Round() RoundResolver { return &roundResolver{r} }
+
+// Status returns StatusResolver implementation.
+func (r *Resolver) Status() StatusResolver { return &statusResolver{r} }
+
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
+type checkResolver struct{ *Resolver }
+type roundResolver struct{ *Resolver }
+type statusResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

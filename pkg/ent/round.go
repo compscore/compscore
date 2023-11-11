@@ -32,6 +32,10 @@ type RoundEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedStatus map[string][]*Status
 }
 
 // StatusOrErr returns the Status value or an error if the edge
@@ -124,6 +128,30 @@ func (r *Round) String() string {
 	builder.WriteString(fmt.Sprintf("%v", r.Completed))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedStatus returns the Status named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Round) NamedStatus(name string) ([]*Status, error) {
+	if r.Edges.namedStatus == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedStatus[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Round) appendNamedStatus(name string, edges ...*Status) {
+	if r.Edges.namedStatus == nil {
+		r.Edges.namedStatus = make(map[string][]*Status)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedStatus[name] = []*Status{}
+	} else {
+		r.Edges.namedStatus[name] = append(r.Edges.namedStatus[name], edges...)
+	}
 }
 
 // Rounds is a parsable slice of Round.

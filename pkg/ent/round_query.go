@@ -19,11 +19,14 @@ import (
 // RoundQuery is the builder for querying Round entities.
 type RoundQuery struct {
 	config
-	ctx        *QueryContext
-	order      []round.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Round
-	withStatus *StatusQuery
+	ctx             *QueryContext
+	order           []round.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Round
+	withStatus      *StatusQuery
+	modifiers       []func(*sql.Selector)
+	loadTotal       []func(context.Context, []*Round) error
+	withNamedStatus map[string]*StatusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(rq.modifiers) > 0 {
+		_spec.Modifiers = rq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 		if err := rq.loadStatus(ctx, query, nodes,
 			func(n *Round) { n.Edges.Status = []*Status{} },
 			func(n *Round, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range rq.withNamedStatus {
+		if err := rq.loadStatus(ctx, query, nodes,
+			func(n *Round) { n.appendNamedStatus(name) },
+			func(n *Round, e *Status) { n.appendNamedStatus(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range rq.loadTotal {
+		if err := rq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -436,6 +454,9 @@ func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 
 func (rq *RoundQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := rq.querySpec()
+	if len(rq.modifiers) > 0 {
+		_spec.Modifiers = rq.modifiers
+	}
 	_spec.Node.Columns = rq.ctx.Fields
 	if len(rq.ctx.Fields) > 0 {
 		_spec.Unique = rq.ctx.Unique != nil && *rq.ctx.Unique
@@ -513,6 +534,20 @@ func (rq *RoundQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedStatus tells the query-builder to eager-load the nodes that are connected to the "status"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoundQuery) WithNamedStatus(name string, opts ...func(*StatusQuery)) *RoundQuery {
+	query := (&StatusClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if rq.withNamedStatus == nil {
+		rq.withNamedStatus = make(map[string]*StatusQuery)
+	}
+	rq.withNamedStatus[name] = query
+	return rq
 }
 
 // RoundGroupBy is the group-by builder for Round entities.

@@ -2,19 +2,92 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type StatusStatus string
+
+const (
+	StatusStatusSuccess StatusStatus = "success"
+	StatusStatusFailure StatusStatus = "failure"
+	StatusStatusUnknown StatusStatus = "unknown"
+)
+
+var AllStatusStatus = []StatusStatus{
+	StatusStatusSuccess,
+	StatusStatusFailure,
+	StatusStatusUnknown,
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+func (e StatusStatus) IsValid() bool {
+	switch e {
+	case StatusStatusSuccess, StatusStatusFailure, StatusStatusUnknown:
+		return true
+	}
+	return false
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+func (e StatusStatus) String() string {
+	return string(e)
+}
+
+func (e *StatusStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = StatusStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid StatusStatus", str)
+	}
+	return nil
+}
+
+func (e StatusStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserRole string
+
+const (
+	UserRoleAdmin      UserRole = "admin"
+	UserRoleCompetitor UserRole = "competitor"
+)
+
+var AllUserRole = []UserRole{
+	UserRoleAdmin,
+	UserRoleCompetitor,
+}
+
+func (e UserRole) IsValid() bool {
+	switch e {
+	case UserRoleAdmin, UserRoleCompetitor:
+		return true
+	}
+	return false
+}
+
+func (e UserRole) String() string {
+	return string(e)
+}
+
+func (e *UserRole) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserRole(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserRole", str)
+	}
+	return nil
+}
+
+func (e UserRole) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

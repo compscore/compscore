@@ -20,12 +20,16 @@ import (
 // CheckQuery is the builder for querying Check entities.
 type CheckQuery struct {
 	config
-	ctx            *QueryContext
-	order          []check.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Check
-	withCredential *CredentialQuery
-	withStatus     *StatusQuery
+	ctx                 *QueryContext
+	order               []check.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.Check
+	withCredential      *CredentialQuery
+	withStatus          *StatusQuery
+	modifiers           []func(*sql.Selector)
+	loadTotal           []func(context.Context, []*Check) error
+	withNamedCredential map[string]*CredentialQuery
+	withNamedStatus     map[string]*StatusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -420,6 +424,9 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -440,6 +447,25 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 		if err := cq.loadStatus(ctx, query, nodes,
 			func(n *Check) { n.Edges.Status = []*Status{} },
 			func(n *Check, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedCredential {
+		if err := cq.loadCredential(ctx, query, nodes,
+			func(n *Check) { n.appendNamedCredential(name) },
+			func(n *Check, e *Credential) { n.appendNamedCredential(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedStatus {
+		if err := cq.loadStatus(ctx, query, nodes,
+			func(n *Check) { n.appendNamedStatus(name) },
+			func(n *Check, e *Status) { n.appendNamedStatus(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range cq.loadTotal {
+		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -511,6 +537,9 @@ func (cq *CheckQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 
 func (cq *CheckQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	_spec.Node.Columns = cq.ctx.Fields
 	if len(cq.ctx.Fields) > 0 {
 		_spec.Unique = cq.ctx.Unique != nil && *cq.ctx.Unique
@@ -588,6 +617,34 @@ func (cq *CheckQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedCredential tells the query-builder to eager-load the nodes that are connected to the "credential"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *CheckQuery) WithNamedCredential(name string, opts ...func(*CredentialQuery)) *CheckQuery {
+	query := (&CredentialClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedCredential == nil {
+		cq.withNamedCredential = make(map[string]*CredentialQuery)
+	}
+	cq.withNamedCredential[name] = query
+	return cq
+}
+
+// WithNamedStatus tells the query-builder to eager-load the nodes that are connected to the "status"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *CheckQuery) WithNamedStatus(name string, opts ...func(*StatusQuery)) *CheckQuery {
+	query := (&StatusClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedStatus == nil {
+		cq.withNamedStatus = make(map[string]*StatusQuery)
+	}
+	cq.withNamedStatus[name] = query
+	return cq
 }
 
 // CheckGroupBy is the group-by builder for Check entities.

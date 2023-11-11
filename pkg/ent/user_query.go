@@ -20,12 +20,16 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx            *QueryContext
-	order          []user.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.User
-	withCredential *CredentialQuery
-	withStatus     *StatusQuery
+	ctx                 *QueryContext
+	order               []user.OrderOption
+	inters              []Interceptor
+	predicates          []predicate.User
+	withCredential      *CredentialQuery
+	withStatus          *StatusQuery
+	modifiers           []func(*sql.Selector)
+	loadTotal           []func(context.Context, []*User) error
+	withNamedCredential map[string]*CredentialQuery
+	withNamedStatus     map[string]*StatusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -420,6 +424,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(uq.modifiers) > 0 {
+		_spec.Modifiers = uq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -440,6 +447,25 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadStatus(ctx, query, nodes,
 			func(n *User) { n.Edges.Status = []*Status{} },
 			func(n *User, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedCredential {
+		if err := uq.loadCredential(ctx, query, nodes,
+			func(n *User) { n.appendNamedCredential(name) },
+			func(n *User, e *Credential) { n.appendNamedCredential(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedStatus {
+		if err := uq.loadStatus(ctx, query, nodes,
+			func(n *User) { n.appendNamedStatus(name) },
+			func(n *User, e *Status) { n.appendNamedStatus(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range uq.loadTotal {
+		if err := uq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -511,6 +537,9 @@ func (uq *UserQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes [
 
 func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := uq.querySpec()
+	if len(uq.modifiers) > 0 {
+		_spec.Modifiers = uq.modifiers
+	}
 	_spec.Node.Columns = uq.ctx.Fields
 	if len(uq.ctx.Fields) > 0 {
 		_spec.Unique = uq.ctx.Unique != nil && *uq.ctx.Unique
@@ -588,6 +617,34 @@ func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedCredential tells the query-builder to eager-load the nodes that are connected to the "credential"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedCredential(name string, opts ...func(*CredentialQuery)) *UserQuery {
+	query := (&CredentialClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedCredential == nil {
+		uq.withNamedCredential = make(map[string]*CredentialQuery)
+	}
+	uq.withNamedCredential[name] = query
+	return uq
+}
+
+// WithNamedStatus tells the query-builder to eager-load the nodes that are connected to the "status"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedStatus(name string, opts ...func(*StatusQuery)) *UserQuery {
+	query := (&StatusClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedStatus == nil {
+		uq.withNamedStatus = make(map[string]*StatusQuery)
+	}
+	uq.withNamedStatus[name] = query
+	return uq
 }
 
 // UserGroupBy is the group-by builder for User entities.

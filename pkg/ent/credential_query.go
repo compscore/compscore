@@ -26,6 +26,8 @@ type CredentialQuery struct {
 	withUser   *UserQuery
 	withCheck  *CheckQuery
 	withFKs    bool
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Credential) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -427,6 +429,9 @@ func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -445,6 +450,11 @@ func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	if query := cq.withCheck; query != nil {
 		if err := cq.loadCheck(ctx, query, nodes, nil,
 			func(n *Credential, e *Check) { n.Edges.Check = e }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range cq.loadTotal {
+		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -518,6 +528,9 @@ func (cq *CredentialQuery) loadCheck(ctx context.Context, query *CheckQuery, nod
 
 func (cq *CredentialQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	_spec.Node.Columns = cq.ctx.Fields
 	if len(cq.ctx.Fields) > 0 {
 		_spec.Unique = cq.ctx.Unique != nil && *cq.ctx.Unique

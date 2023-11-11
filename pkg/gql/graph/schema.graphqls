@@ -2,27 +2,54 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+enum UserRole {
+  admin
+  competitor
 }
 
 type User {
   id: ID!
   name: String!
+  teamNumber: Int!
+  role: UserRole!
+  credentials: [Credential!]!
+  statuses: [Status!]!
 }
 
-type Query {
-  todos: [Todo!]!
+type Credential {
+  id: ID!
+  password: String!
+  check: Check!
+  user: User!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+type Check {
+  id: ID!
+  name: String!
+  weight: Int!
+  credentials: [Credential!]!
+  statuses: [Status!]!
 }
 
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
+enum StatusStatus {
+  success
+  failure
+  unknown
+}
+
+type Status {
+  id: ID!
+  status: StatusStatus!
+  message: String!
+  timestamp: String!
+  points: Int!
+  check: Check!
+  user: User!
+  round: Round!
+}
+
+type Round {
+  id: ID!
+  completed: Boolean!
+  statuses: [Status!]!
 }
