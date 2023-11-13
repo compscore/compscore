@@ -34,7 +34,7 @@ export default function NavBar({ cookies, setDrawerState, mobile }: Props) {
           <Box sx={{ m: 1 }} />
           <Button
             onClick={() => {
-              window.location.href = "/";
+              window.location.href = "/scoreboard";
             }}
             color='inherit'
             sx={{
