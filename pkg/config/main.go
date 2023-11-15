@@ -93,10 +93,29 @@ func UpdateConfiguration() {
 		logrus.WithError(err).Fatal("Failed to unmarshal checks config")
 	}
 
+	err = validateChecks()
+	if err != nil {
+		logrus.WithError(err).Fatal("Failed to validate checks config")
+	}
+
 	err = viper.UnmarshalKey("users", &AdminUsers)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to unmarshal users config")
 	}
+}
+
+func validateChecks() error {
+	existingChecks := map[string]bool{}
+
+	for _, check := range Checks {
+		if _, ok := existingChecks[check.Name]; ok {
+			return fmt.Errorf("duplicate check name: \"%s\"", check.Name)
+		} else {
+			existingChecks[check.Name] = true
+		}
+	}
+
+	return nil
 }
 
 func deploy() (bool, error) {
