@@ -59,7 +59,12 @@ func run(cmd *cobra.Command, args []string) {
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to make terminal raw")
 	}
-	defer term.Restore(int(os.Stdin.Fd()), oldState)
+	defer func() {
+		err := term.Restore(int(os.Stdin.Fd()), oldState)
+		if err != nil {
+			logrus.WithError(err).Fatal("failed to restore terminal")
+		}
+	}()
 
 	fmt.Println("Press 'q' to stop the server\r")
 	fmt.Println("Press 'o' to open the browser\r")
