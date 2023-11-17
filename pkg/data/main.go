@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
 
 	"github.com/compscore/compscore/pkg/config"
 	"github.com/compscore/compscore/pkg/ent"
@@ -14,9 +13,8 @@ import (
 )
 
 var (
-	client *ent.Client
-	ctx    context.Context = context.Background()
-	mutex  *sync.Mutex     = &sync.Mutex{}
+	Client *ent.Client
+	Ctx    context.Context = context.Background()
 )
 
 func Init() {
@@ -44,19 +42,10 @@ func Init() {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
 
-	client = c
+	Client = c
 
 	// Run the auto migration tool.
-	if err := c.Schema.Create(ctx); err != nil {
+	if err := Client.Schema.Create(Ctx); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
-}
-
-func Client(function func(*ent.Client, context.Context) (interface{}, error)) (interface{}, error) {
-	if !config.Production {
-		mutex.Lock()
-		defer mutex.Unlock()
-	}
-
-	return function(client, ctx)
 }
