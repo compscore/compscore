@@ -7,6 +7,8 @@ require (
 	entgo.io/ent v0.12.4
 	github.com/99designs/gqlgen v0.17.40
 	github.com/hashicorp/go-multierror v1.1.1
+	github.com/lib/pq v1.10.9
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/vektah/gqlparser/v2 v2.5.10
