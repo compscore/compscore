@@ -1,0 +1,95 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+enum UserRole {
+  admin
+  competitor
+}
+
+type User {
+  id: ID!
+  name: String!
+  teamNumber: Int!
+  role: UserRole!
+  credentials: [Credential!]!
+  statuses: [Status!]!
+}
+
+type Credential {
+  id: ID!
+  password: String!
+  check: Check!
+  user: User!
+}
+
+type Check {
+  id: ID!
+  name: String!
+  weight: Int!
+  credentials: [Credential!]!
+  statuses: [Status!]!
+}
+
+enum StatusStatus {
+  success
+  failure
+  unknown
+}
+
+type Status {
+  id: ID!
+  status: StatusStatus!
+  message: String!
+  timestamp: String!
+  points: Int!
+  check: Check!
+  user: User!
+  round: Round!
+}
+
+type Round {
+  id: ID!
+  completed: Boolean!
+  statuses: [Status!]!
+}
+
+type CheckStatus {
+  name: String!
+  status: StatusStatus!
+}
+
+type Scoreboard {
+  round: ID!
+  scores: [Int!]!
+  checks: [CheckStatus!]!
+}
+
+type Mutation {
+  createUser(name: String!, teamNumber: Int!, role: UserRole!): User!
+  updateUser(id: ID!, name: String!, teamNumber: Int!, role: UserRole!): User!
+  updatePassword(
+    id: ID!
+    previousPassword: String!
+    newPassword: String!
+  ): User!
+  updatePasswordAdmin(id: ID!, password: String!): User!
+  deleteUser(id: ID!): User!
+
+  createCheck(name: String!, weight: Int!): Check!
+  updateCheck(id: ID!, name: String!, weight: Int!): Check!
+  deleteCheck(id: ID!): Check!
+
+  updateCredential(id: ID!, password: String!): Credential!
+  deleteCredential(id: ID!): Credential!
+
+  updateStatus(id: ID!, status: StatusStatus!, message: String!): Status!
+
+  updateRound(id: ID!, completed: Boolean!, status: StatusStatus!): Round!
+  updateRoundByCheck(
+    roundID: ID!
+    checkID: ID!
+    completed: Boolean!
+    status: StatusStatus!
+  ): Round!
+}
