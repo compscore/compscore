@@ -1,14 +1,10 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
 enum UserRole {
   admin
   competitor
 }
 
 type User {
-  id: ID!
+  id: Int!
   name: String!
   teamNumber: Int!
   role: UserRole!
@@ -17,14 +13,14 @@ type User {
 }
 
 type Credential {
-  id: ID!
+  id: Int!
   password: String!
   check: Check!
   user: User!
 }
 
 type Check {
-  id: ID!
+  id: Int!
   name: String!
   weight: Int!
   credentials: [Credential!]!
@@ -38,7 +34,7 @@ enum StatusStatus {
 }
 
 type Status {
-  id: ID!
+  id: Int!
   status: StatusStatus!
   message: String!
   timestamp: String!
@@ -49,7 +45,7 @@ type Status {
 }
 
 type Round {
-  id: ID!
+  id: Int!
   completed: Boolean!
   statuses: [Status!]!
 }
@@ -60,36 +56,46 @@ type CheckStatus {
 }
 
 type Scoreboard {
-  round: ID!
+  round: Int!
   scores: [Int!]!
   checks: [CheckStatus!]!
 }
 
 type Mutation {
   createUser(name: String!, teamNumber: Int!, role: UserRole!): User!
-  updateUser(id: ID!, name: String!, teamNumber: Int!, role: UserRole!): User!
+  updateUser(id: Int!, name: String!, teamNumber: Int!, role: UserRole!): User!
   updatePassword(
-    id: ID!
+    id: Int!
     previousPassword: String!
     newPassword: String!
   ): User!
-  updatePasswordAdmin(id: ID!, password: String!): User!
-  deleteUser(id: ID!): User!
+  updatePasswordAdmin(id: Int!, password: String!): User!
+  deleteUser(id: Int!): String!
 
   createCheck(name: String!, weight: Int!): Check!
-  updateCheck(id: ID!, name: String!, weight: Int!): Check!
-  deleteCheck(id: ID!): Check!
+  updateCheck(id: Int!, name: String!, weight: Int!): Check!
+  deleteCheck(id: Int!): String!
 
-  updateCredential(id: ID!, password: String!): Credential!
-  deleteCredential(id: ID!): Credential!
+  updateCredential(id: Int!, password: String!): Credential!
+  deleteCredential(id: Int!): String!
 
-  updateStatus(id: ID!, status: StatusStatus!, message: String!): Status!
+  updateStatus(id: Int!, status: StatusStatus!, message: String!): Status!
 
-  updateRound(id: ID!, completed: Boolean!, status: StatusStatus!): Round!
-  updateRoundByCheck(
-    roundID: ID!
-    checkID: ID!
-    completed: Boolean!
+  updateRoundStatuses(id: Int!, status: StatusStatus!): String!
+  updateRoundStatusesByCheck(
+    roundInt: Int!
+    checkInt: Int!
     status: StatusStatus!
-  ): Round!
+  ): String!
+  updateRoundStatusesByUser(
+    roundInt: Int!
+    userInt: Int!
+    status: StatusStatus!
+  ): String!
+  updateRoundStatusesByCheckAndUser(
+    roundInt: Int!
+    checkInt: Int!
+    userInt: Int!
+    status: StatusStatus!
+  ): String!
 }

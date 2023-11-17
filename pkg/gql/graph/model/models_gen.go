@@ -14,7 +14,7 @@ type CheckStatus struct {
 }
 
 type Scoreboard struct {
-	Round  string         `json:"round"`
+	Round  int            `json:"round"`
 	Scores []int          `json:"scores"`
 	Checks []*CheckStatus `json:"checks"`
 }

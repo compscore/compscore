@@ -7,9 +7,12 @@ require (
 	entgo.io/ent v0.12.4
 	github.com/99designs/gqlgen v0.17.40
 	github.com/hashicorp/go-multierror v1.1.1
+	github.com/lib/pq v1.10.9
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/vektah/gqlparser/v2 v2.5.10
+	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167
 	golang.org/x/sync v0.2.0
 	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1
 )
