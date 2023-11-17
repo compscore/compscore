@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/compscore/compscore/pkg/ent"
 	"github.com/compscore/compscore/pkg/gql/graph/model"
@@ -13,46 +14,114 @@ import (
 
 // Credentials is the resolver for the credentials field.
 func (r *checkResolver) Credentials(ctx context.Context, obj *ent.Check) ([]*ent.Credential, error) {
-	return obj.QueryCredential().All(ctx)
+	panic(fmt.Errorf("not implemented: CreateUser - credentials"))
 }
 
 // Statuses is the resolver for the statuses field.
 func (r *checkResolver) Statuses(ctx context.Context, obj *ent.Check) ([]*ent.Status, error) {
-	return obj.QueryStatus().All(ctx)
+	panic(fmt.Errorf("not implemented: CreateUser - statuses"))
+}
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, name string, teamNumber int, role model.UserRole) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+}
+
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, name string, teamNumber int, role model.UserRole) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+}
+
+// UpdatePassword is the resolver for the updatePassword field.
+func (r *mutationResolver) UpdatePassword(ctx context.Context, id string, previousPassword string, newPassword string) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatePassword - updatePassword"))
+}
+
+// UpdatePasswordAdmin is the resolver for the updatePasswordAdmin field.
+func (r *mutationResolver) UpdatePasswordAdmin(ctx context.Context, id string, password string) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: UpdatePasswordAdmin - updatePasswordAdmin"))
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
+}
+
+// CreateCheck is the resolver for the createCheck field.
+func (r *mutationResolver) CreateCheck(ctx context.Context, name string, weight int) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: CreateCheck - createCheck"))
+}
+
+// UpdateCheck is the resolver for the updateCheck field.
+func (r *mutationResolver) UpdateCheck(ctx context.Context, id string, name string, weight int) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: UpdateCheck - updateCheck"))
+}
+
+// DeleteCheck is the resolver for the deleteCheck field.
+func (r *mutationResolver) DeleteCheck(ctx context.Context, id string) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: DeleteCheck - deleteCheck"))
+}
+
+// UpdateCredential is the resolver for the updateCredential field.
+func (r *mutationResolver) UpdateCredential(ctx context.Context, id string, password string) (*ent.Credential, error) {
+	panic(fmt.Errorf("not implemented: UpdateCredential - updateCredential"))
+}
+
+// DeleteCredential is the resolver for the deleteCredential field.
+func (r *mutationResolver) DeleteCredential(ctx context.Context, id string) (*ent.Credential, error) {
+	panic(fmt.Errorf("not implemented: DeleteCredential - deleteCredential"))
+}
+
+// UpdateStatus is the resolver for the updateStatus field.
+func (r *mutationResolver) UpdateStatus(ctx context.Context, id string, status model.StatusStatus, message string) (*ent.Status, error) {
+	panic(fmt.Errorf("not implemented: UpdateStatus - updateStatus"))
+}
+
+// UpdateRound is the resolver for the updateRound field.
+func (r *mutationResolver) UpdateRound(ctx context.Context, id string, completed bool, status model.StatusStatus) (*ent.Round, error) {
+	panic(fmt.Errorf("not implemented: UpdateRound - updateRound"))
+}
+
+// UpdateRoundByCheck is the resolver for the updateRoundByCheck field.
+func (r *mutationResolver) UpdateRoundByCheck(ctx context.Context, roundID string, checkID string, completed bool, status model.StatusStatus) (*ent.Round, error) {
+	panic(fmt.Errorf("not implemented: UpdateRoundByCheck - updateRoundByCheck"))
 }
 
 // Statuses is the resolver for the statuses field.
 func (r *roundResolver) Statuses(ctx context.Context, obj *ent.Round) ([]*ent.Status, error) {
-	return obj.QueryStatus().All(ctx)
+	panic(fmt.Errorf("not implemented: CreateUser - statuses"))
 }
 
 // Status is the resolver for the status field.
 func (r *statusResolver) Status(ctx context.Context, obj *ent.Status) (model.StatusStatus, error) {
-	return model.StatusStatus(obj.Status), nil
+	panic(fmt.Errorf("not implemented: CreateUser - status"))
 }
 
 // Timestamp is the resolver for the timestamp field.
 func (r *statusResolver) Timestamp(ctx context.Context, obj *ent.Status) (string, error) {
-	return obj.Timestamp.Format("2006-01-02 15:04:05"), nil
+	panic(fmt.Errorf("not implemented: CreateUser - timestamp"))
 }
 
 // Role is the resolver for the role field.
 func (r *userResolver) Role(ctx context.Context, obj *ent.User) (model.UserRole, error) {
-	return model.UserRole(obj.Role), nil
+	panic(fmt.Errorf("not implemented: CreateUser - role"))
 }
 
 // Credentials is the resolver for the credentials field.
 func (r *userResolver) Credentials(ctx context.Context, obj *ent.User) ([]*ent.Credential, error) {
-	return obj.QueryCredential().All(ctx)
+	panic(fmt.Errorf("not implemented: CreateUser - credentials"))
 }
 
 // Statuses is the resolver for the statuses field.
 func (r *userResolver) Statuses(ctx context.Context, obj *ent.User) ([]*ent.Status, error) {
-	return obj.QueryStatus().All(ctx)
+	panic(fmt.Errorf("not implemented: CreateUser - statuses"))
 }
 
 // Check returns CheckResolver implementation.
 func (r *Resolver) Check() CheckResolver { return &checkResolver{r} }
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Round returns RoundResolver implementation.
 func (r *Resolver) Round() RoundResolver { return &roundResolver{r} }
@@ -64,6 +133,7 @@ func (r *Resolver) Status() StatusResolver { return &statusResolver{r} }
 func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
 type checkResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 type roundResolver struct{ *Resolver }
 type statusResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }

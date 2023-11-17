@@ -8,6 +8,17 @@ import (
 	"strconv"
 )
 
+type CheckStatus struct {
+	Name   string       `json:"name"`
+	Status StatusStatus `json:"status"`
+}
+
+type Scoreboard struct {
+	Round  string         `json:"round"`
+	Scores []int          `json:"scores"`
+	Checks []*CheckStatus `json:"checks"`
+}
+
 type StatusStatus string
 
 const (
