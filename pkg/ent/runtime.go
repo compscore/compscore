@@ -51,9 +51,13 @@ func init() {
 	scoreFields := schema.Score{}.Fields()
 	_ = scoreFields
 	// scoreDescScore is the schema descriptor for score field.
-	scoreDescScore := scoreFields[0].Descriptor()
+	scoreDescScore := scoreFields[1].Descriptor()
 	// score.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	score.ScoreValidator = scoreDescScore.Validators[0].(func(int) error)
+	// scoreDescID is the schema descriptor for id field.
+	scoreDescID := scoreFields[0].Descriptor()
+	// score.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	score.IDValidator = scoreDescID.Validators[0].(func(int) error)
 	statusFields := schema.Status{}.Fields()
 	_ = statusFields
 	// statusDescTimestamp is the schema descriptor for timestamp field.

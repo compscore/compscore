@@ -14,6 +14,12 @@ type Score struct {
 // Fields of the Score.
 func (Score) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int("id").
+			Comment("ID of the score").
+			StructTag(`json:"id"`).
+			Positive().
+			Immutable().
+			Unique(),
 		field.Int("score").
 			Comment("Score for team at a given round").
 			StructTag(`json:"score"`).

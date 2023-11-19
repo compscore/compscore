@@ -27,6 +27,12 @@ func (sc *ScoreCreate) SetScore(i int) *ScoreCreate {
 	return sc
 }
 
+// SetID sets the "id" field.
+func (sc *ScoreCreate) SetID(i int) *ScoreCreate {
+	sc.mutation.SetID(i)
+	return sc
+}
+
 // SetRoundID sets the "round" edge to the Round entity by ID.
 func (sc *ScoreCreate) SetRoundID(id int) *ScoreCreate {
 	sc.mutation.SetRoundID(id)
@@ -91,6 +97,11 @@ func (sc *ScoreCreate) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "Score.score": %w`, err)}
 		}
 	}
+	if v, ok := sc.mutation.ID(); ok {
+		if err := score.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Score.id": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.RoundID(); !ok {
 		return &ValidationError{Name: "round", err: errors.New(`ent: missing required edge "Score.round"`)}
 	}
@@ -111,8 +122,10 @@ func (sc *ScoreCreate) sqlSave(ctx context.Context) (*Score, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
+	}
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -123,6 +136,10 @@ func (sc *ScoreCreate) createSpec() (*Score, *sqlgraph.CreateSpec) {
 		_node = &Score{config: sc.config}
 		_spec = sqlgraph.NewCreateSpec(score.Table, sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt))
 	)
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sc.mutation.Score(); ok {
 		_spec.SetField(score.FieldScore, field.TypeInt, value)
 		_node.Score = value
@@ -208,7 +225,7 @@ func (scb *ScoreCreateBulk) Save(ctx context.Context) ([]*Score, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

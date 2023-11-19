@@ -95,7 +95,15 @@ type ComplexityRoot struct {
 	Round struct {
 		Completed func(childComplexity int) int
 		ID        func(childComplexity int) int
+		Scores    func(childComplexity int) int
 		Statuses  func(childComplexity int) int
+	}
+
+	Score struct {
+		ID    func(childComplexity int) int
+		Round func(childComplexity int) int
+		Score func(childComplexity int) int
+		User  func(childComplexity int) int
 	}
 
 	Scoreboard struct {
@@ -120,6 +128,7 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Role        func(childComplexity int) int
+		Scores      func(childComplexity int) int
 		Statuses    func(childComplexity int) int
 		TeamNumber  func(childComplexity int) int
 	}
@@ -450,12 +459,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Round.ID(childComplexity), true
 
+	case "Round.scores":
+		if e.complexity.Round.Scores == nil {
+			break
+		}
+
+		return e.complexity.Round.Scores(childComplexity), true
+
 	case "Round.statuses":
 		if e.complexity.Round.Statuses == nil {
 			break
 		}
 
 		return e.complexity.Round.Statuses(childComplexity), true
+
+	case "Score.id":
+		if e.complexity.Score.ID == nil {
+			break
+		}
+
+		return e.complexity.Score.ID(childComplexity), true
+
+	case "Score.round":
+		if e.complexity.Score.Round == nil {
+			break
+		}
+
+		return e.complexity.Score.Round(childComplexity), true
+
+	case "Score.score":
+		if e.complexity.Score.Score == nil {
+			break
+		}
+
+		return e.complexity.Score.Score(childComplexity), true
+
+	case "Score.user":
+		if e.complexity.Score.User == nil {
+			break
+		}
+
+		return e.complexity.Score.User(childComplexity), true
 
 	case "Scoreboard.checks":
 		if e.complexity.Scoreboard.Checks == nil {
@@ -561,6 +605,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Role(childComplexity), true
+
+	case "User.scores":
+		if e.complexity.User.Scores == nil {
+			break
+		}
+
+		return e.complexity.User.Scores(childComplexity), true
 
 	case "User.statuses":
 		if e.complexity.User.Statuses == nil {
@@ -1706,6 +1757,8 @@ func (ec *executionContext) fieldContext_Credential_user(ctx context.Context, fi
 				return ec.fieldContext_User_credentials(ctx, field)
 			case "statuses":
 				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1764,6 +1817,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_credentials(ctx, field)
 			case "statuses":
 				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1833,6 +1888,8 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_credentials(ctx, field)
 			case "statuses":
 				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1902,6 +1959,8 @@ func (ec *executionContext) fieldContext_Mutation_updatePassword(ctx context.Con
 				return ec.fieldContext_User_credentials(ctx, field)
 			case "statuses":
 				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -1971,6 +2030,8 @@ func (ec *executionContext) fieldContext_Mutation_updatePasswordAdmin(ctx contex
 				return ec.fieldContext_User_credentials(ctx, field)
 			case "statuses":
 				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -2925,6 +2986,262 @@ func (ec *executionContext) fieldContext_Round_statuses(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Round_scores(ctx context.Context, field graphql.CollectedField, obj *ent.Round) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Round_scores(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Scores(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Score)
+	fc.Result = res
+	return ec.marshalNScore2ᚕᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐScoreᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Round_scores(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Round",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Score_id(ctx, field)
+			case "score":
+				return ec.fieldContext_Score_score(ctx, field)
+			case "user":
+				return ec.fieldContext_Score_user(ctx, field)
+			case "round":
+				return ec.fieldContext_Score_round(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Score", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Score_id(ctx context.Context, field graphql.CollectedField, obj *ent.Score) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Score_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Score_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Score",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Score_score(ctx context.Context, field graphql.CollectedField, obj *ent.Score) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Score_score(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Score, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Score_score(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Score",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Score_user(ctx context.Context, field graphql.CollectedField, obj *ent.Score) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Score_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Score_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Score",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "teamNumber":
+				return ec.fieldContext_User_teamNumber(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "credentials":
+				return ec.fieldContext_User_credentials(ctx, field)
+			case "statuses":
+				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Score_round(ctx context.Context, field graphql.CollectedField, obj *ent.Score) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Score_round(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Round(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Round)
+	fc.Result = res
+	return ec.marshalNRound2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐRound(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Score_round(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Score",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Round_id(ctx, field)
+			case "completed":
+				return ec.fieldContext_Round_completed(ctx, field)
+			case "statuses":
+				return ec.fieldContext_Round_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_Round_scores(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Round", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Scoreboard_round(ctx context.Context, field graphql.CollectedField, obj *model.Scoreboard) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Scoreboard_round(ctx, field)
 	if err != nil {
@@ -3390,6 +3707,8 @@ func (ec *executionContext) fieldContext_Status_user(ctx context.Context, field 
 				return ec.fieldContext_User_credentials(ctx, field)
 			case "statuses":
 				return ec.fieldContext_User_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_User_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3442,6 +3761,8 @@ func (ec *executionContext) fieldContext_Status_round(ctx context.Context, field
 				return ec.fieldContext_Round_completed(ctx, field)
 			case "statuses":
 				return ec.fieldContext_Round_statuses(ctx, field)
+			case "scores":
+				return ec.fieldContext_Round_scores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Round", field.Name)
 		},
@@ -3736,6 +4057,60 @@ func (ec *executionContext) fieldContext_User_statuses(ctx context.Context, fiel
 				return ec.fieldContext_Status_round(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Status", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_scores(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_scores(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Scores(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Score)
+	fc.Result = res
+	return ec.marshalNScore2ᚕᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐScoreᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_scores(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Score_id(ctx, field)
+			case "score":
+				return ec.fieldContext_Score_score(ctx, field)
+			case "user":
+				return ec.fieldContext_Score_user(ctx, field)
+			case "round":
+				return ec.fieldContext_Score_round(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Score", field.Name)
 		},
 	}
 	return fc, nil
@@ -6057,6 +6432,158 @@ func (ec *executionContext) _Round(ctx context.Context, sel ast.SelectionSet, ob
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "scores":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Round_scores(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var scoreImplementors = []string{"Score"}
+
+func (ec *executionContext) _Score(ctx context.Context, sel ast.SelectionSet, obj *ent.Score) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, scoreImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Score")
+		case "id":
+			out.Values[i] = ec._Score_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "score":
+			out.Values[i] = ec._Score_score(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Score_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "round":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Score_round(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6466,6 +6993,42 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._User_statuses(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "scores":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_scores(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -7037,6 +7600,60 @@ func (ec *executionContext) marshalNRound2ᚖgithubᚗcomᚋcompscoreᚋcompscor
 		return graphql.Null
 	}
 	return ec._Round(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNScore2ᚕᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐScoreᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Score) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNScore2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐScore(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNScore2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐScore(ctx context.Context, sel ast.SelectionSet, v *ent.Score) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Score(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNStatus2githubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐStatus(ctx context.Context, sel ast.SelectionSet, v ent.Status) graphql.Marshaler {

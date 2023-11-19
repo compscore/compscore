@@ -17,7 +17,8 @@ import (
 type Score struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	// ID of the score
+	ID int `json:"id"`
 	// Score for team at a given round
 	Score int `json:"score"`
 	// Edges holds the relations/edges for other nodes in the graph.
