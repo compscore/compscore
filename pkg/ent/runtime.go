@@ -9,6 +9,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/schema"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 )
@@ -47,6 +48,12 @@ func init() {
 	roundDescID := roundFields[0].Descriptor()
 	// round.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	round.IDValidator = roundDescID.Validators[0].(func(int) error)
+	scoreFields := schema.Score{}.Fields()
+	_ = scoreFields
+	// scoreDescScore is the schema descriptor for score field.
+	scoreDescScore := scoreFields[0].Descriptor()
+	// score.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
+	score.ScoreValidator = scoreDescScore.Validators[0].(func(int) error)
 	statusFields := schema.Status{}.Fields()
 	_ = statusFields
 	// statusDescTimestamp is the schema descriptor for timestamp field.

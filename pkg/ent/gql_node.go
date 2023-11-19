@@ -16,6 +16,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 	"github.com/hashicorp/go-multierror"
@@ -35,6 +36,9 @@ func (n *Credential) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Round) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Score) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Status) IsNode() {}
@@ -128,6 +132,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Round.Query().
 			Where(round.ID(id))
 		query, err := query.CollectFields(ctx, "Round")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case score.Table:
+		query := c.Score.Query().
+			Where(score.ID(id))
+		query, err := query.CollectFields(ctx, "Score")
 		if err != nil {
 			return nil, err
 		}
@@ -269,6 +285,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Round.Query().
 			Where(round.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Round")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case score.Table:
+		query := c.Score.Query().
+			Where(score.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Score")
 		if err != nil {
 			return nil, err
 		}

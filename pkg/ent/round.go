@@ -29,13 +29,16 @@ type Round struct {
 type RoundEdges struct {
 	// Status of the round
 	Status []*Status `json:"status,omitempty"`
+	// Scores for the round
+	Scores []*Score `json:"scores,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
 	namedStatus map[string][]*Status
+	namedScores map[string][]*Score
 }
 
 // StatusOrErr returns the Status value or an error if the edge
@@ -45,6 +48,15 @@ func (e RoundEdges) StatusOrErr() ([]*Status, error) {
 		return e.Status, nil
 	}
 	return nil, &NotLoadedError{edge: "status"}
+}
+
+// ScoresOrErr returns the Scores value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoundEdges) ScoresOrErr() ([]*Score, error) {
+	if e.loadedTypes[1] {
+		return e.Scores, nil
+	}
+	return nil, &NotLoadedError{edge: "scores"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -101,6 +113,11 @@ func (r *Round) QueryStatus() *StatusQuery {
 	return NewRoundClient(r.config).QueryStatus(r)
 }
 
+// QueryScores queries the "scores" edge of the Round entity.
+func (r *Round) QueryScores() *ScoreQuery {
+	return NewRoundClient(r.config).QueryScores(r)
+}
+
 // Update returns a builder for updating this Round.
 // Note that you need to call Round.Unwrap() before calling this method if this Round
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -151,6 +168,30 @@ func (r *Round) appendNamedStatus(name string, edges ...*Status) {
 		r.Edges.namedStatus[name] = []*Status{}
 	} else {
 		r.Edges.namedStatus[name] = append(r.Edges.namedStatus[name], edges...)
+	}
+}
+
+// NamedScores returns the Scores named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Round) NamedScores(name string) ([]*Score, error) {
+	if r.Edges.namedScores == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedScores[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Round) appendNamedScores(name string, edges ...*Score) {
+	if r.Edges.namedScores == nil {
+		r.Edges.namedScores = make(map[string][]*Score)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedScores[name] = []*Score{}
+	} else {
+		r.Edges.namedScores[name] = append(r.Edges.namedScores[name], edges...)
 	}
 }
 

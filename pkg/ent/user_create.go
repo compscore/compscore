@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/credential"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 )
@@ -95,6 +96,21 @@ func (uc *UserCreate) AddStatus(s ...*Status) *UserCreate {
 		ids[i] = s[i].ID
 	}
 	return uc.AddStatuIDs(ids...)
+}
+
+// AddScoreIDs adds the "scores" edge to the Score entity by IDs.
+func (uc *UserCreate) AddScoreIDs(ids ...int) *UserCreate {
+	uc.mutation.AddScoreIDs(ids...)
+	return uc
+}
+
+// AddScores adds the "scores" edges to the Score entity.
+func (uc *UserCreate) AddScores(s ...*Score) *UserCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddScoreIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -242,6 +258,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

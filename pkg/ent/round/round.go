@@ -16,6 +16,8 @@ const (
 	FieldCompleted = "completed"
 	// EdgeStatus holds the string denoting the status edge name in mutations.
 	EdgeStatus = "status"
+	// EdgeScores holds the string denoting the scores edge name in mutations.
+	EdgeScores = "scores"
 	// Table holds the table name of the round in the database.
 	Table = "rounds"
 	// StatusTable is the table that holds the status relation/edge.
@@ -25,6 +27,13 @@ const (
 	StatusInverseTable = "status"
 	// StatusColumn is the table column denoting the status relation/edge.
 	StatusColumn = "status_round"
+	// ScoresTable is the table that holds the scores relation/edge.
+	ScoresTable = "scores"
+	// ScoresInverseTable is the table name for the Score entity.
+	// It exists in this package in order to avoid circular dependency with the "score" package.
+	ScoresInverseTable = "scores"
+	// ScoresColumn is the table column denoting the scores relation/edge.
+	ScoresColumn = "round_scores"
 )
 
 // Columns holds all SQL columns for round fields.
@@ -76,10 +85,31 @@ func ByStatus(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newStatusStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByScoresCount orders the results by scores count.
+func ByScoresCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newScoresStep(), opts...)
+	}
+}
+
+// ByScores orders the results by scores terms.
+func ByScores(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newScoresStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newStatusStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StatusInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
+	)
+}
+func newScoresStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ScoresInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ScoresTable, ScoresColumn),
 	)
 }
