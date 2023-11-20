@@ -5,7 +5,7 @@ package user
 import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/compscore/compscore/ent/predicate"
+	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/google/uuid"
 )
 

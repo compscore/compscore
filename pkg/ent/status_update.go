@@ -11,11 +11,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/compscore/compscore/ent/check"
-	"github.com/compscore/compscore/ent/predicate"
-	"github.com/compscore/compscore/ent/round"
-	"github.com/compscore/compscore/ent/status"
-	"github.com/compscore/compscore/ent/user"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/predicate"
+	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/compscore/compscore/pkg/ent/user"
 	"github.com/google/uuid"
 )
 

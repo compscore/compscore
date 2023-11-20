@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/compscore/compscore/ent/round"
+	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/google/uuid"
 )
 

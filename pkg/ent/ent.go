@@ -12,12 +12,12 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/compscore/compscore/ent/check"
-	"github.com/compscore/compscore/ent/credential"
-	"github.com/compscore/compscore/ent/round"
-	"github.com/compscore/compscore/ent/score"
-	"github.com/compscore/compscore/ent/status"
-	"github.com/compscore/compscore/ent/user"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
+	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
+	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/compscore/compscore/pkg/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.

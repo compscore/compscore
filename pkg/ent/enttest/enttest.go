@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/compscore/compscore/ent"
+	"github.com/compscore/compscore/pkg/ent"
 	// required by schema hooks.
-	_ "github.com/compscore/compscore/ent/runtime"
+	_ "github.com/compscore/compscore/pkg/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/compscore/compscore/ent/migrate"
+	"github.com/compscore/compscore/pkg/ent/migrate"
 )
 
 type (

@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/compscore/compscore/ent/predicate"
-	"github.com/compscore/compscore/ent/status"
+	"github.com/compscore/compscore/pkg/ent/predicate"
+	"github.com/compscore/compscore/pkg/ent/status"
 )
 
 // StatusDelete is the builder for deleting a Status entity.

@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/compscore/compscore/ent/check"
-	"github.com/compscore/compscore/ent/predicate"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/predicate"
 )
 
 // CheckDelete is the builder for deleting a Check entity.

@@ -8,9 +8,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/compscore/compscore/ent/check"
-	"github.com/compscore/compscore/ent/credential"
-	"github.com/compscore/compscore/ent/user"
+	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/compscore/compscore/pkg/ent/credential"
+	"github.com/compscore/compscore/pkg/ent/user"
 	"github.com/google/uuid"
 )
 

@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/compscore/compscore/ent"
+	"github.com/compscore/compscore/pkg/ent"
 )
 
 // The CheckFunc type is an adapter to allow the use of ordinary
