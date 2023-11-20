@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/compscore/compscore/pkg/gql/graph/model"
+	"github.com/compscore/compscore/pkg/graph/model"
 )
 
 // CreateTodo is the resolver for the createTodo field.

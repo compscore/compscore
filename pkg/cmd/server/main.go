@@ -12,7 +12,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/compscore/compscore/pkg/config"
-	"github.com/compscore/compscore/pkg/gql/graph"
+	"github.com/compscore/compscore/pkg/graph"
 	"golang.org/x/term"
 
 	"github.com/sirupsen/logrus"
