@@ -1,0 +1,60 @@
+type Check {
+  id: ID!
+  name: String!
+  weight: Int!
+  credentials: [Credential!]!
+  statuses: [Status!]!
+}
+
+type Credential {
+  id: ID!
+  password: String!
+  user: User!
+}
+
+type Round {
+  id: ID!
+  number: Int!
+  completed: Boolean!
+  statuses: [Status!]!
+  scores: [Score!]!
+}
+
+type Score {
+  id: ID!
+  score: Int!
+  round: Round!
+  user: User!
+}
+
+enum StatusEnum {
+  success
+  failure
+  unknown
+}
+
+type Status {
+  id: ID!
+  status: StatusEnum!
+  message: String!
+  timestamp: String!
+  points: Int!
+  round: Round!
+  check: Check!
+  user: User!
+}
+
+enum RoleEnum {
+  admin
+  competitor
+}
+
+type User {
+  id: ID!
+  name: String!
+  team_number: Int!
+  role: RoleEnum!
+  credentials: [Credential!]!
+  statuses: [Status!]!
+  scores: [Score!]!
+}

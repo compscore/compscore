@@ -45,6 +45,18 @@ func (f RoundFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RoundMutation", m)
 }
 
+// The ScoreFunc type is an adapter to allow the use of ordinary
+// function as Score mutator.
+type ScoreFunc func(context.Context, *ent.ScoreMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ScoreMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScoreMutation", m)
+}
+
 // The StatusFunc type is an adapter to allow the use of ordinary
 // function as Status mutator.
 type StatusFunc func(context.Context, *ent.StatusMutation) (ent.Value, error)
@@ -57,16 +69,16 @@ func (f StatusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StatusMutation", m)
 }
 
-// The TeamFunc type is an adapter to allow the use of ordinary
-// function as Team mutator.
-type TeamFunc func(context.Context, *ent.TeamMutation) (ent.Value, error)
+// The UserFunc type is an adapter to allow the use of ordinary
+// function as User mutator.
+type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f TeamFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.TeamMutation); ok {
+func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TeamMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
 }
 
 // Condition is a hook condition function.

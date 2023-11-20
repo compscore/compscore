@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 )
 
 const (
@@ -15,36 +16,22 @@ const (
 	Label = "status"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldError holds the string denoting the error field in the database.
-	FieldError = "error"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldTime holds the string denoting the time field in the database.
-	FieldTime = "time"
+	// FieldMessage holds the string denoting the message field in the database.
+	FieldMessage = "message"
+	// FieldTimestamp holds the string denoting the timestamp field in the database.
+	FieldTimestamp = "timestamp"
 	// FieldPoints holds the string denoting the points field in the database.
 	FieldPoints = "points"
-	// EdgeCheck holds the string denoting the check edge name in mutations.
-	EdgeCheck = "check"
-	// EdgeTeam holds the string denoting the team edge name in mutations.
-	EdgeTeam = "team"
 	// EdgeRound holds the string denoting the round edge name in mutations.
 	EdgeRound = "round"
+	// EdgeCheck holds the string denoting the check edge name in mutations.
+	EdgeCheck = "check"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the status in the database.
 	Table = "status"
-	// CheckTable is the table that holds the check relation/edge.
-	CheckTable = "status"
-	// CheckInverseTable is the table name for the Check entity.
-	// It exists in this package in order to avoid circular dependency with the "check" package.
-	CheckInverseTable = "checks"
-	// CheckColumn is the table column denoting the check relation/edge.
-	CheckColumn = "status_check"
-	// TeamTable is the table that holds the team relation/edge.
-	TeamTable = "status"
-	// TeamInverseTable is the table name for the Team entity.
-	// It exists in this package in order to avoid circular dependency with the "team" package.
-	TeamInverseTable = "teams"
-	// TeamColumn is the table column denoting the team relation/edge.
-	TeamColumn = "status_team"
 	// RoundTable is the table that holds the round relation/edge.
 	RoundTable = "status"
 	// RoundInverseTable is the table name for the Round entity.
@@ -52,23 +39,37 @@ const (
 	RoundInverseTable = "rounds"
 	// RoundColumn is the table column denoting the round relation/edge.
 	RoundColumn = "status_round"
+	// CheckTable is the table that holds the check relation/edge.
+	CheckTable = "status"
+	// CheckInverseTable is the table name for the Check entity.
+	// It exists in this package in order to avoid circular dependency with the "check" package.
+	CheckInverseTable = "checks"
+	// CheckColumn is the table column denoting the check relation/edge.
+	CheckColumn = "status_check"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "status"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "status_user"
 )
 
 // Columns holds all SQL columns for status fields.
 var Columns = []string{
 	FieldID,
-	FieldError,
 	FieldStatus,
-	FieldTime,
+	FieldMessage,
+	FieldTimestamp,
 	FieldPoints,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "status"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"status_check",
-	"status_team",
 	"status_round",
+	"status_check",
+	"status_user",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -87,10 +88,12 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTime holds the default value on creation for the "time" field.
-	DefaultTime func() time.Time
+	// DefaultTimestamp holds the default value on creation for the "timestamp" field.
+	DefaultTimestamp func() time.Time
 	// PointsValidator is a validator for the "points" field. It is called by the builders before save.
 	PointsValidator func(int) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // Status defines the type for the "status" enum field.
@@ -101,8 +104,8 @@ const DefaultStatus = StatusUnknown
 
 // Status values.
 const (
-	StatusUp      Status = "up"
-	StatusDown    Status = "down"
+	StatusSuccess Status = "success"
+	StatusFailure Status = "failure"
 	StatusUnknown Status = "unknown"
 )
 
@@ -113,7 +116,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusUp, StatusDown, StatusUnknown:
+	case StatusSuccess, StatusFailure, StatusUnknown:
 		return nil
 	default:
 		return fmt.Errorf("status: invalid enum value for status field: %q", s)
@@ -128,24 +131,31 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByError orders the results by the error field.
-func ByError(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldError, opts...).ToFunc()
-}
-
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }
 
-// ByTime orders the results by the time field.
-func ByTime(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTime, opts...).ToFunc()
+// ByMessage orders the results by the message field.
+func ByMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMessage, opts...).ToFunc()
+}
+
+// ByTimestamp orders the results by the timestamp field.
+func ByTimestamp(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTimestamp, opts...).ToFunc()
 }
 
 // ByPoints orders the results by the points field.
 func ByPoints(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPoints, opts...).ToFunc()
+}
+
+// ByRoundField orders the results by round field.
+func ByRoundField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRoundStep(), sql.OrderByField(field, opts...))
+	}
 }
 
 // ByCheckField orders the results by check field.
@@ -155,18 +165,18 @@ func ByCheckField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByTeamField orders the results by team field.
-func ByTeamField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTeamStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByRoundField orders the results by round field.
-func ByRoundField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRoundStep(), sql.OrderByField(field, opts...))
-	}
+func newRoundStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RoundInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, RoundTable, RoundColumn),
+	)
 }
 func newCheckStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
@@ -175,17 +185,10 @@ func newCheckStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, CheckTable, CheckColumn),
 	)
 }
-func newTeamStep() *sqlgraph.Step {
+func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TeamInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, TeamTable, TeamColumn),
-	)
-}
-func newRoundStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RoundInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, RoundTable, RoundColumn),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
 	)
 }

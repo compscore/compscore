@@ -15,8 +15,11 @@ type Credential func(*sql.Selector)
 // Round is the predicate function for round builders.
 type Round func(*sql.Selector)
 
+// Score is the predicate function for score builders.
+type Score func(*sql.Selector)
+
 // Status is the predicate function for status builders.
 type Status func(*sql.Selector)
 
-// Team is the predicate function for team builders.
-type Team func(*sql.Selector)
+// User is the predicate function for user builders.
+type User func(*sql.Selector)

@@ -12,6 +12,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/google/uuid"
 )
 
 // CheckCreate is the builder for creating a Check entity.
@@ -34,39 +35,47 @@ func (cc *CheckCreate) SetWeight(i int) *CheckCreate {
 }
 
 // SetID sets the "id" field.
-func (cc *CheckCreate) SetID(i int) *CheckCreate {
-	cc.mutation.SetID(i)
+func (cc *CheckCreate) SetID(u uuid.UUID) *CheckCreate {
+	cc.mutation.SetID(u)
 	return cc
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (cc *CheckCreate) AddStatuIDs(ids ...int) *CheckCreate {
-	cc.mutation.AddStatuIDs(ids...)
-	return cc
-}
-
-// AddStatus adds the "status" edges to the Status entity.
-func (cc *CheckCreate) AddStatus(s ...*Status) *CheckCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// SetNillableID sets the "id" field if the given value is not nil.
+func (cc *CheckCreate) SetNillableID(u *uuid.UUID) *CheckCreate {
+	if u != nil {
+		cc.SetID(*u)
 	}
-	return cc.AddStatuIDs(ids...)
+	return cc
 }
 
 // AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
-func (cc *CheckCreate) AddCredentialIDs(ids ...int) *CheckCreate {
+func (cc *CheckCreate) AddCredentialIDs(ids ...uuid.UUID) *CheckCreate {
 	cc.mutation.AddCredentialIDs(ids...)
 	return cc
 }
 
 // AddCredential adds the "credential" edges to the Credential entity.
 func (cc *CheckCreate) AddCredential(c ...*Credential) *CheckCreate {
-	ids := make([]int, len(c))
+	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
 	return cc.AddCredentialIDs(ids...)
+}
+
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (cc *CheckCreate) AddStatusIDs(ids ...uuid.UUID) *CheckCreate {
+	cc.mutation.AddStatusIDs(ids...)
+	return cc
+}
+
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (cc *CheckCreate) AddStatuses(s ...*Status) *CheckCreate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return cc.AddStatusIDs(ids...)
 }
 
 // Mutation returns the CheckMutation object of the builder.
@@ -76,6 +85,7 @@ func (cc *CheckCreate) Mutation() *CheckMutation {
 
 // Save creates the Check in the database.
 func (cc *CheckCreate) Save(ctx context.Context) (*Check, error) {
+	cc.defaults()
 	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
@@ -98,6 +108,14 @@ func (cc *CheckCreate) Exec(ctx context.Context) error {
 func (cc *CheckCreate) ExecX(ctx context.Context) {
 	if err := cc.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (cc *CheckCreate) defaults() {
+	if _, ok := cc.mutation.ID(); !ok {
+		v := check.DefaultID()
+		cc.mutation.SetID(v)
 	}
 }
 
@@ -133,9 +151,12 @@ func (cc *CheckCreate) sqlSave(ctx context.Context) (*Check, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
 	}
 	cc.mutation.id = &_node.ID
 	cc.mutation.done = true
@@ -145,11 +166,11 @@ func (cc *CheckCreate) sqlSave(ctx context.Context) (*Check, error) {
 func (cc *CheckCreate) createSpec() (*Check, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Check{config: cc.config}
-		_spec = sqlgraph.NewCreateSpec(check.Table, sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(check.Table, sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID))
 	)
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(check.FieldName, field.TypeString, value)
@@ -159,22 +180,6 @@ func (cc *CheckCreate) createSpec() (*Check, *sqlgraph.CreateSpec) {
 		_spec.SetField(check.FieldWeight, field.TypeInt, value)
 		_node.Weight = value
 	}
-	if nodes := cc.mutation.StatusIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := cc.mutation.CredentialIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -183,7 +188,23 @@ func (cc *CheckCreate) createSpec() (*Check, *sqlgraph.CreateSpec) {
 			Columns: []string{check.CredentialColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.StatusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -197,17 +218,22 @@ func (cc *CheckCreate) createSpec() (*Check, *sqlgraph.CreateSpec) {
 // CheckCreateBulk is the builder for creating many Check entities in bulk.
 type CheckCreateBulk struct {
 	config
+	err      error
 	builders []*CheckCreate
 }
 
 // Save creates the Check entities in the database.
 func (ccb *CheckCreateBulk) Save(ctx context.Context) ([]*Check, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Check, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
 	for i := range ccb.builders {
 		func(i int, root context.Context) {
 			builder := ccb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CheckMutation)
 				if !ok {
@@ -234,10 +260,6 @@ func (ccb *CheckCreateBulk) Save(ctx context.Context) ([]*Check, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

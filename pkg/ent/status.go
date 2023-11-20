@@ -12,74 +12,50 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // Status is the model entity for the Status schema.
 type Status struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"-"`
-	// Error message
-	Error string `json:"error"`
-	// Status
+	// ID of the status
+	ID uuid.UUID `json:"id"`
+	// Status of the status
 	Status status.Status `json:"status"`
-	// Time of check
-	Time time.Time `json:"time"`
-	// Points holds the value of the "points" field.
-	Points int `json:"-"`
+	// Message of the status
+	Message string `json:"message"`
+	// Timestamp of the status
+	Timestamp time.Time `json:"timestamp"`
+	// Points of the status
+	Points int `json:"points"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the StatusQuery when eager-loading is set.
 	Edges        StatusEdges `json:"edges"`
-	status_check *int
-	status_team  *int
-	status_round *int
+	status_round *uuid.UUID
+	status_check *uuid.UUID
+	status_user  *uuid.UUID
 	selectValues sql.SelectValues
 }
 
 // StatusEdges holds the relations/edges for other nodes in the graph.
 type StatusEdges struct {
-	// Check
-	Check *Check `json:"check,omitempty"`
-	// Team
-	Team *Team `json:"team,omitempty"`
-	// Round
+	// Round of the status
 	Round *Round `json:"round,omitempty"`
+	// Check of the status
+	Check *Check `json:"check,omitempty"`
+	// User of the status
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
 }
 
-// CheckOrErr returns the Check value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e StatusEdges) CheckOrErr() (*Check, error) {
-	if e.loadedTypes[0] {
-		if e.Check == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: check.Label}
-		}
-		return e.Check, nil
-	}
-	return nil, &NotLoadedError{edge: "check"}
-}
-
-// TeamOrErr returns the Team value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e StatusEdges) TeamOrErr() (*Team, error) {
-	if e.loadedTypes[1] {
-		if e.Team == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: team.Label}
-		}
-		return e.Team, nil
-	}
-	return nil, &NotLoadedError{edge: "team"}
-}
-
 // RoundOrErr returns the Round value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e StatusEdges) RoundOrErr() (*Round, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[0] {
 		if e.Round == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: round.Label}
@@ -89,23 +65,51 @@ func (e StatusEdges) RoundOrErr() (*Round, error) {
 	return nil, &NotLoadedError{edge: "round"}
 }
 
+// CheckOrErr returns the Check value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e StatusEdges) CheckOrErr() (*Check, error) {
+	if e.loadedTypes[1] {
+		if e.Check == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: check.Label}
+		}
+		return e.Check, nil
+	}
+	return nil, &NotLoadedError{edge: "check"}
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e StatusEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[2] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Status) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case status.FieldID, status.FieldPoints:
+		case status.FieldPoints:
 			values[i] = new(sql.NullInt64)
-		case status.FieldError, status.FieldStatus:
+		case status.FieldStatus, status.FieldMessage:
 			values[i] = new(sql.NullString)
-		case status.FieldTime:
+		case status.FieldTimestamp:
 			values[i] = new(sql.NullTime)
-		case status.ForeignKeys[0]: // status_check
-			values[i] = new(sql.NullInt64)
-		case status.ForeignKeys[1]: // status_team
-			values[i] = new(sql.NullInt64)
-		case status.ForeignKeys[2]: // status_round
-			values[i] = new(sql.NullInt64)
+		case status.FieldID:
+			values[i] = new(uuid.UUID)
+		case status.ForeignKeys[0]: // status_round
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case status.ForeignKeys[1]: // status_check
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case status.ForeignKeys[2]: // status_user
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -122,16 +126,10 @@ func (s *Status) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case status.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
-			}
-			s.ID = int(value.Int64)
-		case status.FieldError:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field error", values[i])
-			} else if value.Valid {
-				s.Error = value.String
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				s.ID = *value
 			}
 		case status.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -139,11 +137,17 @@ func (s *Status) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Status = status.Status(value.String)
 			}
-		case status.FieldTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field time", values[i])
+		case status.FieldMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field message", values[i])
 			} else if value.Valid {
-				s.Time = value.Time
+				s.Message = value.String
+			}
+		case status.FieldTimestamp:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field timestamp", values[i])
+			} else if value.Valid {
+				s.Timestamp = value.Time
 			}
 		case status.FieldPoints:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -152,25 +156,25 @@ func (s *Status) assignValues(columns []string, values []any) error {
 				s.Points = int(value.Int64)
 			}
 		case status.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field status_check", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field status_round", values[i])
 			} else if value.Valid {
-				s.status_check = new(int)
-				*s.status_check = int(value.Int64)
+				s.status_round = new(uuid.UUID)
+				*s.status_round = *value.S.(*uuid.UUID)
 			}
 		case status.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field status_team", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field status_check", values[i])
 			} else if value.Valid {
-				s.status_team = new(int)
-				*s.status_team = int(value.Int64)
+				s.status_check = new(uuid.UUID)
+				*s.status_check = *value.S.(*uuid.UUID)
 			}
 		case status.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field status_round", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field status_user", values[i])
 			} else if value.Valid {
-				s.status_round = new(int)
-				*s.status_round = int(value.Int64)
+				s.status_user = new(uuid.UUID)
+				*s.status_user = *value.S.(*uuid.UUID)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -185,19 +189,19 @@ func (s *Status) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
+// QueryRound queries the "round" edge of the Status entity.
+func (s *Status) QueryRound() *RoundQuery {
+	return NewStatusClient(s.config).QueryRound(s)
+}
+
 // QueryCheck queries the "check" edge of the Status entity.
 func (s *Status) QueryCheck() *CheckQuery {
 	return NewStatusClient(s.config).QueryCheck(s)
 }
 
-// QueryTeam queries the "team" edge of the Status entity.
-func (s *Status) QueryTeam() *TeamQuery {
-	return NewStatusClient(s.config).QueryTeam(s)
-}
-
-// QueryRound queries the "round" edge of the Status entity.
-func (s *Status) QueryRound() *RoundQuery {
-	return NewStatusClient(s.config).QueryRound(s)
+// QueryUser queries the "user" edge of the Status entity.
+func (s *Status) QueryUser() *UserQuery {
+	return NewStatusClient(s.config).QueryUser(s)
 }
 
 // Update returns a builder for updating this Status.
@@ -223,14 +227,14 @@ func (s *Status) String() string {
 	var builder strings.Builder
 	builder.WriteString("Status(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
-	builder.WriteString("error=")
-	builder.WriteString(s.Error)
-	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", s.Status))
 	builder.WriteString(", ")
-	builder.WriteString("time=")
-	builder.WriteString(s.Time.Format(time.ANSIC))
+	builder.WriteString("message=")
+	builder.WriteString(s.Message)
+	builder.WriteString(", ")
+	builder.WriteString("timestamp=")
+	builder.WriteString(s.Timestamp.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("points=")
 	builder.WriteString(fmt.Sprintf("%v", s.Points))

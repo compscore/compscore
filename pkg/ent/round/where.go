@@ -6,50 +6,51 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/compscore/compscore/pkg/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Round {
+func ID(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Round {
+func IDEQ(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Round {
+func IDNEQ(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Round {
+func IDIn(ids ...uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Round {
+func IDNotIn(ids ...uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Round {
+func IDGT(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Round {
+func IDGTE(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Round {
+func IDLT(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Round {
+func IDLTE(id uuid.UUID) predicate.Round {
 	return predicate.Round(sql.FieldLTE(FieldID, id))
 }
 
@@ -58,9 +59,9 @@ func Number(v int) predicate.Round {
 	return predicate.Round(sql.FieldEQ(FieldNumber, v))
 }
 
-// Complete applies equality check predicate on the "complete" field. It's identical to CompleteEQ.
-func Complete(v bool) predicate.Round {
-	return predicate.Round(sql.FieldEQ(FieldComplete, v))
+// Completed applies equality check predicate on the "completed" field. It's identical to CompletedEQ.
+func Completed(v bool) predicate.Round {
+	return predicate.Round(sql.FieldEQ(FieldCompleted, v))
 }
 
 // NumberEQ applies the EQ predicate on the "number" field.
@@ -103,31 +104,54 @@ func NumberLTE(v int) predicate.Round {
 	return predicate.Round(sql.FieldLTE(FieldNumber, v))
 }
 
-// CompleteEQ applies the EQ predicate on the "complete" field.
-func CompleteEQ(v bool) predicate.Round {
-	return predicate.Round(sql.FieldEQ(FieldComplete, v))
+// CompletedEQ applies the EQ predicate on the "completed" field.
+func CompletedEQ(v bool) predicate.Round {
+	return predicate.Round(sql.FieldEQ(FieldCompleted, v))
 }
 
-// CompleteNEQ applies the NEQ predicate on the "complete" field.
-func CompleteNEQ(v bool) predicate.Round {
-	return predicate.Round(sql.FieldNEQ(FieldComplete, v))
+// CompletedNEQ applies the NEQ predicate on the "completed" field.
+func CompletedNEQ(v bool) predicate.Round {
+	return predicate.Round(sql.FieldNEQ(FieldCompleted, v))
 }
 
-// HasStatus applies the HasEdge predicate on the "status" edge.
-func HasStatus() predicate.Round {
+// HasStatuses applies the HasEdge predicate on the "statuses" edge.
+func HasStatuses() predicate.Round {
 	return predicate.Round(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, StatusesTable, StatusesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasStatusWith applies the HasEdge predicate on the "status" edge with a given conditions (other predicates).
-func HasStatusWith(preds ...predicate.Status) predicate.Round {
+// HasStatusesWith applies the HasEdge predicate on the "statuses" edge with a given conditions (other predicates).
+func HasStatusesWith(preds ...predicate.Status) predicate.Round {
 	return predicate.Round(func(s *sql.Selector) {
-		step := newStatusStep()
+		step := newStatusesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasScores applies the HasEdge predicate on the "scores" edge.
+func HasScores() predicate.Round {
+	return predicate.Round(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ScoresTable, ScoresColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasScoresWith applies the HasEdge predicate on the "scores" edge with a given conditions (other predicates).
+func HasScoresWith(preds ...predicate.Score) predicate.Round {
+	return predicate.Round(func(s *sql.Selector) {
+		step := newScoresStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -138,32 +162,15 @@ func HasStatusWith(preds ...predicate.Status) predicate.Round {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Round) predicate.Round {
-	return predicate.Round(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Round(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Round) predicate.Round {
-	return predicate.Round(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Round(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Round) predicate.Round {
-	return predicate.Round(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Round(sql.NotPredicates(p))
 }

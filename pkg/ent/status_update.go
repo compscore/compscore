@@ -15,7 +15,8 @@ import (
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // StatusUpdate is the builder for updating Status entities.
@@ -28,26 +29,6 @@ type StatusUpdate struct {
 // Where appends a list predicates to the StatusUpdate builder.
 func (su *StatusUpdate) Where(ps ...predicate.Status) *StatusUpdate {
 	su.mutation.Where(ps...)
-	return su
-}
-
-// SetError sets the "error" field.
-func (su *StatusUpdate) SetError(s string) *StatusUpdate {
-	su.mutation.SetError(s)
-	return su
-}
-
-// SetNillableError sets the "error" field if the given value is not nil.
-func (su *StatusUpdate) SetNillableError(s *string) *StatusUpdate {
-	if s != nil {
-		su.SetError(*s)
-	}
-	return su
-}
-
-// ClearError clears the value of the "error" field.
-func (su *StatusUpdate) ClearError() *StatusUpdate {
-	su.mutation.ClearError()
 	return su
 }
 
@@ -65,16 +46,36 @@ func (su *StatusUpdate) SetNillableStatus(s *status.Status) *StatusUpdate {
 	return su
 }
 
-// SetTime sets the "time" field.
-func (su *StatusUpdate) SetTime(t time.Time) *StatusUpdate {
-	su.mutation.SetTime(t)
+// SetMessage sets the "message" field.
+func (su *StatusUpdate) SetMessage(s string) *StatusUpdate {
+	su.mutation.SetMessage(s)
 	return su
 }
 
-// SetNillableTime sets the "time" field if the given value is not nil.
-func (su *StatusUpdate) SetNillableTime(t *time.Time) *StatusUpdate {
+// SetNillableMessage sets the "message" field if the given value is not nil.
+func (su *StatusUpdate) SetNillableMessage(s *string) *StatusUpdate {
+	if s != nil {
+		su.SetMessage(*s)
+	}
+	return su
+}
+
+// ClearMessage clears the value of the "message" field.
+func (su *StatusUpdate) ClearMessage() *StatusUpdate {
+	su.mutation.ClearMessage()
+	return su
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (su *StatusUpdate) SetTimestamp(t time.Time) *StatusUpdate {
+	su.mutation.SetTimestamp(t)
+	return su
+}
+
+// SetNillableTimestamp sets the "timestamp" field if the given value is not nil.
+func (su *StatusUpdate) SetNillableTimestamp(t *time.Time) *StatusUpdate {
 	if t != nil {
-		su.SetTime(*t)
+		su.SetTimestamp(*t)
 	}
 	return su
 }
@@ -86,36 +87,22 @@ func (su *StatusUpdate) SetPoints(i int) *StatusUpdate {
 	return su
 }
 
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (su *StatusUpdate) SetNillablePoints(i *int) *StatusUpdate {
+	if i != nil {
+		su.SetPoints(*i)
+	}
+	return su
+}
+
 // AddPoints adds i to the "points" field.
 func (su *StatusUpdate) AddPoints(i int) *StatusUpdate {
 	su.mutation.AddPoints(i)
 	return su
 }
 
-// SetCheckID sets the "check" edge to the Check entity by ID.
-func (su *StatusUpdate) SetCheckID(id int) *StatusUpdate {
-	su.mutation.SetCheckID(id)
-	return su
-}
-
-// SetCheck sets the "check" edge to the Check entity.
-func (su *StatusUpdate) SetCheck(c *Check) *StatusUpdate {
-	return su.SetCheckID(c.ID)
-}
-
-// SetTeamID sets the "team" edge to the Team entity by ID.
-func (su *StatusUpdate) SetTeamID(id int) *StatusUpdate {
-	su.mutation.SetTeamID(id)
-	return su
-}
-
-// SetTeam sets the "team" edge to the Team entity.
-func (su *StatusUpdate) SetTeam(t *Team) *StatusUpdate {
-	return su.SetTeamID(t.ID)
-}
-
 // SetRoundID sets the "round" edge to the Round entity by ID.
-func (su *StatusUpdate) SetRoundID(id int) *StatusUpdate {
+func (su *StatusUpdate) SetRoundID(id uuid.UUID) *StatusUpdate {
 	su.mutation.SetRoundID(id)
 	return su
 }
@@ -125,9 +112,37 @@ func (su *StatusUpdate) SetRound(r *Round) *StatusUpdate {
 	return su.SetRoundID(r.ID)
 }
 
+// SetCheckID sets the "check" edge to the Check entity by ID.
+func (su *StatusUpdate) SetCheckID(id uuid.UUID) *StatusUpdate {
+	su.mutation.SetCheckID(id)
+	return su
+}
+
+// SetCheck sets the "check" edge to the Check entity.
+func (su *StatusUpdate) SetCheck(c *Check) *StatusUpdate {
+	return su.SetCheckID(c.ID)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (su *StatusUpdate) SetUserID(id uuid.UUID) *StatusUpdate {
+	su.mutation.SetUserID(id)
+	return su
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (su *StatusUpdate) SetUser(u *User) *StatusUpdate {
+	return su.SetUserID(u.ID)
+}
+
 // Mutation returns the StatusMutation object of the builder.
 func (su *StatusUpdate) Mutation() *StatusMutation {
 	return su.mutation
+}
+
+// ClearRound clears the "round" edge to the Round entity.
+func (su *StatusUpdate) ClearRound() *StatusUpdate {
+	su.mutation.ClearRound()
+	return su
 }
 
 // ClearCheck clears the "check" edge to the Check entity.
@@ -136,15 +151,9 @@ func (su *StatusUpdate) ClearCheck() *StatusUpdate {
 	return su
 }
 
-// ClearTeam clears the "team" edge to the Team entity.
-func (su *StatusUpdate) ClearTeam() *StatusUpdate {
-	su.mutation.ClearTeam()
-	return su
-}
-
-// ClearRound clears the "round" edge to the Round entity.
-func (su *StatusUpdate) ClearRound() *StatusUpdate {
-	su.mutation.ClearRound()
+// ClearUser clears the "user" edge to the User entity.
+func (su *StatusUpdate) ClearUser() *StatusUpdate {
+	su.mutation.ClearUser()
 	return su
 }
 
@@ -187,14 +196,14 @@ func (su *StatusUpdate) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf(`ent: validator failed for field "Status.points": %w`, err)}
 		}
 	}
+	if _, ok := su.mutation.RoundID(); su.mutation.RoundCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Status.round"`)
+	}
 	if _, ok := su.mutation.CheckID(); su.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Status.check"`)
 	}
-	if _, ok := su.mutation.TeamID(); su.mutation.TeamCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Status.team"`)
-	}
-	if _, ok := su.mutation.RoundID(); su.mutation.RoundCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Status.round"`)
+	if _, ok := su.mutation.UserID(); su.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Status.user"`)
 	}
 	return nil
 }
@@ -203,7 +212,7 @@ func (su *StatusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := su.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(status.Table, status.Columns, sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(status.Table, status.Columns, sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -211,81 +220,23 @@ func (su *StatusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := su.mutation.Error(); ok {
-		_spec.SetField(status.FieldError, field.TypeString, value)
-	}
-	if su.mutation.ErrorCleared() {
-		_spec.ClearField(status.FieldError, field.TypeString)
-	}
 	if value, ok := su.mutation.Status(); ok {
 		_spec.SetField(status.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := su.mutation.Time(); ok {
-		_spec.SetField(status.FieldTime, field.TypeTime, value)
+	if value, ok := su.mutation.Message(); ok {
+		_spec.SetField(status.FieldMessage, field.TypeString, value)
+	}
+	if su.mutation.MessageCleared() {
+		_spec.ClearField(status.FieldMessage, field.TypeString)
+	}
+	if value, ok := su.mutation.Timestamp(); ok {
+		_spec.SetField(status.FieldTimestamp, field.TypeTime, value)
 	}
 	if value, ok := su.mutation.Points(); ok {
 		_spec.SetField(status.FieldPoints, field.TypeInt, value)
 	}
 	if value, ok := su.mutation.AddedPoints(); ok {
 		_spec.AddField(status.FieldPoints, field.TypeInt, value)
-	}
-	if su.mutation.CheckCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.CheckTable,
-			Columns: []string{status.CheckColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.CheckIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.CheckTable,
-			Columns: []string{status.CheckColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if su.mutation.TeamCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.TeamTable,
-			Columns: []string{status.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.TeamIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.TeamTable,
-			Columns: []string{status.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if su.mutation.RoundCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -295,7 +246,7 @@ func (su *StatusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{status.RoundColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -308,7 +259,65 @@ func (su *StatusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{status.RoundColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.CheckCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.CheckTable,
+			Columns: []string{status.CheckColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.CheckIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.CheckTable,
+			Columns: []string{status.CheckColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.UserTable,
+			Columns: []string{status.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.UserTable,
+			Columns: []string{status.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -336,26 +345,6 @@ type StatusUpdateOne struct {
 	mutation *StatusMutation
 }
 
-// SetError sets the "error" field.
-func (suo *StatusUpdateOne) SetError(s string) *StatusUpdateOne {
-	suo.mutation.SetError(s)
-	return suo
-}
-
-// SetNillableError sets the "error" field if the given value is not nil.
-func (suo *StatusUpdateOne) SetNillableError(s *string) *StatusUpdateOne {
-	if s != nil {
-		suo.SetError(*s)
-	}
-	return suo
-}
-
-// ClearError clears the value of the "error" field.
-func (suo *StatusUpdateOne) ClearError() *StatusUpdateOne {
-	suo.mutation.ClearError()
-	return suo
-}
-
 // SetStatus sets the "status" field.
 func (suo *StatusUpdateOne) SetStatus(s status.Status) *StatusUpdateOne {
 	suo.mutation.SetStatus(s)
@@ -370,16 +359,36 @@ func (suo *StatusUpdateOne) SetNillableStatus(s *status.Status) *StatusUpdateOne
 	return suo
 }
 
-// SetTime sets the "time" field.
-func (suo *StatusUpdateOne) SetTime(t time.Time) *StatusUpdateOne {
-	suo.mutation.SetTime(t)
+// SetMessage sets the "message" field.
+func (suo *StatusUpdateOne) SetMessage(s string) *StatusUpdateOne {
+	suo.mutation.SetMessage(s)
 	return suo
 }
 
-// SetNillableTime sets the "time" field if the given value is not nil.
-func (suo *StatusUpdateOne) SetNillableTime(t *time.Time) *StatusUpdateOne {
+// SetNillableMessage sets the "message" field if the given value is not nil.
+func (suo *StatusUpdateOne) SetNillableMessage(s *string) *StatusUpdateOne {
+	if s != nil {
+		suo.SetMessage(*s)
+	}
+	return suo
+}
+
+// ClearMessage clears the value of the "message" field.
+func (suo *StatusUpdateOne) ClearMessage() *StatusUpdateOne {
+	suo.mutation.ClearMessage()
+	return suo
+}
+
+// SetTimestamp sets the "timestamp" field.
+func (suo *StatusUpdateOne) SetTimestamp(t time.Time) *StatusUpdateOne {
+	suo.mutation.SetTimestamp(t)
+	return suo
+}
+
+// SetNillableTimestamp sets the "timestamp" field if the given value is not nil.
+func (suo *StatusUpdateOne) SetNillableTimestamp(t *time.Time) *StatusUpdateOne {
 	if t != nil {
-		suo.SetTime(*t)
+		suo.SetTimestamp(*t)
 	}
 	return suo
 }
@@ -391,36 +400,22 @@ func (suo *StatusUpdateOne) SetPoints(i int) *StatusUpdateOne {
 	return suo
 }
 
+// SetNillablePoints sets the "points" field if the given value is not nil.
+func (suo *StatusUpdateOne) SetNillablePoints(i *int) *StatusUpdateOne {
+	if i != nil {
+		suo.SetPoints(*i)
+	}
+	return suo
+}
+
 // AddPoints adds i to the "points" field.
 func (suo *StatusUpdateOne) AddPoints(i int) *StatusUpdateOne {
 	suo.mutation.AddPoints(i)
 	return suo
 }
 
-// SetCheckID sets the "check" edge to the Check entity by ID.
-func (suo *StatusUpdateOne) SetCheckID(id int) *StatusUpdateOne {
-	suo.mutation.SetCheckID(id)
-	return suo
-}
-
-// SetCheck sets the "check" edge to the Check entity.
-func (suo *StatusUpdateOne) SetCheck(c *Check) *StatusUpdateOne {
-	return suo.SetCheckID(c.ID)
-}
-
-// SetTeamID sets the "team" edge to the Team entity by ID.
-func (suo *StatusUpdateOne) SetTeamID(id int) *StatusUpdateOne {
-	suo.mutation.SetTeamID(id)
-	return suo
-}
-
-// SetTeam sets the "team" edge to the Team entity.
-func (suo *StatusUpdateOne) SetTeam(t *Team) *StatusUpdateOne {
-	return suo.SetTeamID(t.ID)
-}
-
 // SetRoundID sets the "round" edge to the Round entity by ID.
-func (suo *StatusUpdateOne) SetRoundID(id int) *StatusUpdateOne {
+func (suo *StatusUpdateOne) SetRoundID(id uuid.UUID) *StatusUpdateOne {
 	suo.mutation.SetRoundID(id)
 	return suo
 }
@@ -430,9 +425,37 @@ func (suo *StatusUpdateOne) SetRound(r *Round) *StatusUpdateOne {
 	return suo.SetRoundID(r.ID)
 }
 
+// SetCheckID sets the "check" edge to the Check entity by ID.
+func (suo *StatusUpdateOne) SetCheckID(id uuid.UUID) *StatusUpdateOne {
+	suo.mutation.SetCheckID(id)
+	return suo
+}
+
+// SetCheck sets the "check" edge to the Check entity.
+func (suo *StatusUpdateOne) SetCheck(c *Check) *StatusUpdateOne {
+	return suo.SetCheckID(c.ID)
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (suo *StatusUpdateOne) SetUserID(id uuid.UUID) *StatusUpdateOne {
+	suo.mutation.SetUserID(id)
+	return suo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (suo *StatusUpdateOne) SetUser(u *User) *StatusUpdateOne {
+	return suo.SetUserID(u.ID)
+}
+
 // Mutation returns the StatusMutation object of the builder.
 func (suo *StatusUpdateOne) Mutation() *StatusMutation {
 	return suo.mutation
+}
+
+// ClearRound clears the "round" edge to the Round entity.
+func (suo *StatusUpdateOne) ClearRound() *StatusUpdateOne {
+	suo.mutation.ClearRound()
+	return suo
 }
 
 // ClearCheck clears the "check" edge to the Check entity.
@@ -441,15 +464,9 @@ func (suo *StatusUpdateOne) ClearCheck() *StatusUpdateOne {
 	return suo
 }
 
-// ClearTeam clears the "team" edge to the Team entity.
-func (suo *StatusUpdateOne) ClearTeam() *StatusUpdateOne {
-	suo.mutation.ClearTeam()
-	return suo
-}
-
-// ClearRound clears the "round" edge to the Round entity.
-func (suo *StatusUpdateOne) ClearRound() *StatusUpdateOne {
-	suo.mutation.ClearRound()
+// ClearUser clears the "user" edge to the User entity.
+func (suo *StatusUpdateOne) ClearUser() *StatusUpdateOne {
+	suo.mutation.ClearUser()
 	return suo
 }
 
@@ -505,14 +522,14 @@ func (suo *StatusUpdateOne) check() error {
 			return &ValidationError{Name: "points", err: fmt.Errorf(`ent: validator failed for field "Status.points": %w`, err)}
 		}
 	}
+	if _, ok := suo.mutation.RoundID(); suo.mutation.RoundCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Status.round"`)
+	}
 	if _, ok := suo.mutation.CheckID(); suo.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Status.check"`)
 	}
-	if _, ok := suo.mutation.TeamID(); suo.mutation.TeamCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Status.team"`)
-	}
-	if _, ok := suo.mutation.RoundID(); suo.mutation.RoundCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Status.round"`)
+	if _, ok := suo.mutation.UserID(); suo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Status.user"`)
 	}
 	return nil
 }
@@ -521,7 +538,7 @@ func (suo *StatusUpdateOne) sqlSave(ctx context.Context) (_node *Status, err err
 	if err := suo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(status.Table, status.Columns, sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(status.Table, status.Columns, sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Status.id" for update`)}
@@ -546,81 +563,23 @@ func (suo *StatusUpdateOne) sqlSave(ctx context.Context) (_node *Status, err err
 			}
 		}
 	}
-	if value, ok := suo.mutation.Error(); ok {
-		_spec.SetField(status.FieldError, field.TypeString, value)
-	}
-	if suo.mutation.ErrorCleared() {
-		_spec.ClearField(status.FieldError, field.TypeString)
-	}
 	if value, ok := suo.mutation.Status(); ok {
 		_spec.SetField(status.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := suo.mutation.Time(); ok {
-		_spec.SetField(status.FieldTime, field.TypeTime, value)
+	if value, ok := suo.mutation.Message(); ok {
+		_spec.SetField(status.FieldMessage, field.TypeString, value)
+	}
+	if suo.mutation.MessageCleared() {
+		_spec.ClearField(status.FieldMessage, field.TypeString)
+	}
+	if value, ok := suo.mutation.Timestamp(); ok {
+		_spec.SetField(status.FieldTimestamp, field.TypeTime, value)
 	}
 	if value, ok := suo.mutation.Points(); ok {
 		_spec.SetField(status.FieldPoints, field.TypeInt, value)
 	}
 	if value, ok := suo.mutation.AddedPoints(); ok {
 		_spec.AddField(status.FieldPoints, field.TypeInt, value)
-	}
-	if suo.mutation.CheckCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.CheckTable,
-			Columns: []string{status.CheckColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.CheckIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.CheckTable,
-			Columns: []string{status.CheckColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if suo.mutation.TeamCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.TeamTable,
-			Columns: []string{status.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.TeamIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   status.TeamTable,
-			Columns: []string{status.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if suo.mutation.RoundCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -630,7 +589,7 @@ func (suo *StatusUpdateOne) sqlSave(ctx context.Context) (_node *Status, err err
 			Columns: []string{status.RoundColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -643,7 +602,65 @@ func (suo *StatusUpdateOne) sqlSave(ctx context.Context) (_node *Status, err err
 			Columns: []string{status.RoundColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(round.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.CheckCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.CheckTable,
+			Columns: []string{status.CheckColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.CheckIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.CheckTable,
+			Columns: []string{status.CheckColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.UserTable,
+			Columns: []string{status.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   status.UserTable,
+			Columns: []string{status.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

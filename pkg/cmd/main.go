@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/compscore/compscore/pkg/cmd/engine"
+	"github.com/compscore/compscore/pkg/cmd/server"
+	"github.com/compscore/compscore/pkg/logging"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +23,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 }
 
-// Entrypoint for all commands
+// entrypoint for all commands
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -32,10 +33,8 @@ func Execute() {
 
 // registers all commands
 func init() {
+	logging.Init()
 	rootCmd.AddCommand(
-		engine.Cmd,
-		generateCmd,
-		serverCmd,
-		versionCmd,
+		server.Cmd,
 	)
 }

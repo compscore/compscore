@@ -15,6 +15,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/google/uuid"
 )
 
 // CheckQuery is the builder for querying Check entities.
@@ -24,8 +25,8 @@ type CheckQuery struct {
 	order          []check.OrderOption
 	inters         []Interceptor
 	predicates     []predicate.Check
-	withStatus     *StatusQuery
 	withCredential *CredentialQuery
+	withStatuses   *StatusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,28 +63,6 @@ func (cq *CheckQuery) Order(o ...check.OrderOption) *CheckQuery {
 	return cq
 }
 
-// QueryStatus chains the current query on the "status" edge.
-func (cq *CheckQuery) QueryStatus() *StatusQuery {
-	query := (&StatusClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(check.Table, check.FieldID, selector),
-			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusTable, check.StatusColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryCredential chains the current query on the "credential" edge.
 func (cq *CheckQuery) QueryCredential() *CredentialQuery {
 	query := (&CredentialClient{config: cq.config}).Query()
@@ -99,6 +78,28 @@ func (cq *CheckQuery) QueryCredential() *CredentialQuery {
 			sqlgraph.From(check.Table, check.FieldID, selector),
 			sqlgraph.To(credential.Table, credential.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, check.CredentialTable, check.CredentialColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStatuses chains the current query on the "statuses" edge.
+func (cq *CheckQuery) QueryStatuses() *StatusQuery {
+	query := (&StatusClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(check.Table, check.FieldID, selector),
+			sqlgraph.To(status.Table, status.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusesTable, check.StatusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -130,8 +131,8 @@ func (cq *CheckQuery) FirstX(ctx context.Context) *Check {
 
 // FirstID returns the first Check ID from the query.
 // Returns a *NotFoundError when no Check ID was found.
-func (cq *CheckQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CheckQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -143,7 +144,7 @@ func (cq *CheckQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CheckQuery) FirstIDX(ctx context.Context) int {
+func (cq *CheckQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -181,8 +182,8 @@ func (cq *CheckQuery) OnlyX(ctx context.Context) *Check {
 // OnlyID is like Only, but returns the only Check ID in the query.
 // Returns a *NotSingularError when more than one Check ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CheckQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CheckQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -198,7 +199,7 @@ func (cq *CheckQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CheckQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CheckQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -226,7 +227,7 @@ func (cq *CheckQuery) AllX(ctx context.Context) []*Check {
 }
 
 // IDs executes the query and returns a list of Check IDs.
-func (cq *CheckQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (cq *CheckQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
@@ -238,7 +239,7 @@ func (cq *CheckQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CheckQuery) IDsX(ctx context.Context) []int {
+func (cq *CheckQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -298,23 +299,12 @@ func (cq *CheckQuery) Clone() *CheckQuery {
 		order:          append([]check.OrderOption{}, cq.order...),
 		inters:         append([]Interceptor{}, cq.inters...),
 		predicates:     append([]predicate.Check{}, cq.predicates...),
-		withStatus:     cq.withStatus.Clone(),
 		withCredential: cq.withCredential.Clone(),
+		withStatuses:   cq.withStatuses.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
-}
-
-// WithStatus tells the query-builder to eager-load the nodes that are connected to
-// the "status" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CheckQuery) WithStatus(opts ...func(*StatusQuery)) *CheckQuery {
-	query := (&StatusClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withStatus = query
-	return cq
 }
 
 // WithCredential tells the query-builder to eager-load the nodes that are connected to
@@ -325,6 +315,17 @@ func (cq *CheckQuery) WithCredential(opts ...func(*CredentialQuery)) *CheckQuery
 		opt(query)
 	}
 	cq.withCredential = query
+	return cq
+}
+
+// WithStatuses tells the query-builder to eager-load the nodes that are connected to
+// the "statuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CheckQuery) WithStatuses(opts ...func(*StatusQuery)) *CheckQuery {
+	query := (&StatusClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withStatuses = query
 	return cq
 }
 
@@ -407,8 +408,8 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 		nodes       = []*Check{}
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
-			cq.withStatus != nil,
 			cq.withCredential != nil,
+			cq.withStatuses != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -429,13 +430,6 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withStatus; query != nil {
-		if err := cq.loadStatus(ctx, query, nodes,
-			func(n *Check) { n.Edges.Status = []*Status{} },
-			func(n *Check, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := cq.withCredential; query != nil {
 		if err := cq.loadCredential(ctx, query, nodes,
 			func(n *Check) { n.Edges.Credential = []*Credential{} },
@@ -443,43 +437,19 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 			return nil, err
 		}
 	}
+	if query := cq.withStatuses; query != nil {
+		if err := cq.loadStatuses(ctx, query, nodes,
+			func(n *Check) { n.Edges.Statuses = []*Status{} },
+			func(n *Check, e *Status) { n.Edges.Statuses = append(n.Edges.Statuses, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (cq *CheckQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes []*Check, init func(*Check), assign func(*Check, *Status)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Check)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Status(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(check.StatusColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.status_check
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "status_check" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "status_check" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (cq *CheckQuery) loadCredential(ctx context.Context, query *CredentialQuery, nodes []*Check, init func(*Check), assign func(*Check, *Credential)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Check)
+	nodeids := make(map[uuid.UUID]*Check)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -508,6 +478,37 @@ func (cq *CheckQuery) loadCredential(ctx context.Context, query *CredentialQuery
 	}
 	return nil
 }
+func (cq *CheckQuery) loadStatuses(ctx context.Context, query *StatusQuery, nodes []*Check, init func(*Check), assign func(*Check, *Status)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Check)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Status(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(check.StatusesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.status_check
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "status_check" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "status_check" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (cq *CheckQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
@@ -519,7 +520,7 @@ func (cq *CheckQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (cq *CheckQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(check.Table, check.Columns, sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(check.Table, check.Columns, sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

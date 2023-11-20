@@ -10,39 +10,54 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // Credential is the model entity for the Credential schema.
 type Credential struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"-"`
-	// Password of Check
+	// ID of the credential
+	ID uuid.UUID `json:"id"`
+	// Password of the credential
 	Password string `json:"password"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CredentialQuery when eager-loading is set.
 	Edges            CredentialEdges `json:"edges"`
-	credential_check *int
-	credential_team  *int
+	credential_user  *uuid.UUID
+	credential_check *uuid.UUID
 	selectValues     sql.SelectValues
 }
 
 // CredentialEdges holds the relations/edges for other nodes in the graph.
 type CredentialEdges struct {
-	// Check
+	// User of the credential
+	User *User `json:"user,omitempty"`
+	// Check of the credential
 	Check *Check `json:"check,omitempty"`
-	// Team
-	Team *Team `json:"team,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CredentialEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
 // CheckOrErr returns the Check value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e CredentialEdges) CheckOrErr() (*Check, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.Check == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: check.Label}
@@ -52,32 +67,19 @@ func (e CredentialEdges) CheckOrErr() (*Check, error) {
 	return nil, &NotLoadedError{edge: "check"}
 }
 
-// TeamOrErr returns the Team value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CredentialEdges) TeamOrErr() (*Team, error) {
-	if e.loadedTypes[1] {
-		if e.Team == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: team.Label}
-		}
-		return e.Team, nil
-	}
-	return nil, &NotLoadedError{edge: "team"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Credential) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case credential.FieldID:
-			values[i] = new(sql.NullInt64)
 		case credential.FieldPassword:
 			values[i] = new(sql.NullString)
-		case credential.ForeignKeys[0]: // credential_check
-			values[i] = new(sql.NullInt64)
-		case credential.ForeignKeys[1]: // credential_team
-			values[i] = new(sql.NullInt64)
+		case credential.FieldID:
+			values[i] = new(uuid.UUID)
+		case credential.ForeignKeys[0]: // credential_user
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case credential.ForeignKeys[1]: // credential_check
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -94,11 +96,11 @@ func (c *Credential) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case credential.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				c.ID = *value
 			}
-			c.ID = int(value.Int64)
 		case credential.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
@@ -106,18 +108,18 @@ func (c *Credential) assignValues(columns []string, values []any) error {
 				c.Password = value.String
 			}
 		case credential.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field credential_check", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field credential_user", values[i])
 			} else if value.Valid {
-				c.credential_check = new(int)
-				*c.credential_check = int(value.Int64)
+				c.credential_user = new(uuid.UUID)
+				*c.credential_user = *value.S.(*uuid.UUID)
 			}
 		case credential.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field credential_team", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field credential_check", values[i])
 			} else if value.Valid {
-				c.credential_team = new(int)
-				*c.credential_team = int(value.Int64)
+				c.credential_check = new(uuid.UUID)
+				*c.credential_check = *value.S.(*uuid.UUID)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -132,14 +134,14 @@ func (c *Credential) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
+// QueryUser queries the "user" edge of the Credential entity.
+func (c *Credential) QueryUser() *UserQuery {
+	return NewCredentialClient(c.config).QueryUser(c)
+}
+
 // QueryCheck queries the "check" edge of the Credential entity.
 func (c *Credential) QueryCheck() *CheckQuery {
 	return NewCredentialClient(c.config).QueryCheck(c)
-}
-
-// QueryTeam queries the "team" edge of the Credential entity.
-func (c *Credential) QueryTeam() *TeamQuery {
-	return NewCredentialClient(c.config).QueryTeam(c)
 }
 
 // Update returns a builder for updating this Credential.

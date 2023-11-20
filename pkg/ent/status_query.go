@@ -14,7 +14,8 @@ import (
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/round"
 	"github.com/compscore/compscore/pkg/ent/status"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // StatusQuery is the builder for querying Status entities.
@@ -24,9 +25,9 @@ type StatusQuery struct {
 	order      []status.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Status
-	withCheck  *CheckQuery
-	withTeam   *TeamQuery
 	withRound  *RoundQuery
+	withCheck  *CheckQuery
+	withUser   *UserQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -64,6 +65,28 @@ func (sq *StatusQuery) Order(o ...status.OrderOption) *StatusQuery {
 	return sq
 }
 
+// QueryRound chains the current query on the "round" edge.
+func (sq *StatusQuery) QueryRound() *RoundQuery {
+	query := (&RoundClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(status.Table, status.FieldID, selector),
+			sqlgraph.To(round.Table, round.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, status.RoundTable, status.RoundColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryCheck chains the current query on the "check" edge.
 func (sq *StatusQuery) QueryCheck() *CheckQuery {
 	query := (&CheckClient{config: sq.config}).Query()
@@ -86,9 +109,9 @@ func (sq *StatusQuery) QueryCheck() *CheckQuery {
 	return query
 }
 
-// QueryTeam chains the current query on the "team" edge.
-func (sq *StatusQuery) QueryTeam() *TeamQuery {
-	query := (&TeamClient{config: sq.config}).Query()
+// QueryUser chains the current query on the "user" edge.
+func (sq *StatusQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -99,30 +122,8 @@ func (sq *StatusQuery) QueryTeam() *TeamQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(status.Table, status.FieldID, selector),
-			sqlgraph.To(team.Table, team.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, status.TeamTable, status.TeamColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryRound chains the current query on the "round" edge.
-func (sq *StatusQuery) QueryRound() *RoundQuery {
-	query := (&RoundClient{config: sq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := sq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := sq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(status.Table, status.FieldID, selector),
-			sqlgraph.To(round.Table, round.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, status.RoundTable, status.RoundColumn),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, status.UserTable, status.UserColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -154,8 +155,8 @@ func (sq *StatusQuery) FirstX(ctx context.Context) *Status {
 
 // FirstID returns the first Status ID from the query.
 // Returns a *NotFoundError when no Status ID was found.
-func (sq *StatusQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *StatusQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(1).IDs(setContextOp(ctx, sq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -167,7 +168,7 @@ func (sq *StatusQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *StatusQuery) FirstIDX(ctx context.Context) int {
+func (sq *StatusQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -205,8 +206,8 @@ func (sq *StatusQuery) OnlyX(ctx context.Context) *Status {
 // OnlyID is like Only, but returns the only Status ID in the query.
 // Returns a *NotSingularError when more than one Status ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *StatusQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *StatusQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = sq.Limit(2).IDs(setContextOp(ctx, sq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -222,7 +223,7 @@ func (sq *StatusQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *StatusQuery) OnlyIDX(ctx context.Context) int {
+func (sq *StatusQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -250,7 +251,7 @@ func (sq *StatusQuery) AllX(ctx context.Context) []*Status {
 }
 
 // IDs executes the query and returns a list of Status IDs.
-func (sq *StatusQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (sq *StatusQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if sq.ctx.Unique == nil && sq.path != nil {
 		sq.Unique(true)
 	}
@@ -262,7 +263,7 @@ func (sq *StatusQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *StatusQuery) IDsX(ctx context.Context) []int {
+func (sq *StatusQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -322,35 +323,13 @@ func (sq *StatusQuery) Clone() *StatusQuery {
 		order:      append([]status.OrderOption{}, sq.order...),
 		inters:     append([]Interceptor{}, sq.inters...),
 		predicates: append([]predicate.Status{}, sq.predicates...),
-		withCheck:  sq.withCheck.Clone(),
-		withTeam:   sq.withTeam.Clone(),
 		withRound:  sq.withRound.Clone(),
+		withCheck:  sq.withCheck.Clone(),
+		withUser:   sq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
-}
-
-// WithCheck tells the query-builder to eager-load the nodes that are connected to
-// the "check" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *StatusQuery) WithCheck(opts ...func(*CheckQuery)) *StatusQuery {
-	query := (&CheckClient{config: sq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	sq.withCheck = query
-	return sq
-}
-
-// WithTeam tells the query-builder to eager-load the nodes that are connected to
-// the "team" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *StatusQuery) WithTeam(opts ...func(*TeamQuery)) *StatusQuery {
-	query := (&TeamClient{config: sq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	sq.withTeam = query
-	return sq
 }
 
 // WithRound tells the query-builder to eager-load the nodes that are connected to
@@ -364,18 +343,40 @@ func (sq *StatusQuery) WithRound(opts ...func(*RoundQuery)) *StatusQuery {
 	return sq
 }
 
+// WithCheck tells the query-builder to eager-load the nodes that are connected to
+// the "check" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StatusQuery) WithCheck(opts ...func(*CheckQuery)) *StatusQuery {
+	query := (&CheckClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withCheck = query
+	return sq
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *StatusQuery) WithUser(opts ...func(*UserQuery)) *StatusQuery {
+	query := (&UserClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withUser = query
+	return sq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Error string `json:"error"`
+//		Status status.Status `json:"status"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Status.Query().
-//		GroupBy(status.FieldError).
+//		GroupBy(status.FieldStatus).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *StatusQuery) GroupBy(field string, fields ...string) *StatusGroupBy {
@@ -393,11 +394,11 @@ func (sq *StatusQuery) GroupBy(field string, fields ...string) *StatusGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Error string `json:"error"`
+//		Status status.Status `json:"status"`
 //	}
 //
 //	client.Status.Query().
-//		Select(status.FieldError).
+//		Select(status.FieldStatus).
 //		Scan(ctx, &v)
 func (sq *StatusQuery) Select(fields ...string) *StatusSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
@@ -444,12 +445,12 @@ func (sq *StatusQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Statu
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [3]bool{
-			sq.withCheck != nil,
-			sq.withTeam != nil,
 			sq.withRound != nil,
+			sq.withCheck != nil,
+			sq.withUser != nil,
 		}
 	)
-	if sq.withCheck != nil || sq.withTeam != nil || sq.withRound != nil {
+	if sq.withRound != nil || sq.withCheck != nil || sq.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -473,94 +474,30 @@ func (sq *StatusQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Statu
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := sq.withCheck; query != nil {
-		if err := sq.loadCheck(ctx, query, nodes, nil,
-			func(n *Status, e *Check) { n.Edges.Check = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := sq.withTeam; query != nil {
-		if err := sq.loadTeam(ctx, query, nodes, nil,
-			func(n *Status, e *Team) { n.Edges.Team = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := sq.withRound; query != nil {
 		if err := sq.loadRound(ctx, query, nodes, nil,
 			func(n *Status, e *Round) { n.Edges.Round = e }); err != nil {
 			return nil, err
 		}
 	}
+	if query := sq.withCheck; query != nil {
+		if err := sq.loadCheck(ctx, query, nodes, nil,
+			func(n *Status, e *Check) { n.Edges.Check = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withUser; query != nil {
+		if err := sq.loadUser(ctx, query, nodes, nil,
+			func(n *Status, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (sq *StatusQuery) loadCheck(ctx context.Context, query *CheckQuery, nodes []*Status, init func(*Status), assign func(*Status, *Check)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Status)
-	for i := range nodes {
-		if nodes[i].status_check == nil {
-			continue
-		}
-		fk := *nodes[i].status_check
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(check.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "status_check" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (sq *StatusQuery) loadTeam(ctx context.Context, query *TeamQuery, nodes []*Status, init func(*Status), assign func(*Status, *Team)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Status)
-	for i := range nodes {
-		if nodes[i].status_team == nil {
-			continue
-		}
-		fk := *nodes[i].status_team
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(team.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "status_team" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 func (sq *StatusQuery) loadRound(ctx context.Context, query *RoundQuery, nodes []*Status, init func(*Status), assign func(*Status, *Round)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Status)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Status)
 	for i := range nodes {
 		if nodes[i].status_round == nil {
 			continue
@@ -590,6 +527,70 @@ func (sq *StatusQuery) loadRound(ctx context.Context, query *RoundQuery, nodes [
 	}
 	return nil
 }
+func (sq *StatusQuery) loadCheck(ctx context.Context, query *CheckQuery, nodes []*Status, init func(*Status), assign func(*Status, *Check)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Status)
+	for i := range nodes {
+		if nodes[i].status_check == nil {
+			continue
+		}
+		fk := *nodes[i].status_check
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(check.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "status_check" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (sq *StatusQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Status, init func(*Status), assign func(*Status, *User)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Status)
+	for i := range nodes {
+		if nodes[i].status_user == nil {
+			continue
+		}
+		fk := *nodes[i].status_user
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "status_user" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (sq *StatusQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
@@ -601,7 +602,7 @@ func (sq *StatusQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (sq *StatusQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(status.Table, status.Columns, sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(status.Table, status.Columns, sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID))
 	_spec.From = sq.sql
 	if unique := sq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

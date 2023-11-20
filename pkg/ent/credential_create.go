@@ -11,7 +11,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // CredentialCreate is the builder for creating a Credential entity.
@@ -28,13 +29,32 @@ func (cc *CredentialCreate) SetPassword(s string) *CredentialCreate {
 }
 
 // SetID sets the "id" field.
-func (cc *CredentialCreate) SetID(i int) *CredentialCreate {
-	cc.mutation.SetID(i)
+func (cc *CredentialCreate) SetID(u uuid.UUID) *CredentialCreate {
+	cc.mutation.SetID(u)
 	return cc
 }
 
+// SetNillableID sets the "id" field if the given value is not nil.
+func (cc *CredentialCreate) SetNillableID(u *uuid.UUID) *CredentialCreate {
+	if u != nil {
+		cc.SetID(*u)
+	}
+	return cc
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (cc *CredentialCreate) SetUserID(id uuid.UUID) *CredentialCreate {
+	cc.mutation.SetUserID(id)
+	return cc
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (cc *CredentialCreate) SetUser(u *User) *CredentialCreate {
+	return cc.SetUserID(u.ID)
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
-func (cc *CredentialCreate) SetCheckID(id int) *CredentialCreate {
+func (cc *CredentialCreate) SetCheckID(id uuid.UUID) *CredentialCreate {
 	cc.mutation.SetCheckID(id)
 	return cc
 }
@@ -44,17 +64,6 @@ func (cc *CredentialCreate) SetCheck(c *Check) *CredentialCreate {
 	return cc.SetCheckID(c.ID)
 }
 
-// SetTeamID sets the "team" edge to the Team entity by ID.
-func (cc *CredentialCreate) SetTeamID(id int) *CredentialCreate {
-	cc.mutation.SetTeamID(id)
-	return cc
-}
-
-// SetTeam sets the "team" edge to the Team entity.
-func (cc *CredentialCreate) SetTeam(t *Team) *CredentialCreate {
-	return cc.SetTeamID(t.ID)
-}
-
 // Mutation returns the CredentialMutation object of the builder.
 func (cc *CredentialCreate) Mutation() *CredentialMutation {
 	return cc.mutation
@@ -62,6 +71,7 @@ func (cc *CredentialCreate) Mutation() *CredentialMutation {
 
 // Save creates the Credential in the database.
 func (cc *CredentialCreate) Save(ctx context.Context) (*Credential, error) {
+	cc.defaults()
 	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
@@ -87,16 +97,24 @@ func (cc *CredentialCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cc *CredentialCreate) defaults() {
+	if _, ok := cc.mutation.ID(); !ok {
+		v := credential.DefaultID()
+		cc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cc *CredentialCreate) check() error {
 	if _, ok := cc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Credential.password"`)}
 	}
+	if _, ok := cc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Credential.user"`)}
+	}
 	if _, ok := cc.mutation.CheckID(); !ok {
 		return &ValidationError{Name: "check", err: errors.New(`ent: missing required edge "Credential.check"`)}
-	}
-	if _, ok := cc.mutation.TeamID(); !ok {
-		return &ValidationError{Name: "team", err: errors.New(`ent: missing required edge "Credential.team"`)}
 	}
 	return nil
 }
@@ -112,9 +130,12 @@ func (cc *CredentialCreate) sqlSave(ctx context.Context) (*Credential, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
 	}
 	cc.mutation.id = &_node.ID
 	cc.mutation.done = true
@@ -124,15 +145,32 @@ func (cc *CredentialCreate) sqlSave(ctx context.Context) (*Credential, error) {
 func (cc *CredentialCreate) createSpec() (*Credential, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Credential{config: cc.config}
-		_spec = sqlgraph.NewCreateSpec(credential.Table, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(credential.Table, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID))
 	)
 	if id, ok := cc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := cc.mutation.Password(); ok {
 		_spec.SetField(credential.FieldPassword, field.TypeString, value)
 		_node.Password = value
+	}
+	if nodes := cc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   credential.UserTable,
+			Columns: []string{credential.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.credential_user = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.CheckIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -142,7 +180,7 @@ func (cc *CredentialCreate) createSpec() (*Credential, *sqlgraph.CreateSpec) {
 			Columns: []string{credential.CheckColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -151,40 +189,28 @@ func (cc *CredentialCreate) createSpec() (*Credential, *sqlgraph.CreateSpec) {
 		_node.credential_check = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.TeamIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   credential.TeamTable,
-			Columns: []string{credential.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.credential_team = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	return _node, _spec
 }
 
 // CredentialCreateBulk is the builder for creating many Credential entities in bulk.
 type CredentialCreateBulk struct {
 	config
+	err      error
 	builders []*CredentialCreate
 }
 
 // Save creates the Credential entities in the database.
 func (ccb *CredentialCreateBulk) Save(ctx context.Context) ([]*Credential, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Credential, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
 	for i := range ccb.builders {
 		func(i int, root context.Context) {
 			builder := ccb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CredentialMutation)
 				if !ok {
@@ -211,10 +237,6 @@ func (ccb *CredentialCreateBulk) Save(ctx context.Context) ([]*Credential, error
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

@@ -9,17 +9,19 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/google/uuid"
 )
 
 // Round is the model entity for the Round schema.
 type Round struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"-"`
-	// Round number
+	// ID of the round
+	ID uuid.UUID `json:"id"`
+	// Number of the round
 	Number int `json:"number"`
-	// Round Complete
-	Complete bool `json:"complete"`
+	// Whether the round is completed
+	Completed bool `json:"completed"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoundQuery when eager-loading is set.
 	Edges        RoundEdges `json:"edges"`
@@ -28,20 +30,31 @@ type Round struct {
 
 // RoundEdges holds the relations/edges for other nodes in the graph.
 type RoundEdges struct {
-	// Check statuses
-	Status []*Status `json:"status,omitempty"`
+	// Status of the round
+	Statuses []*Status `json:"status,omitempty"`
+	// Scores for the round
+	Scores []*Score `json:"scores,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
-// StatusOrErr returns the Status value or an error if the edge
+// StatusesOrErr returns the Statuses value or an error if the edge
 // was not loaded in eager-loading.
-func (e RoundEdges) StatusOrErr() ([]*Status, error) {
+func (e RoundEdges) StatusesOrErr() ([]*Status, error) {
 	if e.loadedTypes[0] {
-		return e.Status, nil
+		return e.Statuses, nil
 	}
-	return nil, &NotLoadedError{edge: "status"}
+	return nil, &NotLoadedError{edge: "statuses"}
+}
+
+// ScoresOrErr returns the Scores value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoundEdges) ScoresOrErr() ([]*Score, error) {
+	if e.loadedTypes[1] {
+		return e.Scores, nil
+	}
+	return nil, &NotLoadedError{edge: "scores"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -49,10 +62,12 @@ func (*Round) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case round.FieldComplete:
+		case round.FieldCompleted:
 			values[i] = new(sql.NullBool)
-		case round.FieldID, round.FieldNumber:
+		case round.FieldNumber:
 			values[i] = new(sql.NullInt64)
+		case round.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -69,22 +84,22 @@ func (r *Round) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case round.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				r.ID = *value
 			}
-			r.ID = int(value.Int64)
 		case round.FieldNumber:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field number", values[i])
 			} else if value.Valid {
 				r.Number = int(value.Int64)
 			}
-		case round.FieldComplete:
+		case round.FieldCompleted:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field complete", values[i])
+				return fmt.Errorf("unexpected type %T for field completed", values[i])
 			} else if value.Valid {
-				r.Complete = value.Bool
+				r.Completed = value.Bool
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -99,9 +114,14 @@ func (r *Round) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
-// QueryStatus queries the "status" edge of the Round entity.
-func (r *Round) QueryStatus() *StatusQuery {
-	return NewRoundClient(r.config).QueryStatus(r)
+// QueryStatuses queries the "statuses" edge of the Round entity.
+func (r *Round) QueryStatuses() *StatusQuery {
+	return NewRoundClient(r.config).QueryStatuses(r)
+}
+
+// QueryScores queries the "scores" edge of the Round entity.
+func (r *Round) QueryScores() *ScoreQuery {
+	return NewRoundClient(r.config).QueryScores(r)
 }
 
 // Update returns a builder for updating this Round.
@@ -130,8 +150,8 @@ func (r *Round) String() string {
 	builder.WriteString("number=")
 	builder.WriteString(fmt.Sprintf("%v", r.Number))
 	builder.WriteString(", ")
-	builder.WriteString("complete=")
-	builder.WriteString(fmt.Sprintf("%v", r.Complete))
+	builder.WriteString("completed=")
+	builder.WriteString(fmt.Sprintf("%v", r.Completed))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -6,50 +6,51 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/compscore/compscore/pkg/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Check {
+func ID(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Check {
+func IDEQ(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Check {
+func IDNEQ(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Check {
+func IDIn(ids ...uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Check {
+func IDNotIn(ids ...uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Check {
+func IDGT(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Check {
+func IDGTE(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Check {
+func IDLT(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Check {
+func IDLTE(id uuid.UUID) predicate.Check {
 	return predicate.Check(sql.FieldLTE(FieldID, id))
 }
 
@@ -168,29 +169,6 @@ func WeightLTE(v int) predicate.Check {
 	return predicate.Check(sql.FieldLTE(FieldWeight, v))
 }
 
-// HasStatus applies the HasEdge predicate on the "status" edge.
-func HasStatus() predicate.Check {
-	return predicate.Check(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStatusWith applies the HasEdge predicate on the "status" edge with a given conditions (other predicates).
-func HasStatusWith(preds ...predicate.Status) predicate.Check {
-	return predicate.Check(func(s *sql.Selector) {
-		step := newStatusStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasCredential applies the HasEdge predicate on the "credential" edge.
 func HasCredential() predicate.Check {
 	return predicate.Check(func(s *sql.Selector) {
@@ -214,34 +192,40 @@ func HasCredentialWith(preds ...predicate.Credential) predicate.Check {
 	})
 }
 
+// HasStatuses applies the HasEdge predicate on the "statuses" edge.
+func HasStatuses() predicate.Check {
+	return predicate.Check(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, StatusesTable, StatusesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStatusesWith applies the HasEdge predicate on the "statuses" edge with a given conditions (other predicates).
+func HasStatusesWith(preds ...predicate.Status) predicate.Check {
+	return predicate.Check(func(s *sql.Selector) {
+		step := newStatusesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Check) predicate.Check {
-	return predicate.Check(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Check(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Check) predicate.Check {
-	return predicate.Check(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Check(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Check) predicate.Check {
-	return predicate.Check(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Check(sql.NotPredicates(p))
 }

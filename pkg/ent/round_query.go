@@ -13,17 +13,20 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/google/uuid"
 )
 
 // RoundQuery is the builder for querying Round entities.
 type RoundQuery struct {
 	config
-	ctx        *QueryContext
-	order      []round.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Round
-	withStatus *StatusQuery
+	ctx          *QueryContext
+	order        []round.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Round
+	withStatuses *StatusQuery
+	withScores   *ScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,8 +63,8 @@ func (rq *RoundQuery) Order(o ...round.OrderOption) *RoundQuery {
 	return rq
 }
 
-// QueryStatus chains the current query on the "status" edge.
-func (rq *RoundQuery) QueryStatus() *StatusQuery {
+// QueryStatuses chains the current query on the "statuses" edge.
+func (rq *RoundQuery) QueryStatuses() *StatusQuery {
 	query := (&StatusClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
@@ -74,7 +77,29 @@ func (rq *RoundQuery) QueryStatus() *StatusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(round.Table, round.FieldID, selector),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusTable, round.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusesTable, round.StatusesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryScores chains the current query on the "scores" edge.
+func (rq *RoundQuery) QueryScores() *ScoreQuery {
+	query := (&ScoreClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(round.Table, round.FieldID, selector),
+			sqlgraph.To(score.Table, score.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, round.ScoresTable, round.ScoresColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -106,8 +131,8 @@ func (rq *RoundQuery) FirstX(ctx context.Context) *Round {
 
 // FirstID returns the first Round ID from the query.
 // Returns a *NotFoundError when no Round ID was found.
-func (rq *RoundQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rq *RoundQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = rq.Limit(1).IDs(setContextOp(ctx, rq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -119,7 +144,7 @@ func (rq *RoundQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rq *RoundQuery) FirstIDX(ctx context.Context) int {
+func (rq *RoundQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := rq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -157,8 +182,8 @@ func (rq *RoundQuery) OnlyX(ctx context.Context) *Round {
 // OnlyID is like Only, but returns the only Round ID in the query.
 // Returns a *NotSingularError when more than one Round ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rq *RoundQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rq *RoundQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = rq.Limit(2).IDs(setContextOp(ctx, rq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -174,7 +199,7 @@ func (rq *RoundQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *RoundQuery) OnlyIDX(ctx context.Context) int {
+func (rq *RoundQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := rq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -202,7 +227,7 @@ func (rq *RoundQuery) AllX(ctx context.Context) []*Round {
 }
 
 // IDs executes the query and returns a list of Round IDs.
-func (rq *RoundQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (rq *RoundQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if rq.ctx.Unique == nil && rq.path != nil {
 		rq.Unique(true)
 	}
@@ -214,7 +239,7 @@ func (rq *RoundQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *RoundQuery) IDsX(ctx context.Context) []int {
+func (rq *RoundQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := rq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -269,26 +294,38 @@ func (rq *RoundQuery) Clone() *RoundQuery {
 		return nil
 	}
 	return &RoundQuery{
-		config:     rq.config,
-		ctx:        rq.ctx.Clone(),
-		order:      append([]round.OrderOption{}, rq.order...),
-		inters:     append([]Interceptor{}, rq.inters...),
-		predicates: append([]predicate.Round{}, rq.predicates...),
-		withStatus: rq.withStatus.Clone(),
+		config:       rq.config,
+		ctx:          rq.ctx.Clone(),
+		order:        append([]round.OrderOption{}, rq.order...),
+		inters:       append([]Interceptor{}, rq.inters...),
+		predicates:   append([]predicate.Round{}, rq.predicates...),
+		withStatuses: rq.withStatuses.Clone(),
+		withScores:   rq.withScores.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
 	}
 }
 
-// WithStatus tells the query-builder to eager-load the nodes that are connected to
-// the "status" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RoundQuery) WithStatus(opts ...func(*StatusQuery)) *RoundQuery {
+// WithStatuses tells the query-builder to eager-load the nodes that are connected to
+// the "statuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoundQuery) WithStatuses(opts ...func(*StatusQuery)) *RoundQuery {
 	query := (&StatusClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rq.withStatus = query
+	rq.withStatuses = query
+	return rq
+}
+
+// WithScores tells the query-builder to eager-load the nodes that are connected to
+// the "scores" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoundQuery) WithScores(opts ...func(*ScoreQuery)) *RoundQuery {
+	query := (&ScoreClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withScores = query
 	return rq
 }
 
@@ -370,8 +407,9 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 	var (
 		nodes       = []*Round{}
 		_spec       = rq.querySpec()
-		loadedTypes = [1]bool{
-			rq.withStatus != nil,
+		loadedTypes = [2]bool{
+			rq.withStatuses != nil,
+			rq.withScores != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -392,19 +430,26 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := rq.withStatus; query != nil {
-		if err := rq.loadStatus(ctx, query, nodes,
-			func(n *Round) { n.Edges.Status = []*Status{} },
-			func(n *Round, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+	if query := rq.withStatuses; query != nil {
+		if err := rq.loadStatuses(ctx, query, nodes,
+			func(n *Round) { n.Edges.Statuses = []*Status{} },
+			func(n *Round, e *Status) { n.Edges.Statuses = append(n.Edges.Statuses, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := rq.withScores; query != nil {
+		if err := rq.loadScores(ctx, query, nodes,
+			func(n *Round) { n.Edges.Scores = []*Score{} },
+			func(n *Round, e *Score) { n.Edges.Scores = append(n.Edges.Scores, e) }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes []*Round, init func(*Round), assign func(*Round, *Status)) error {
+func (rq *RoundQuery) loadStatuses(ctx context.Context, query *StatusQuery, nodes []*Round, init func(*Round), assign func(*Round, *Status)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Round)
+	nodeids := make(map[uuid.UUID]*Round)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -414,7 +459,7 @@ func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 	}
 	query.withFKs = true
 	query.Where(predicate.Status(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(round.StatusColumn), fks...))
+		s.Where(sql.InValues(s.C(round.StatusesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -433,6 +478,37 @@ func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 	}
 	return nil
 }
+func (rq *RoundQuery) loadScores(ctx context.Context, query *ScoreQuery, nodes []*Round, init func(*Round), assign func(*Round, *Score)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Round)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Score(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(round.ScoresColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.round_scores
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "round_scores" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "round_scores" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (rq *RoundQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := rq.querySpec()
@@ -444,7 +520,7 @@ func (rq *RoundQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (rq *RoundQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(round.Table, round.Columns, sqlgraph.NewFieldSpec(round.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(round.Table, round.Columns, sqlgraph.NewFieldSpec(round.FieldID, field.TypeUUID))
 	_spec.From = rq.sql
 	if unique := rq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

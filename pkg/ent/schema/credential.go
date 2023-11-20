@@ -4,35 +4,41 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
-// Check holds the schema definition for the Credential entity.
+// Credential holds the schema definition for the Credential entity.
 type Credential struct {
 	ent.Schema
 }
 
-// Fields of the Check.
+// Fields of the Credential.
 func (Credential) Fields() []ent.Field {
 	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).
+			Comment("ID of the credential").
+			StructTag(`json:"id"`).
+			Immutable().
+			Unique().
+			Default(uuid.New),
 		field.String("password").
-			StructTag(`json:"password"`).
-			Comment("Password of Check"),
-		field.Int("id").
-			StructTag(`json:"-"`),
+			Comment("Password of the credential").
+			StructTag(`json:"password"`),
 	}
+
 }
 
-// Edges of the Check.
+// Edges of the Credential.
 func (Credential) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("check", Check.Type).
-			StructTag(`json:"check,omitempty"`).
-			Comment("Check").
+		edge.To("user", User.Type).
+			Comment("User of the credential").
+			StructTag(`json:"user,omitempty"`).
 			Required().
 			Unique(),
-		edge.To("team", Team.Type).
-			StructTag(`json:"team,omitempty"`).
-			Comment("Team").
+		edge.To("check", Check.Type).
+			Comment("Check of the credential").
+			StructTag(`json:"check,omitempty"`).
 			Required().
 			Unique(),
 	}

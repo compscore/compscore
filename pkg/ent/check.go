@@ -9,17 +9,19 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/compscore/compscore/pkg/ent/check"
+	"github.com/google/uuid"
 )
 
 // Check is the model entity for the Check schema.
 type Check struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"-"`
-	// Check name
+	// ID of the check
+	ID uuid.UUID `json:"id"`
+	// Name of the check
 	Name string `json:"name"`
-	// Weight holds the value of the "weight" field.
-	Weight int `json:"-"`
+	// Weight of the check
+	Weight int `json:"weight"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CheckQuery when eager-loading is set.
 	Edges        CheckEdges `json:"edges"`
@@ -28,31 +30,31 @@ type Check struct {
 
 // CheckEdges holds the relations/edges for other nodes in the graph.
 type CheckEdges struct {
-	// Check statuses
-	Status []*Status `json:"status,omitempty"`
-	// Check credential
+	// Credential of the check
 	Credential []*Credential `json:"credential,omitempty"`
+	// Status of the check
+	Statuses []*Status `json:"status,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
-// StatusOrErr returns the Status value or an error if the edge
-// was not loaded in eager-loading.
-func (e CheckEdges) StatusOrErr() ([]*Status, error) {
-	if e.loadedTypes[0] {
-		return e.Status, nil
-	}
-	return nil, &NotLoadedError{edge: "status"}
-}
-
 // CredentialOrErr returns the Credential value or an error if the edge
 // was not loaded in eager-loading.
 func (e CheckEdges) CredentialOrErr() ([]*Credential, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Credential, nil
 	}
 	return nil, &NotLoadedError{edge: "credential"}
+}
+
+// StatusesOrErr returns the Statuses value or an error if the edge
+// was not loaded in eager-loading.
+func (e CheckEdges) StatusesOrErr() ([]*Status, error) {
+	if e.loadedTypes[1] {
+		return e.Statuses, nil
+	}
+	return nil, &NotLoadedError{edge: "statuses"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -60,10 +62,12 @@ func (*Check) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case check.FieldID, check.FieldWeight:
+		case check.FieldWeight:
 			values[i] = new(sql.NullInt64)
 		case check.FieldName:
 			values[i] = new(sql.NullString)
+		case check.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -80,11 +84,11 @@ func (c *Check) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case check.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				c.ID = *value
 			}
-			c.ID = int(value.Int64)
 		case check.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -110,14 +114,14 @@ func (c *Check) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryStatus queries the "status" edge of the Check entity.
-func (c *Check) QueryStatus() *StatusQuery {
-	return NewCheckClient(c.config).QueryStatus(c)
-}
-
 // QueryCredential queries the "credential" edge of the Check entity.
 func (c *Check) QueryCredential() *CredentialQuery {
 	return NewCheckClient(c.config).QueryCredential(c)
+}
+
+// QueryStatuses queries the "statuses" edge of the Check entity.
+func (c *Check) QueryStatuses() *StatusQuery {
+	return NewCheckClient(c.config).QueryStatuses(c)
 }
 
 // Update returns a builder for updating this Check.

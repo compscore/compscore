@@ -18,10 +18,12 @@ type Tx struct {
 	Credential *CredentialClient
 	// Round is the client for interacting with the Round builders.
 	Round *RoundClient
+	// Score is the client for interacting with the Score builders.
+	Score *ScoreClient
 	// Status is the client for interacting with the Status builders.
 	Status *StatusClient
-	// Team is the client for interacting with the Team builders.
-	Team *TeamClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -156,8 +158,9 @@ func (tx *Tx) init() {
 	tx.Check = NewCheckClient(tx.config)
 	tx.Credential = NewCredentialClient(tx.config)
 	tx.Round = NewRoundClient(tx.config)
+	tx.Score = NewScoreClient(tx.config)
 	tx.Status = NewStatusClient(tx.config)
-	tx.Team = NewTeamClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

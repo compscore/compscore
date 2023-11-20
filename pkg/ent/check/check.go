@@ -5,6 +5,7 @@ package check
 import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 )
 
 const (
@@ -16,19 +17,12 @@ const (
 	FieldName = "name"
 	// FieldWeight holds the string denoting the weight field in the database.
 	FieldWeight = "weight"
-	// EdgeStatus holds the string denoting the status edge name in mutations.
-	EdgeStatus = "status"
 	// EdgeCredential holds the string denoting the credential edge name in mutations.
 	EdgeCredential = "credential"
+	// EdgeStatuses holds the string denoting the statuses edge name in mutations.
+	EdgeStatuses = "statuses"
 	// Table holds the table name of the check in the database.
 	Table = "checks"
-	// StatusTable is the table that holds the status relation/edge.
-	StatusTable = "status"
-	// StatusInverseTable is the table name for the Status entity.
-	// It exists in this package in order to avoid circular dependency with the "status" package.
-	StatusInverseTable = "status"
-	// StatusColumn is the table column denoting the status relation/edge.
-	StatusColumn = "status_check"
 	// CredentialTable is the table that holds the credential relation/edge.
 	CredentialTable = "credentials"
 	// CredentialInverseTable is the table name for the Credential entity.
@@ -36,6 +30,13 @@ const (
 	CredentialInverseTable = "credentials"
 	// CredentialColumn is the table column denoting the credential relation/edge.
 	CredentialColumn = "credential_check"
+	// StatusesTable is the table that holds the statuses relation/edge.
+	StatusesTable = "status"
+	// StatusesInverseTable is the table name for the Status entity.
+	// It exists in this package in order to avoid circular dependency with the "status" package.
+	StatusesInverseTable = "status"
+	// StatusesColumn is the table column denoting the statuses relation/edge.
+	StatusesColumn = "status_check"
 )
 
 // Columns holds all SQL columns for check fields.
@@ -60,6 +61,8 @@ var (
 	NameValidator func(string) error
 	// WeightValidator is a validator for the "weight" field. It is called by the builders before save.
 	WeightValidator func(int) error
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // OrderOption defines the ordering options for the Check queries.
@@ -80,20 +83,6 @@ func ByWeight(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWeight, opts...).ToFunc()
 }
 
-// ByStatusCount orders the results by status count.
-func ByStatusCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newStatusStep(), opts...)
-	}
-}
-
-// ByStatus orders the results by status terms.
-func ByStatus(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStatusStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByCredentialCount orders the results by credential count.
 func ByCredentialCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -107,17 +96,31 @@ func ByCredential(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCredentialStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newStatusStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(StatusInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
-	)
+
+// ByStatusesCount orders the results by statuses count.
+func ByStatusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newStatusesStep(), opts...)
+	}
+}
+
+// ByStatuses orders the results by statuses terms.
+func ByStatuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStatusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
 }
 func newCredentialStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CredentialInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, CredentialTable, CredentialColumn),
+	)
+}
+func newStatusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StatusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, StatusesTable, StatusesColumn),
 	)
 }

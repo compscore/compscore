@@ -13,7 +13,8 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // CredentialQuery is the builder for querying Credential entities.
@@ -23,8 +24,8 @@ type CredentialQuery struct {
 	order      []credential.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Credential
+	withUser   *UserQuery
 	withCheck  *CheckQuery
-	withTeam   *TeamQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -62,6 +63,28 @@ func (cq *CredentialQuery) Order(o ...credential.OrderOption) *CredentialQuery {
 	return cq
 }
 
+// QueryUser chains the current query on the "user" edge.
+func (cq *CredentialQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(credential.Table, credential.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, credential.UserTable, credential.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryCheck chains the current query on the "check" edge.
 func (cq *CredentialQuery) QueryCheck() *CheckQuery {
 	query := (&CheckClient{config: cq.config}).Query()
@@ -77,28 +100,6 @@ func (cq *CredentialQuery) QueryCheck() *CheckQuery {
 			sqlgraph.From(credential.Table, credential.FieldID, selector),
 			sqlgraph.To(check.Table, check.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, credential.CheckTable, credential.CheckColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryTeam chains the current query on the "team" edge.
-func (cq *CredentialQuery) QueryTeam() *TeamQuery {
-	query := (&TeamClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(credential.Table, credential.FieldID, selector),
-			sqlgraph.To(team.Table, team.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, credential.TeamTable, credential.TeamColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -130,8 +131,8 @@ func (cq *CredentialQuery) FirstX(ctx context.Context) *Credential {
 
 // FirstID returns the first Credential ID from the query.
 // Returns a *NotFoundError when no Credential ID was found.
-func (cq *CredentialQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CredentialQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -143,7 +144,7 @@ func (cq *CredentialQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CredentialQuery) FirstIDX(ctx context.Context) int {
+func (cq *CredentialQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -181,8 +182,8 @@ func (cq *CredentialQuery) OnlyX(ctx context.Context) *Credential {
 // OnlyID is like Only, but returns the only Credential ID in the query.
 // Returns a *NotSingularError when more than one Credential ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CredentialQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CredentialQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -198,7 +199,7 @@ func (cq *CredentialQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CredentialQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CredentialQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -226,7 +227,7 @@ func (cq *CredentialQuery) AllX(ctx context.Context) []*Credential {
 }
 
 // IDs executes the query and returns a list of Credential IDs.
-func (cq *CredentialQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (cq *CredentialQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
@@ -238,7 +239,7 @@ func (cq *CredentialQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CredentialQuery) IDsX(ctx context.Context) []int {
+func (cq *CredentialQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -298,12 +299,23 @@ func (cq *CredentialQuery) Clone() *CredentialQuery {
 		order:      append([]credential.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Credential{}, cq.predicates...),
+		withUser:   cq.withUser.Clone(),
 		withCheck:  cq.withCheck.Clone(),
-		withTeam:   cq.withTeam.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CredentialQuery) WithUser(opts ...func(*UserQuery)) *CredentialQuery {
+	query := (&UserClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withUser = query
+	return cq
 }
 
 // WithCheck tells the query-builder to eager-load the nodes that are connected to
@@ -314,17 +326,6 @@ func (cq *CredentialQuery) WithCheck(opts ...func(*CheckQuery)) *CredentialQuery
 		opt(query)
 	}
 	cq.withCheck = query
-	return cq
-}
-
-// WithTeam tells the query-builder to eager-load the nodes that are connected to
-// the "team" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CredentialQuery) WithTeam(opts ...func(*TeamQuery)) *CredentialQuery {
-	query := (&TeamClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withTeam = query
 	return cq
 }
 
@@ -408,11 +409,11 @@ func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
+			cq.withUser != nil,
 			cq.withCheck != nil,
-			cq.withTeam != nil,
 		}
 	)
-	if cq.withCheck != nil || cq.withTeam != nil {
+	if cq.withUser != nil || cq.withCheck != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -436,24 +437,56 @@ func (cq *CredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withUser; query != nil {
+		if err := cq.loadUser(ctx, query, nodes, nil,
+			func(n *Credential, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := cq.withCheck; query != nil {
 		if err := cq.loadCheck(ctx, query, nodes, nil,
 			func(n *Credential, e *Check) { n.Edges.Check = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withTeam; query != nil {
-		if err := cq.loadTeam(ctx, query, nodes, nil,
-			func(n *Credential, e *Team) { n.Edges.Team = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
 }
 
+func (cq *CredentialQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Credential, init func(*Credential), assign func(*Credential, *User)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Credential)
+	for i := range nodes {
+		if nodes[i].credential_user == nil {
+			continue
+		}
+		fk := *nodes[i].credential_user
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "credential_user" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (cq *CredentialQuery) loadCheck(ctx context.Context, query *CheckQuery, nodes []*Credential, init func(*Credential), assign func(*Credential, *Check)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Credential)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Credential)
 	for i := range nodes {
 		if nodes[i].credential_check == nil {
 			continue
@@ -483,38 +516,6 @@ func (cq *CredentialQuery) loadCheck(ctx context.Context, query *CheckQuery, nod
 	}
 	return nil
 }
-func (cq *CredentialQuery) loadTeam(ctx context.Context, query *TeamQuery, nodes []*Credential, init func(*Credential), assign func(*Credential, *Team)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Credential)
-	for i := range nodes {
-		if nodes[i].credential_team == nil {
-			continue
-		}
-		fk := *nodes[i].credential_team
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(team.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "credential_team" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 
 func (cq *CredentialQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
@@ -526,7 +527,7 @@ func (cq *CredentialQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (cq *CredentialQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

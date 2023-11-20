@@ -13,7 +13,8 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
-	"github.com/compscore/compscore/pkg/ent/team"
+	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // CredentialUpdate is the builder for updating Credential entities.
@@ -35,8 +36,27 @@ func (cu *CredentialUpdate) SetPassword(s string) *CredentialUpdate {
 	return cu
 }
 
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (cu *CredentialUpdate) SetNillablePassword(s *string) *CredentialUpdate {
+	if s != nil {
+		cu.SetPassword(*s)
+	}
+	return cu
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (cu *CredentialUpdate) SetUserID(id uuid.UUID) *CredentialUpdate {
+	cu.mutation.SetUserID(id)
+	return cu
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (cu *CredentialUpdate) SetUser(u *User) *CredentialUpdate {
+	return cu.SetUserID(u.ID)
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
-func (cu *CredentialUpdate) SetCheckID(id int) *CredentialUpdate {
+func (cu *CredentialUpdate) SetCheckID(id uuid.UUID) *CredentialUpdate {
 	cu.mutation.SetCheckID(id)
 	return cu
 }
@@ -46,31 +66,20 @@ func (cu *CredentialUpdate) SetCheck(c *Check) *CredentialUpdate {
 	return cu.SetCheckID(c.ID)
 }
 
-// SetTeamID sets the "team" edge to the Team entity by ID.
-func (cu *CredentialUpdate) SetTeamID(id int) *CredentialUpdate {
-	cu.mutation.SetTeamID(id)
-	return cu
-}
-
-// SetTeam sets the "team" edge to the Team entity.
-func (cu *CredentialUpdate) SetTeam(t *Team) *CredentialUpdate {
-	return cu.SetTeamID(t.ID)
-}
-
 // Mutation returns the CredentialMutation object of the builder.
 func (cu *CredentialUpdate) Mutation() *CredentialMutation {
 	return cu.mutation
 }
 
-// ClearCheck clears the "check" edge to the Check entity.
-func (cu *CredentialUpdate) ClearCheck() *CredentialUpdate {
-	cu.mutation.ClearCheck()
+// ClearUser clears the "user" edge to the User entity.
+func (cu *CredentialUpdate) ClearUser() *CredentialUpdate {
+	cu.mutation.ClearUser()
 	return cu
 }
 
-// ClearTeam clears the "team" edge to the Team entity.
-func (cu *CredentialUpdate) ClearTeam() *CredentialUpdate {
-	cu.mutation.ClearTeam()
+// ClearCheck clears the "check" edge to the Check entity.
+func (cu *CredentialUpdate) ClearCheck() *CredentialUpdate {
+	cu.mutation.ClearCheck()
 	return cu
 }
 
@@ -103,11 +112,11 @@ func (cu *CredentialUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CredentialUpdate) check() error {
+	if _, ok := cu.mutation.UserID(); cu.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Credential.user"`)
+	}
 	if _, ok := cu.mutation.CheckID(); cu.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Credential.check"`)
-	}
-	if _, ok := cu.mutation.TeamID(); cu.mutation.TeamCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Credential.team"`)
 	}
 	return nil
 }
@@ -116,7 +125,7 @@ func (cu *CredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := cu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -127,6 +136,35 @@ func (cu *CredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Password(); ok {
 		_spec.SetField(credential.FieldPassword, field.TypeString, value)
 	}
+	if cu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   credential.UserTable,
+			Columns: []string{credential.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   credential.UserTable,
+			Columns: []string{credential.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cu.mutation.CheckCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -135,7 +173,7 @@ func (cu *CredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{credential.CheckColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -148,36 +186,7 @@ func (cu *CredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{credential.CheckColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.TeamCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   credential.TeamTable,
-			Columns: []string{credential.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.TeamIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   credential.TeamTable,
-			Columns: []string{credential.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -211,8 +220,27 @@ func (cuo *CredentialUpdateOne) SetPassword(s string) *CredentialUpdateOne {
 	return cuo
 }
 
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (cuo *CredentialUpdateOne) SetNillablePassword(s *string) *CredentialUpdateOne {
+	if s != nil {
+		cuo.SetPassword(*s)
+	}
+	return cuo
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (cuo *CredentialUpdateOne) SetUserID(id uuid.UUID) *CredentialUpdateOne {
+	cuo.mutation.SetUserID(id)
+	return cuo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (cuo *CredentialUpdateOne) SetUser(u *User) *CredentialUpdateOne {
+	return cuo.SetUserID(u.ID)
+}
+
 // SetCheckID sets the "check" edge to the Check entity by ID.
-func (cuo *CredentialUpdateOne) SetCheckID(id int) *CredentialUpdateOne {
+func (cuo *CredentialUpdateOne) SetCheckID(id uuid.UUID) *CredentialUpdateOne {
 	cuo.mutation.SetCheckID(id)
 	return cuo
 }
@@ -222,31 +250,20 @@ func (cuo *CredentialUpdateOne) SetCheck(c *Check) *CredentialUpdateOne {
 	return cuo.SetCheckID(c.ID)
 }
 
-// SetTeamID sets the "team" edge to the Team entity by ID.
-func (cuo *CredentialUpdateOne) SetTeamID(id int) *CredentialUpdateOne {
-	cuo.mutation.SetTeamID(id)
-	return cuo
-}
-
-// SetTeam sets the "team" edge to the Team entity.
-func (cuo *CredentialUpdateOne) SetTeam(t *Team) *CredentialUpdateOne {
-	return cuo.SetTeamID(t.ID)
-}
-
 // Mutation returns the CredentialMutation object of the builder.
 func (cuo *CredentialUpdateOne) Mutation() *CredentialMutation {
 	return cuo.mutation
 }
 
-// ClearCheck clears the "check" edge to the Check entity.
-func (cuo *CredentialUpdateOne) ClearCheck() *CredentialUpdateOne {
-	cuo.mutation.ClearCheck()
+// ClearUser clears the "user" edge to the User entity.
+func (cuo *CredentialUpdateOne) ClearUser() *CredentialUpdateOne {
+	cuo.mutation.ClearUser()
 	return cuo
 }
 
-// ClearTeam clears the "team" edge to the Team entity.
-func (cuo *CredentialUpdateOne) ClearTeam() *CredentialUpdateOne {
-	cuo.mutation.ClearTeam()
+// ClearCheck clears the "check" edge to the Check entity.
+func (cuo *CredentialUpdateOne) ClearCheck() *CredentialUpdateOne {
+	cuo.mutation.ClearCheck()
 	return cuo
 }
 
@@ -292,11 +309,11 @@ func (cuo *CredentialUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CredentialUpdateOne) check() error {
+	if _, ok := cuo.mutation.UserID(); cuo.mutation.UserCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Credential.user"`)
+	}
 	if _, ok := cuo.mutation.CheckID(); cuo.mutation.CheckCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Credential.check"`)
-	}
-	if _, ok := cuo.mutation.TeamID(); cuo.mutation.TeamCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Credential.team"`)
 	}
 	return nil
 }
@@ -305,7 +322,7 @@ func (cuo *CredentialUpdateOne) sqlSave(ctx context.Context) (_node *Credential,
 	if err := cuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(credential.Table, credential.Columns, sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Credential.id" for update`)}
@@ -333,6 +350,35 @@ func (cuo *CredentialUpdateOne) sqlSave(ctx context.Context) (_node *Credential,
 	if value, ok := cuo.mutation.Password(); ok {
 		_spec.SetField(credential.FieldPassword, field.TypeString, value)
 	}
+	if cuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   credential.UserTable,
+			Columns: []string{credential.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   credential.UserTable,
+			Columns: []string{credential.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cuo.mutation.CheckCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -341,7 +387,7 @@ func (cuo *CredentialUpdateOne) sqlSave(ctx context.Context) (_node *Credential,
 			Columns: []string{credential.CheckColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -354,36 +400,7 @@ func (cuo *CredentialUpdateOne) sqlSave(ctx context.Context) (_node *Credential,
 			Columns: []string{credential.CheckColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.TeamCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   credential.TeamTable,
-			Columns: []string{credential.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.TeamIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   credential.TeamTable,
-			Columns: []string{credential.TeamColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(team.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(check.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

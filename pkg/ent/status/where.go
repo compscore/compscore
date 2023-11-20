@@ -8,141 +8,67 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/compscore/compscore/pkg/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Status {
+func ID(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Status {
+func IDEQ(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Status {
+func IDNEQ(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Status {
+func IDIn(ids ...uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Status {
+func IDNotIn(ids ...uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Status {
+func IDGT(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Status {
+func IDGTE(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Status {
+func IDLT(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Status {
+func IDLTE(id uuid.UUID) predicate.Status {
 	return predicate.Status(sql.FieldLTE(FieldID, id))
 }
 
-// Error applies equality check predicate on the "error" field. It's identical to ErrorEQ.
-func Error(v string) predicate.Status {
-	return predicate.Status(sql.FieldEQ(FieldError, v))
+// Message applies equality check predicate on the "message" field. It's identical to MessageEQ.
+func Message(v string) predicate.Status {
+	return predicate.Status(sql.FieldEQ(FieldMessage, v))
 }
 
-// Time applies equality check predicate on the "time" field. It's identical to TimeEQ.
-func Time(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldEQ(FieldTime, v))
+// Timestamp applies equality check predicate on the "timestamp" field. It's identical to TimestampEQ.
+func Timestamp(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldEQ(FieldTimestamp, v))
 }
 
 // Points applies equality check predicate on the "points" field. It's identical to PointsEQ.
 func Points(v int) predicate.Status {
 	return predicate.Status(sql.FieldEQ(FieldPoints, v))
-}
-
-// ErrorEQ applies the EQ predicate on the "error" field.
-func ErrorEQ(v string) predicate.Status {
-	return predicate.Status(sql.FieldEQ(FieldError, v))
-}
-
-// ErrorNEQ applies the NEQ predicate on the "error" field.
-func ErrorNEQ(v string) predicate.Status {
-	return predicate.Status(sql.FieldNEQ(FieldError, v))
-}
-
-// ErrorIn applies the In predicate on the "error" field.
-func ErrorIn(vs ...string) predicate.Status {
-	return predicate.Status(sql.FieldIn(FieldError, vs...))
-}
-
-// ErrorNotIn applies the NotIn predicate on the "error" field.
-func ErrorNotIn(vs ...string) predicate.Status {
-	return predicate.Status(sql.FieldNotIn(FieldError, vs...))
-}
-
-// ErrorGT applies the GT predicate on the "error" field.
-func ErrorGT(v string) predicate.Status {
-	return predicate.Status(sql.FieldGT(FieldError, v))
-}
-
-// ErrorGTE applies the GTE predicate on the "error" field.
-func ErrorGTE(v string) predicate.Status {
-	return predicate.Status(sql.FieldGTE(FieldError, v))
-}
-
-// ErrorLT applies the LT predicate on the "error" field.
-func ErrorLT(v string) predicate.Status {
-	return predicate.Status(sql.FieldLT(FieldError, v))
-}
-
-// ErrorLTE applies the LTE predicate on the "error" field.
-func ErrorLTE(v string) predicate.Status {
-	return predicate.Status(sql.FieldLTE(FieldError, v))
-}
-
-// ErrorContains applies the Contains predicate on the "error" field.
-func ErrorContains(v string) predicate.Status {
-	return predicate.Status(sql.FieldContains(FieldError, v))
-}
-
-// ErrorHasPrefix applies the HasPrefix predicate on the "error" field.
-func ErrorHasPrefix(v string) predicate.Status {
-	return predicate.Status(sql.FieldHasPrefix(FieldError, v))
-}
-
-// ErrorHasSuffix applies the HasSuffix predicate on the "error" field.
-func ErrorHasSuffix(v string) predicate.Status {
-	return predicate.Status(sql.FieldHasSuffix(FieldError, v))
-}
-
-// ErrorIsNil applies the IsNil predicate on the "error" field.
-func ErrorIsNil() predicate.Status {
-	return predicate.Status(sql.FieldIsNull(FieldError))
-}
-
-// ErrorNotNil applies the NotNil predicate on the "error" field.
-func ErrorNotNil() predicate.Status {
-	return predicate.Status(sql.FieldNotNull(FieldError))
-}
-
-// ErrorEqualFold applies the EqualFold predicate on the "error" field.
-func ErrorEqualFold(v string) predicate.Status {
-	return predicate.Status(sql.FieldEqualFold(FieldError, v))
-}
-
-// ErrorContainsFold applies the ContainsFold predicate on the "error" field.
-func ErrorContainsFold(v string) predicate.Status {
-	return predicate.Status(sql.FieldContainsFold(FieldError, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
@@ -165,44 +91,119 @@ func StatusNotIn(vs ...Status) predicate.Status {
 	return predicate.Status(sql.FieldNotIn(FieldStatus, vs...))
 }
 
-// TimeEQ applies the EQ predicate on the "time" field.
-func TimeEQ(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldEQ(FieldTime, v))
+// MessageEQ applies the EQ predicate on the "message" field.
+func MessageEQ(v string) predicate.Status {
+	return predicate.Status(sql.FieldEQ(FieldMessage, v))
 }
 
-// TimeNEQ applies the NEQ predicate on the "time" field.
-func TimeNEQ(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldNEQ(FieldTime, v))
+// MessageNEQ applies the NEQ predicate on the "message" field.
+func MessageNEQ(v string) predicate.Status {
+	return predicate.Status(sql.FieldNEQ(FieldMessage, v))
 }
 
-// TimeIn applies the In predicate on the "time" field.
-func TimeIn(vs ...time.Time) predicate.Status {
-	return predicate.Status(sql.FieldIn(FieldTime, vs...))
+// MessageIn applies the In predicate on the "message" field.
+func MessageIn(vs ...string) predicate.Status {
+	return predicate.Status(sql.FieldIn(FieldMessage, vs...))
 }
 
-// TimeNotIn applies the NotIn predicate on the "time" field.
-func TimeNotIn(vs ...time.Time) predicate.Status {
-	return predicate.Status(sql.FieldNotIn(FieldTime, vs...))
+// MessageNotIn applies the NotIn predicate on the "message" field.
+func MessageNotIn(vs ...string) predicate.Status {
+	return predicate.Status(sql.FieldNotIn(FieldMessage, vs...))
 }
 
-// TimeGT applies the GT predicate on the "time" field.
-func TimeGT(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldGT(FieldTime, v))
+// MessageGT applies the GT predicate on the "message" field.
+func MessageGT(v string) predicate.Status {
+	return predicate.Status(sql.FieldGT(FieldMessage, v))
 }
 
-// TimeGTE applies the GTE predicate on the "time" field.
-func TimeGTE(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldGTE(FieldTime, v))
+// MessageGTE applies the GTE predicate on the "message" field.
+func MessageGTE(v string) predicate.Status {
+	return predicate.Status(sql.FieldGTE(FieldMessage, v))
 }
 
-// TimeLT applies the LT predicate on the "time" field.
-func TimeLT(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldLT(FieldTime, v))
+// MessageLT applies the LT predicate on the "message" field.
+func MessageLT(v string) predicate.Status {
+	return predicate.Status(sql.FieldLT(FieldMessage, v))
 }
 
-// TimeLTE applies the LTE predicate on the "time" field.
-func TimeLTE(v time.Time) predicate.Status {
-	return predicate.Status(sql.FieldLTE(FieldTime, v))
+// MessageLTE applies the LTE predicate on the "message" field.
+func MessageLTE(v string) predicate.Status {
+	return predicate.Status(sql.FieldLTE(FieldMessage, v))
+}
+
+// MessageContains applies the Contains predicate on the "message" field.
+func MessageContains(v string) predicate.Status {
+	return predicate.Status(sql.FieldContains(FieldMessage, v))
+}
+
+// MessageHasPrefix applies the HasPrefix predicate on the "message" field.
+func MessageHasPrefix(v string) predicate.Status {
+	return predicate.Status(sql.FieldHasPrefix(FieldMessage, v))
+}
+
+// MessageHasSuffix applies the HasSuffix predicate on the "message" field.
+func MessageHasSuffix(v string) predicate.Status {
+	return predicate.Status(sql.FieldHasSuffix(FieldMessage, v))
+}
+
+// MessageIsNil applies the IsNil predicate on the "message" field.
+func MessageIsNil() predicate.Status {
+	return predicate.Status(sql.FieldIsNull(FieldMessage))
+}
+
+// MessageNotNil applies the NotNil predicate on the "message" field.
+func MessageNotNil() predicate.Status {
+	return predicate.Status(sql.FieldNotNull(FieldMessage))
+}
+
+// MessageEqualFold applies the EqualFold predicate on the "message" field.
+func MessageEqualFold(v string) predicate.Status {
+	return predicate.Status(sql.FieldEqualFold(FieldMessage, v))
+}
+
+// MessageContainsFold applies the ContainsFold predicate on the "message" field.
+func MessageContainsFold(v string) predicate.Status {
+	return predicate.Status(sql.FieldContainsFold(FieldMessage, v))
+}
+
+// TimestampEQ applies the EQ predicate on the "timestamp" field.
+func TimestampEQ(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldEQ(FieldTimestamp, v))
+}
+
+// TimestampNEQ applies the NEQ predicate on the "timestamp" field.
+func TimestampNEQ(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldNEQ(FieldTimestamp, v))
+}
+
+// TimestampIn applies the In predicate on the "timestamp" field.
+func TimestampIn(vs ...time.Time) predicate.Status {
+	return predicate.Status(sql.FieldIn(FieldTimestamp, vs...))
+}
+
+// TimestampNotIn applies the NotIn predicate on the "timestamp" field.
+func TimestampNotIn(vs ...time.Time) predicate.Status {
+	return predicate.Status(sql.FieldNotIn(FieldTimestamp, vs...))
+}
+
+// TimestampGT applies the GT predicate on the "timestamp" field.
+func TimestampGT(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldGT(FieldTimestamp, v))
+}
+
+// TimestampGTE applies the GTE predicate on the "timestamp" field.
+func TimestampGTE(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldGTE(FieldTimestamp, v))
+}
+
+// TimestampLT applies the LT predicate on the "timestamp" field.
+func TimestampLT(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldLT(FieldTimestamp, v))
+}
+
+// TimestampLTE applies the LTE predicate on the "timestamp" field.
+func TimestampLTE(v time.Time) predicate.Status {
+	return predicate.Status(sql.FieldLTE(FieldTimestamp, v))
 }
 
 // PointsEQ applies the EQ predicate on the "points" field.
@@ -245,52 +246,6 @@ func PointsLTE(v int) predicate.Status {
 	return predicate.Status(sql.FieldLTE(FieldPoints, v))
 }
 
-// HasCheck applies the HasEdge predicate on the "check" edge.
-func HasCheck() predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CheckTable, CheckColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCheckWith applies the HasEdge predicate on the "check" edge with a given conditions (other predicates).
-func HasCheckWith(preds ...predicate.Check) predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		step := newCheckStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasTeam applies the HasEdge predicate on the "team" edge.
-func HasTeam() predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, TeamTable, TeamColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasTeamWith applies the HasEdge predicate on the "team" edge with a given conditions (other predicates).
-func HasTeamWith(preds ...predicate.Team) predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		step := newTeamStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasRound applies the HasEdge predicate on the "round" edge.
 func HasRound() predicate.Status {
 	return predicate.Status(func(s *sql.Selector) {
@@ -314,34 +269,63 @@ func HasRoundWith(preds ...predicate.Round) predicate.Status {
 	})
 }
 
+// HasCheck applies the HasEdge predicate on the "check" edge.
+func HasCheck() predicate.Status {
+	return predicate.Status(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, CheckTable, CheckColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCheckWith applies the HasEdge predicate on the "check" edge with a given conditions (other predicates).
+func HasCheckWith(preds ...predicate.Check) predicate.Status {
+	return predicate.Status(func(s *sql.Selector) {
+		step := newCheckStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.Status {
+	return predicate.Status(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.Status {
+	return predicate.Status(func(s *sql.Selector) {
+		step := newUserStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Status) predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Status(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Status) predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Status(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Status) predicate.Status {
-	return predicate.Status(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Status(sql.NotPredicates(p))
 }
