@@ -315,6 +315,29 @@ func HasStatusWith(preds ...predicate.Status) predicate.User {
 	})
 }
 
+// HasScores applies the HasEdge predicate on the "scores" edge.
+func HasScores() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ScoresTable, ScoresColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasScoresWith applies the HasEdge predicate on the "scores" edge with a given conditions (other predicates).
+func HasScoresWith(preds ...predicate.Score) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newScoresStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
 	return predicate.User(sql.AndPredicates(predicates...))

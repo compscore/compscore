@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/ent/round"
+	"github.com/compscore/compscore/ent/score"
 	"github.com/compscore/compscore/ent/status"
 	"github.com/google/uuid"
 )
@@ -68,6 +69,21 @@ func (rc *RoundCreate) AddStatus(s ...*Status) *RoundCreate {
 		ids[i] = s[i].ID
 	}
 	return rc.AddStatuIDs(ids...)
+}
+
+// AddScoreIDs adds the "scores" edge to the Score entity by IDs.
+func (rc *RoundCreate) AddScoreIDs(ids ...uuid.UUID) *RoundCreate {
+	rc.mutation.AddScoreIDs(ids...)
+	return rc
+}
+
+// AddScores adds the "scores" edges to the Score entity.
+func (rc *RoundCreate) AddScores(s ...*Score) *RoundCreate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rc.AddScoreIDs(ids...)
 }
 
 // Mutation returns the RoundMutation object of the builder.
@@ -180,6 +196,22 @@ func (rc *RoundCreate) createSpec() (*Round, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.ScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

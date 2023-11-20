@@ -9,6 +9,7 @@ import (
 	"github.com/compscore/compscore/ent/credential"
 	"github.com/compscore/compscore/ent/round"
 	"github.com/compscore/compscore/ent/schema"
+	"github.com/compscore/compscore/ent/score"
 	"github.com/compscore/compscore/ent/status"
 	"github.com/compscore/compscore/ent/user"
 	"github.com/google/uuid"
@@ -52,6 +53,16 @@ func init() {
 	roundDescID := roundFields[0].Descriptor()
 	// round.DefaultID holds the default value on creation for the id field.
 	round.DefaultID = roundDescID.Default.(func() uuid.UUID)
+	scoreFields := schema.Score{}.Fields()
+	_ = scoreFields
+	// scoreDescScore is the schema descriptor for score field.
+	scoreDescScore := scoreFields[1].Descriptor()
+	// score.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
+	score.ScoreValidator = scoreDescScore.Validators[0].(func(int) error)
+	// scoreDescID is the schema descriptor for id field.
+	scoreDescID := scoreFields[0].Descriptor()
+	// score.DefaultID holds the default value on creation for the id field.
+	score.DefaultID = scoreDescID.Default.(func() uuid.UUID)
 	statusFields := schema.Status{}.Fields()
 	_ = statusFields
 	// statusDescTimestamp is the schema descriptor for timestamp field.

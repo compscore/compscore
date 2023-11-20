@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/ent/predicate"
 	"github.com/compscore/compscore/ent/round"
+	"github.com/compscore/compscore/ent/score"
 	"github.com/compscore/compscore/ent/status"
 	"github.com/google/uuid"
 )
@@ -25,6 +26,7 @@ type RoundQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Round
 	withStatus *StatusQuery
+	withScores *ScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -76,6 +78,28 @@ func (rq *RoundQuery) QueryStatus() *StatusQuery {
 			sqlgraph.From(round.Table, round.FieldID, selector),
 			sqlgraph.To(status.Table, status.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusTable, round.StatusColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryScores chains the current query on the "scores" edge.
+func (rq *RoundQuery) QueryScores() *ScoreQuery {
+	query := (&ScoreClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(round.Table, round.FieldID, selector),
+			sqlgraph.To(score.Table, score.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, round.ScoresTable, round.ScoresColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -276,6 +300,7 @@ func (rq *RoundQuery) Clone() *RoundQuery {
 		inters:     append([]Interceptor{}, rq.inters...),
 		predicates: append([]predicate.Round{}, rq.predicates...),
 		withStatus: rq.withStatus.Clone(),
+		withScores: rq.withScores.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
@@ -290,6 +315,17 @@ func (rq *RoundQuery) WithStatus(opts ...func(*StatusQuery)) *RoundQuery {
 		opt(query)
 	}
 	rq.withStatus = query
+	return rq
+}
+
+// WithScores tells the query-builder to eager-load the nodes that are connected to
+// the "scores" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoundQuery) WithScores(opts ...func(*ScoreQuery)) *RoundQuery {
+	query := (&ScoreClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withScores = query
 	return rq
 }
 
@@ -371,8 +407,9 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 	var (
 		nodes       = []*Round{}
 		_spec       = rq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			rq.withStatus != nil,
+			rq.withScores != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -397,6 +434,13 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 		if err := rq.loadStatus(ctx, query, nodes,
 			func(n *Round) { n.Edges.Status = []*Status{} },
 			func(n *Round, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := rq.withScores; query != nil {
+		if err := rq.loadScores(ctx, query, nodes,
+			func(n *Round) { n.Edges.Scores = []*Score{} },
+			func(n *Round, e *Score) { n.Edges.Scores = append(n.Edges.Scores, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -429,6 +473,37 @@ func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "status_round" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (rq *RoundQuery) loadScores(ctx context.Context, query *ScoreQuery, nodes []*Round, init func(*Round), assign func(*Round, *Score)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Round)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Score(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(round.ScoresColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.round_scores
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "round_scores" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "round_scores" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

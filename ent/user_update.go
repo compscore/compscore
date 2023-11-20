@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/ent/credential"
 	"github.com/compscore/compscore/ent/predicate"
+	"github.com/compscore/compscore/ent/score"
 	"github.com/compscore/compscore/ent/status"
 	"github.com/compscore/compscore/ent/user"
 	"github.com/google/uuid"
@@ -129,6 +130,21 @@ func (uu *UserUpdate) AddStatus(s ...*Status) *UserUpdate {
 	return uu.AddStatuIDs(ids...)
 }
 
+// AddScoreIDs adds the "scores" edge to the Score entity by IDs.
+func (uu *UserUpdate) AddScoreIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddScoreIDs(ids...)
+	return uu
+}
+
+// AddScores adds the "scores" edges to the Score entity.
+func (uu *UserUpdate) AddScores(s ...*Score) *UserUpdate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddScoreIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -174,6 +190,27 @@ func (uu *UserUpdate) RemoveStatus(s ...*Status) *UserUpdate {
 		ids[i] = s[i].ID
 	}
 	return uu.RemoveStatuIDs(ids...)
+}
+
+// ClearScores clears all "scores" edges to the Score entity.
+func (uu *UserUpdate) ClearScores() *UserUpdate {
+	uu.mutation.ClearScores()
+	return uu
+}
+
+// RemoveScoreIDs removes the "scores" edge to Score entities by IDs.
+func (uu *UserUpdate) RemoveScoreIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveScoreIDs(ids...)
+	return uu
+}
+
+// RemoveScores removes "scores" edges to Score entities.
+func (uu *UserUpdate) RemoveScores(s ...*Score) *UserUpdate {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveScoreIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -343,6 +380,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedScoresIDs(); len(nodes) > 0 && !uu.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -462,6 +544,21 @@ func (uuo *UserUpdateOne) AddStatus(s ...*Status) *UserUpdateOne {
 	return uuo.AddStatuIDs(ids...)
 }
 
+// AddScoreIDs adds the "scores" edge to the Score entity by IDs.
+func (uuo *UserUpdateOne) AddScoreIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddScoreIDs(ids...)
+	return uuo
+}
+
+// AddScores adds the "scores" edges to the Score entity.
+func (uuo *UserUpdateOne) AddScores(s ...*Score) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddScoreIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -507,6 +604,27 @@ func (uuo *UserUpdateOne) RemoveStatus(s ...*Status) *UserUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return uuo.RemoveStatuIDs(ids...)
+}
+
+// ClearScores clears all "scores" edges to the Score entity.
+func (uuo *UserUpdateOne) ClearScores() *UserUpdateOne {
+	uuo.mutation.ClearScores()
+	return uuo
+}
+
+// RemoveScoreIDs removes the "scores" edge to Score entities by IDs.
+func (uuo *UserUpdateOne) RemoveScoreIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveScoreIDs(ids...)
+	return uuo
+}
+
+// RemoveScores removes "scores" edges to Score entities.
+func (uuo *UserUpdateOne) RemoveScores(s ...*Score) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveScoreIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -699,6 +817,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedScoresIDs(); len(nodes) > 0 && !uuo.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ScoresTable,
+			Columns: []string{user.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

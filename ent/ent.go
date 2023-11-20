@@ -15,6 +15,7 @@ import (
 	"github.com/compscore/compscore/ent/check"
 	"github.com/compscore/compscore/ent/credential"
 	"github.com/compscore/compscore/ent/round"
+	"github.com/compscore/compscore/ent/score"
 	"github.com/compscore/compscore/ent/status"
 	"github.com/compscore/compscore/ent/user"
 )
@@ -80,6 +81,7 @@ func checkColumn(table, column string) error {
 			check.Table:      check.ValidColumn,
 			credential.Table: credential.ValidColumn,
 			round.Table:      round.ValidColumn,
+			score.Table:      score.ValidColumn,
 			status.Table:     status.ValidColumn,
 			user.Table:       user.ValidColumn,
 		})

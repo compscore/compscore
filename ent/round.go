@@ -32,9 +32,11 @@ type Round struct {
 type RoundEdges struct {
 	// Status of the round
 	Status []*Status `json:"status,omitempty"`
+	// Scores for the round
+	Scores []*Score `json:"scores,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // StatusOrErr returns the Status value or an error if the edge
@@ -44,6 +46,15 @@ func (e RoundEdges) StatusOrErr() ([]*Status, error) {
 		return e.Status, nil
 	}
 	return nil, &NotLoadedError{edge: "status"}
+}
+
+// ScoresOrErr returns the Scores value or an error if the edge
+// was not loaded in eager-loading.
+func (e RoundEdges) ScoresOrErr() ([]*Score, error) {
+	if e.loadedTypes[1] {
+		return e.Scores, nil
+	}
+	return nil, &NotLoadedError{edge: "scores"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -106,6 +117,11 @@ func (r *Round) Value(name string) (ent.Value, error) {
 // QueryStatus queries the "status" edge of the Round entity.
 func (r *Round) QueryStatus() *StatusQuery {
 	return NewRoundClient(r.config).QueryStatus(r)
+}
+
+// QueryScores queries the "scores" edge of the Round entity.
+func (r *Round) QueryScores() *ScoreQuery {
+	return NewRoundClient(r.config).QueryScores(r)
 }
 
 // Update returns a builder for updating this Round.
