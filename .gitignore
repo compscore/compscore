@@ -1,0 +1,9 @@
+build/*
+!build/.gitkeep
+
+database.sqlite
+
+pkg/checks/imports/*
+!pkg/checks/imports/main.go
+
+.env
