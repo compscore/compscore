@@ -10,6 +10,7 @@ type User {
   role: UserRole!
   credentials: [Credential!]!
   statuses: [Status!]!
+  scores: [Score!]!
 }
 
 type Credential {
@@ -44,10 +45,18 @@ type Status {
   round: Round!
 }
 
+type Score {
+  id: Int!
+  score: Int!
+  user: User!
+  round: Round!
+}
+
 type Round {
   id: Int!
   completed: Boolean!
   statuses: [Status!]!
+  scores: [Score!]!
 }
 
 type CheckStatus {

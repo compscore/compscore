@@ -60,6 +60,34 @@ func (r *Round) Status(ctx context.Context) (result []*Status, err error) {
 	return result, err
 }
 
+func (r *Round) Scores(ctx context.Context) (result []*Score, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedScores(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.ScoresOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryScores().All(ctx)
+	}
+	return result, err
+}
+
+func (s *Score) Round(ctx context.Context) (*Round, error) {
+	result, err := s.Edges.RoundOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryRound().Only(ctx)
+	}
+	return result, err
+}
+
+func (s *Score) User(ctx context.Context) (*User, error) {
+	result, err := s.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
 func (s *Status) Round(ctx context.Context) (*Round, error) {
 	result, err := s.Edges.RoundOrErr()
 	if IsNotLoaded(err) {
@@ -104,6 +132,18 @@ func (u *User) Status(ctx context.Context) (result []*Status, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = u.QueryStatus().All(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Scores(ctx context.Context) (result []*Score, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedScores(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.ScoresOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = u.QueryScores().All(ctx)
 	}
 	return result, err
 }

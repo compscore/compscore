@@ -14,6 +14,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -834,6 +835,252 @@ func (r *Round) ToEdge(order *RoundOrder) *RoundEdge {
 	return &RoundEdge{
 		Node:   r,
 		Cursor: order.Field.toCursor(r),
+	}
+}
+
+// ScoreEdge is the edge representation of Score.
+type ScoreEdge struct {
+	Node   *Score `json:"node"`
+	Cursor Cursor `json:"cursor"`
+}
+
+// ScoreConnection is the connection containing edges to Score.
+type ScoreConnection struct {
+	Edges      []*ScoreEdge `json:"edges"`
+	PageInfo   PageInfo     `json:"pageInfo"`
+	TotalCount int          `json:"totalCount"`
+}
+
+func (c *ScoreConnection) build(nodes []*Score, pager *scorePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Score
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Score {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Score {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*ScoreEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &ScoreEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// ScorePaginateOption enables pagination customization.
+type ScorePaginateOption func(*scorePager) error
+
+// WithScoreOrder configures pagination ordering.
+func WithScoreOrder(order *ScoreOrder) ScorePaginateOption {
+	if order == nil {
+		order = DefaultScoreOrder
+	}
+	o := *order
+	return func(pager *scorePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultScoreOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithScoreFilter configures pagination filter.
+func WithScoreFilter(filter func(*ScoreQuery) (*ScoreQuery, error)) ScorePaginateOption {
+	return func(pager *scorePager) error {
+		if filter == nil {
+			return errors.New("ScoreQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type scorePager struct {
+	reverse bool
+	order   *ScoreOrder
+	filter  func(*ScoreQuery) (*ScoreQuery, error)
+}
+
+func newScorePager(opts []ScorePaginateOption, reverse bool) (*scorePager, error) {
+	pager := &scorePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultScoreOrder
+	}
+	return pager, nil
+}
+
+func (p *scorePager) applyFilter(query *ScoreQuery) (*ScoreQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *scorePager) toCursor(s *Score) Cursor {
+	return p.order.Field.toCursor(s)
+}
+
+func (p *scorePager) applyCursors(query *ScoreQuery, after, before *Cursor) (*ScoreQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultScoreOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *scorePager) applyOrder(query *ScoreQuery) *ScoreQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultScoreOrder.Field {
+		query = query.Order(DefaultScoreOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *scorePager) orderExpr(query *ScoreQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultScoreOrder.Field {
+			b.Comma().Ident(DefaultScoreOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Score.
+func (s *ScoreQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ScorePaginateOption,
+) (*ScoreConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newScorePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if s, err = pager.applyFilter(s); err != nil {
+		return nil, err
+	}
+	conn := &ScoreConnection{Edges: []*ScoreEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = s.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if s, err = pager.applyCursors(s, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		s.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := s.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	s = pager.applyOrder(s)
+	nodes, err := s.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// ScoreOrderField defines the ordering field of Score.
+type ScoreOrderField struct {
+	// Value extracts the ordering value from the given Score.
+	Value    func(*Score) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) score.OrderOption
+	toCursor func(*Score) Cursor
+}
+
+// ScoreOrder defines the ordering of Score.
+type ScoreOrder struct {
+	Direction OrderDirection   `json:"direction"`
+	Field     *ScoreOrderField `json:"field"`
+}
+
+// DefaultScoreOrder is the default ordering of Score.
+var DefaultScoreOrder = &ScoreOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &ScoreOrderField{
+		Value: func(s *Score) (ent.Value, error) {
+			return s.ID, nil
+		},
+		column: score.FieldID,
+		toTerm: score.ByID,
+		toCursor: func(s *Score) Cursor {
+			return Cursor{ID: s.ID}
+		},
+	},
+}
+
+// ToEdge converts Score into ScoreEdge.
+func (s *Score) ToEdge(order *ScoreOrder) *ScoreEdge {
+	if order == nil {
+		order = DefaultScoreOrder
+	}
+	return &ScoreEdge{
+		Node:   s,
+		Cursor: order.Field.toCursor(s),
 	}
 }
 

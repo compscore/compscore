@@ -18,6 +18,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 )
@@ -33,6 +34,8 @@ type Client struct {
 	Credential *CredentialClient
 	// Round is the client for interacting with the Round builders.
 	Round *RoundClient
+	// Score is the client for interacting with the Score builders.
+	Score *ScoreClient
 	// Status is the client for interacting with the Status builders.
 	Status *StatusClient
 	// User is the client for interacting with the User builders.
@@ -55,6 +58,7 @@ func (c *Client) init() {
 	c.Check = NewCheckClient(c.config)
 	c.Credential = NewCredentialClient(c.config)
 	c.Round = NewRoundClient(c.config)
+	c.Score = NewScoreClient(c.config)
 	c.Status = NewStatusClient(c.config)
 	c.User = NewUserClient(c.config)
 }
@@ -145,6 +149,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Check:      NewCheckClient(cfg),
 		Credential: NewCredentialClient(cfg),
 		Round:      NewRoundClient(cfg),
+		Score:      NewScoreClient(cfg),
 		Status:     NewStatusClient(cfg),
 		User:       NewUserClient(cfg),
 	}, nil
@@ -169,6 +174,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Check:      NewCheckClient(cfg),
 		Credential: NewCredentialClient(cfg),
 		Round:      NewRoundClient(cfg),
+		Score:      NewScoreClient(cfg),
 		Status:     NewStatusClient(cfg),
 		User:       NewUserClient(cfg),
 	}, nil
@@ -199,21 +205,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Check.Use(hooks...)
-	c.Credential.Use(hooks...)
-	c.Round.Use(hooks...)
-	c.Status.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Check, c.Credential, c.Round, c.Score, c.Status, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Check.Intercept(interceptors...)
-	c.Credential.Intercept(interceptors...)
-	c.Round.Intercept(interceptors...)
-	c.Status.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Check, c.Credential, c.Round, c.Score, c.Status, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -225,6 +231,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Credential.mutate(ctx, m)
 	case *RoundMutation:
 		return c.Round.mutate(ctx, m)
+	case *ScoreMutation:
+		return c.Score.mutate(ctx, m)
 	case *StatusMutation:
 		return c.Status.mutate(ctx, m)
 	case *UserMutation:
@@ -688,6 +696,22 @@ func (c *RoundClient) QueryStatus(r *Round) *StatusQuery {
 	return query
 }
 
+// QueryScores queries the scores edge of a Round.
+func (c *RoundClient) QueryScores(r *Round) *ScoreQuery {
+	query := (&ScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(round.Table, round.FieldID, id),
+			sqlgraph.To(score.Table, score.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, round.ScoresTable, round.ScoresColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RoundClient) Hooks() []Hook {
 	return c.hooks.Round
@@ -710,6 +734,171 @@ func (c *RoundClient) mutate(ctx context.Context, m *RoundMutation) (Value, erro
 		return (&RoundDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Round mutation op: %q", m.Op())
+	}
+}
+
+// ScoreClient is a client for the Score schema.
+type ScoreClient struct {
+	config
+}
+
+// NewScoreClient returns a client for the Score from the given config.
+func NewScoreClient(c config) *ScoreClient {
+	return &ScoreClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `score.Hooks(f(g(h())))`.
+func (c *ScoreClient) Use(hooks ...Hook) {
+	c.hooks.Score = append(c.hooks.Score, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `score.Intercept(f(g(h())))`.
+func (c *ScoreClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Score = append(c.inters.Score, interceptors...)
+}
+
+// Create returns a builder for creating a Score entity.
+func (c *ScoreClient) Create() *ScoreCreate {
+	mutation := newScoreMutation(c.config, OpCreate)
+	return &ScoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Score entities.
+func (c *ScoreClient) CreateBulk(builders ...*ScoreCreate) *ScoreCreateBulk {
+	return &ScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ScoreClient) MapCreateBulk(slice any, setFunc func(*ScoreCreate, int)) *ScoreCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ScoreCreateBulk{err: fmt.Errorf("calling to ScoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ScoreCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Score.
+func (c *ScoreClient) Update() *ScoreUpdate {
+	mutation := newScoreMutation(c.config, OpUpdate)
+	return &ScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScoreClient) UpdateOne(s *Score) *ScoreUpdateOne {
+	mutation := newScoreMutation(c.config, OpUpdateOne, withScore(s))
+	return &ScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScoreClient) UpdateOneID(id int) *ScoreUpdateOne {
+	mutation := newScoreMutation(c.config, OpUpdateOne, withScoreID(id))
+	return &ScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Score.
+func (c *ScoreClient) Delete() *ScoreDelete {
+	mutation := newScoreMutation(c.config, OpDelete)
+	return &ScoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScoreClient) DeleteOne(s *Score) *ScoreDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScoreClient) DeleteOneID(id int) *ScoreDeleteOne {
+	builder := c.Delete().Where(score.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScoreDeleteOne{builder}
+}
+
+// Query returns a query builder for Score.
+func (c *ScoreClient) Query() *ScoreQuery {
+	return &ScoreQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeScore},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Score entity by its id.
+func (c *ScoreClient) Get(ctx context.Context, id int) (*Score, error) {
+	return c.Query().Where(score.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScoreClient) GetX(ctx context.Context, id int) *Score {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRound queries the round edge of a Score.
+func (c *ScoreClient) QueryRound(s *Score) *RoundQuery {
+	query := (&RoundClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(score.Table, score.FieldID, id),
+			sqlgraph.To(round.Table, round.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, score.RoundTable, score.RoundColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a Score.
+func (c *ScoreClient) QueryUser(s *Score) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(score.Table, score.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, score.UserTable, score.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ScoreClient) Hooks() []Hook {
+	return c.hooks.Score
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScoreClient) Interceptors() []Interceptor {
+	return c.inters.Score
+}
+
+func (c *ScoreClient) mutate(ctx context.Context, m *ScoreMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScoreCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScoreUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Score mutation op: %q", m.Op())
 	}
 }
 
@@ -1034,6 +1223,22 @@ func (c *UserClient) QueryStatus(u *User) *StatusQuery {
 	return query
 }
 
+// QueryScores queries the scores edge of a User.
+func (c *UserClient) QueryScores(u *User) *ScoreQuery {
+	query := (&ScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(score.Table, score.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ScoresTable, user.ScoresColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -1062,9 +1267,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Check, Credential, Round, Status, User []ent.Hook
+		Check, Credential, Round, Score, Status, User []ent.Hook
 	}
 	inters struct {
-		Check, Credential, Round, Status, User []ent.Interceptor
+		Check, Credential, Round, Score, Status, User []ent.Interceptor
 	}
 )

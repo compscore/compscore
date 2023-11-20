@@ -67,5 +67,13 @@ func (User) Edges() []ent.Edge {
 				},
 			).
 			Ref("user"),
+		edge.To("scores", Score.Type).
+			Comment("Scores for the user").
+			StructTag(`json:"scores,omitempty"`).
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			),
 	}
 }

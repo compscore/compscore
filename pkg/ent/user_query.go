@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/predicate"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 )
@@ -26,10 +27,12 @@ type UserQuery struct {
 	predicates          []predicate.User
 	withCredential      *CredentialQuery
 	withStatus          *StatusQuery
+	withScores          *ScoreQuery
 	modifiers           []func(*sql.Selector)
 	loadTotal           []func(context.Context, []*User) error
 	withNamedCredential map[string]*CredentialQuery
 	withNamedStatus     map[string]*StatusQuery
+	withNamedScores     map[string]*ScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,6 +106,28 @@ func (uq *UserQuery) QueryStatus() *StatusQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(status.Table, status.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, user.StatusTable, user.StatusColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryScores chains the current query on the "scores" edge.
+func (uq *UserQuery) QueryScores() *ScoreQuery {
+	query := (&ScoreClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(score.Table, score.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ScoresTable, user.ScoresColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -304,6 +329,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 		predicates:     append([]predicate.User{}, uq.predicates...),
 		withCredential: uq.withCredential.Clone(),
 		withStatus:     uq.withStatus.Clone(),
+		withScores:     uq.withScores.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -329,6 +355,17 @@ func (uq *UserQuery) WithStatus(opts ...func(*StatusQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withStatus = query
+	return uq
+}
+
+// WithScores tells the query-builder to eager-load the nodes that are connected to
+// the "scores" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithScores(opts ...func(*ScoreQuery)) *UserQuery {
+	query := (&ScoreClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withScores = query
 	return uq
 }
 
@@ -410,9 +447,10 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			uq.withCredential != nil,
 			uq.withStatus != nil,
+			uq.withScores != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -450,6 +488,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := uq.withScores; query != nil {
+		if err := uq.loadScores(ctx, query, nodes,
+			func(n *User) { n.Edges.Scores = []*Score{} },
+			func(n *User, e *Score) { n.Edges.Scores = append(n.Edges.Scores, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range uq.withNamedCredential {
 		if err := uq.loadCredential(ctx, query, nodes,
 			func(n *User) { n.appendNamedCredential(name) },
@@ -461,6 +506,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadStatus(ctx, query, nodes,
 			func(n *User) { n.appendNamedStatus(name) },
 			func(n *User, e *Status) { n.appendNamedStatus(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedScores {
+		if err := uq.loadScores(ctx, query, nodes,
+			func(n *User) { n.appendNamedScores(name) },
+			func(n *User, e *Score) { n.appendNamedScores(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -529,6 +581,37 @@ func (uq *UserQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes [
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "status_user" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadScores(ctx context.Context, query *ScoreQuery, nodes []*User, init func(*User), assign func(*User, *Score)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Score(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.ScoresColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.user_scores
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "user_scores" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_scores" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -644,6 +727,20 @@ func (uq *UserQuery) WithNamedStatus(name string, opts ...func(*StatusQuery)) *U
 		uq.withNamedStatus = make(map[string]*StatusQuery)
 	}
 	uq.withNamedStatus[name] = query
+	return uq
+}
+
+// WithNamedScores tells the query-builder to eager-load the nodes that are connected to the "scores"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedScores(name string, opts ...func(*ScoreQuery)) *UserQuery {
+	query := (&ScoreClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedScores == nil {
+		uq.withNamedScores = make(map[string]*ScoreQuery)
+	}
+	uq.withNamedScores[name] = query
 	return uq
 }
 

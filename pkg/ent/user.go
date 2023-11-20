@@ -37,14 +37,17 @@ type UserEdges struct {
 	Credential []*Credential `json:"credential,omitempty"`
 	// Status of the user
 	Status []*Status `json:"status,omitempty"`
+	// Scores for the user
+	Scores []*Score `json:"scores,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 
 	namedCredential map[string][]*Credential
 	namedStatus     map[string][]*Status
+	namedScores     map[string][]*Score
 }
 
 // CredentialOrErr returns the Credential value or an error if the edge
@@ -63,6 +66,15 @@ func (e UserEdges) StatusOrErr() ([]*Status, error) {
 		return e.Status, nil
 	}
 	return nil, &NotLoadedError{edge: "status"}
+}
+
+// ScoresOrErr returns the Scores value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ScoresOrErr() ([]*Score, error) {
+	if e.loadedTypes[2] {
+		return e.Scores, nil
+	}
+	return nil, &NotLoadedError{edge: "scores"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -140,6 +152,11 @@ func (u *User) QueryCredential() *CredentialQuery {
 // QueryStatus queries the "status" edge of the User entity.
 func (u *User) QueryStatus() *StatusQuery {
 	return NewUserClient(u.config).QueryStatus(u)
+}
+
+// QueryScores queries the "scores" edge of the User entity.
+func (u *User) QueryScores() *ScoreQuery {
+	return NewUserClient(u.config).QueryScores(u)
 }
 
 // Update returns a builder for updating this User.
@@ -224,6 +241,30 @@ func (u *User) appendNamedStatus(name string, edges ...*Status) {
 		u.Edges.namedStatus[name] = []*Status{}
 	} else {
 		u.Edges.namedStatus[name] = append(u.Edges.namedStatus[name], edges...)
+	}
+}
+
+// NamedScores returns the Scores named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedScores(name string) ([]*Score, error) {
+	if u.Edges.namedScores == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedScores[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedScores(name string, edges ...*Score) {
+	if u.Edges.namedScores == nil {
+		u.Edges.namedScores = make(map[string][]*Score)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedScores[name] = []*Score{}
+	} else {
+		u.Edges.namedScores[name] = append(u.Edges.namedScores[name], edges...)
 	}
 }
 

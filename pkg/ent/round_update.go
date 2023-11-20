@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/compscore/compscore/pkg/ent/predicate"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 )
 
@@ -57,6 +58,21 @@ func (ru *RoundUpdate) AddStatus(s ...*Status) *RoundUpdate {
 	return ru.AddStatuIDs(ids...)
 }
 
+// AddScoreIDs adds the "scores" edge to the Score entity by IDs.
+func (ru *RoundUpdate) AddScoreIDs(ids ...int) *RoundUpdate {
+	ru.mutation.AddScoreIDs(ids...)
+	return ru
+}
+
+// AddScores adds the "scores" edges to the Score entity.
+func (ru *RoundUpdate) AddScores(s ...*Score) *RoundUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ru.AddScoreIDs(ids...)
+}
+
 // Mutation returns the RoundMutation object of the builder.
 func (ru *RoundUpdate) Mutation() *RoundMutation {
 	return ru.mutation
@@ -81,6 +97,27 @@ func (ru *RoundUpdate) RemoveStatus(s ...*Status) *RoundUpdate {
 		ids[i] = s[i].ID
 	}
 	return ru.RemoveStatuIDs(ids...)
+}
+
+// ClearScores clears all "scores" edges to the Score entity.
+func (ru *RoundUpdate) ClearScores() *RoundUpdate {
+	ru.mutation.ClearScores()
+	return ru
+}
+
+// RemoveScoreIDs removes the "scores" edge to Score entities by IDs.
+func (ru *RoundUpdate) RemoveScoreIDs(ids ...int) *RoundUpdate {
+	ru.mutation.RemoveScoreIDs(ids...)
+	return ru
+}
+
+// RemoveScores removes "scores" edges to Score entities.
+func (ru *RoundUpdate) RemoveScores(s ...*Score) *RoundUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ru.RemoveScoreIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -167,6 +204,51 @@ func (ru *RoundUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ru.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedScoresIDs(); len(nodes) > 0 && !ru.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.ScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{round.Label}
@@ -216,6 +298,21 @@ func (ruo *RoundUpdateOne) AddStatus(s ...*Status) *RoundUpdateOne {
 	return ruo.AddStatuIDs(ids...)
 }
 
+// AddScoreIDs adds the "scores" edge to the Score entity by IDs.
+func (ruo *RoundUpdateOne) AddScoreIDs(ids ...int) *RoundUpdateOne {
+	ruo.mutation.AddScoreIDs(ids...)
+	return ruo
+}
+
+// AddScores adds the "scores" edges to the Score entity.
+func (ruo *RoundUpdateOne) AddScores(s ...*Score) *RoundUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ruo.AddScoreIDs(ids...)
+}
+
 // Mutation returns the RoundMutation object of the builder.
 func (ruo *RoundUpdateOne) Mutation() *RoundMutation {
 	return ruo.mutation
@@ -240,6 +337,27 @@ func (ruo *RoundUpdateOne) RemoveStatus(s ...*Status) *RoundUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return ruo.RemoveStatuIDs(ids...)
+}
+
+// ClearScores clears all "scores" edges to the Score entity.
+func (ruo *RoundUpdateOne) ClearScores() *RoundUpdateOne {
+	ruo.mutation.ClearScores()
+	return ruo
+}
+
+// RemoveScoreIDs removes the "scores" edge to Score entities by IDs.
+func (ruo *RoundUpdateOne) RemoveScoreIDs(ids ...int) *RoundUpdateOne {
+	ruo.mutation.RemoveScoreIDs(ids...)
+	return ruo
+}
+
+// RemoveScores removes "scores" edges to Score entities.
+func (ruo *RoundUpdateOne) RemoveScores(s ...*Score) *RoundUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ruo.RemoveScoreIDs(ids...)
 }
 
 // Where appends a list predicates to the RoundUpdate builder.
@@ -349,6 +467,51 @@ func (ruo *RoundUpdateOne) sqlSave(ctx context.Context) (_node *Round, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedScoresIDs(); len(nodes) > 0 && !ruo.mutation.ScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.ScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   round.ScoresTable,
+			Columns: []string{round.ScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(score.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

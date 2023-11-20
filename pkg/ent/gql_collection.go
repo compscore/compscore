@@ -10,6 +10,7 @@ import (
 	"github.com/compscore/compscore/pkg/ent/check"
 	"github.com/compscore/compscore/pkg/ent/credential"
 	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
 )
@@ -224,6 +225,18 @@ func (r *RoundQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			r.WithNamedStatus(alias, func(wq *StatusQuery) {
 				*wq = *query
 			})
+		case "scores":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ScoreClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedScores(alias, func(wq *ScoreQuery) {
+				*wq = *query
+			})
 		case "completed":
 			if _, ok := fieldSeen[round.FieldCompleted]; !ok {
 				selectedFields = append(selectedFields, round.FieldCompleted)
@@ -249,6 +262,90 @@ type roundPaginateArgs struct {
 
 func newRoundPaginateArgs(rv map[string]any) *roundPaginateArgs {
 	args := &roundPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (s *ScoreQuery) CollectFields(ctx context.Context, satisfies ...string) (*ScoreQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return s, nil
+	}
+	if err := s.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func (s *ScoreQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(score.Columns))
+		selectedFields = []string{score.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "round":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RoundClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			s.withRound = query
+		case "user":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			s.withUser = query
+		case "score":
+			if _, ok := fieldSeen[score.FieldScore]; !ok {
+				selectedFields = append(selectedFields, score.FieldScore)
+				fieldSeen[score.FieldScore] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		s.Select(selectedFields...)
+	}
+	return nil
+}
+
+type scorePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ScorePaginateOption
+}
+
+func newScorePaginateArgs(rv map[string]any) *scorePaginateArgs {
+	args := &scorePaginateArgs{}
 	if rv == nil {
 		return args
 	}
@@ -419,6 +516,18 @@ func (u *UserQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				return err
 			}
 			u.WithNamedStatus(alias, func(wq *StatusQuery) {
+				*wq = *query
+			})
+		case "scores":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ScoreClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			u.WithNamedScores(alias, func(wq *ScoreQuery) {
 				*wq = *query
 			})
 		case "name":

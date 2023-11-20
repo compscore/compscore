@@ -58,6 +58,33 @@ var (
 		Columns:    RoundsColumns,
 		PrimaryKey: []*schema.Column{RoundsColumns[0]},
 	}
+	// ScoresColumns holds the columns for the "scores" table.
+	ScoresColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "score", Type: field.TypeInt},
+		{Name: "round_scores", Type: field.TypeInt},
+		{Name: "user_scores", Type: field.TypeInt},
+	}
+	// ScoresTable holds the schema information for the "scores" table.
+	ScoresTable = &schema.Table{
+		Name:       "scores",
+		Columns:    ScoresColumns,
+		PrimaryKey: []*schema.Column{ScoresColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "scores_rounds_scores",
+				Columns:    []*schema.Column{ScoresColumns[2]},
+				RefColumns: []*schema.Column{RoundsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "scores_users_scores",
+				Columns:    []*schema.Column{ScoresColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// StatusColumns holds the columns for the "status" table.
 	StatusColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -114,6 +141,7 @@ var (
 		ChecksTable,
 		CredentialsTable,
 		RoundsTable,
+		ScoresTable,
 		StatusTable,
 		UsersTable,
 	}
@@ -122,6 +150,8 @@ var (
 func init() {
 	CredentialsTable.ForeignKeys[0].RefTable = UsersTable
 	CredentialsTable.ForeignKeys[1].RefTable = ChecksTable
+	ScoresTable.ForeignKeys[0].RefTable = RoundsTable
+	ScoresTable.ForeignKeys[1].RefTable = UsersTable
 	StatusTable.ForeignKeys[0].RefTable = RoundsTable
 	StatusTable.ForeignKeys[1].RefTable = ChecksTable
 	StatusTable.ForeignKeys[2].RefTable = UsersTable

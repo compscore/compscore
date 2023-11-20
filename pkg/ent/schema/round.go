@@ -40,5 +40,13 @@ func (Round) Edges() []ent.Edge {
 				},
 			).
 			Ref("round"),
+		edge.To("scores", Score.Type).
+			Comment("Scores for the round").
+			StructTag(`json:"scores,omitempty"`).
+			Annotations(
+				entsql.Annotation{
+					OnDelete: entsql.Cascade,
+				},
+			),
 	}
 }
