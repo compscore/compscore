@@ -80,19 +80,19 @@ func (cu *CheckUpdate) AddCredential(c ...*Credential) *CheckUpdate {
 	return cu.AddCredentialIDs(ids...)
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (cu *CheckUpdate) AddStatuIDs(ids ...uuid.UUID) *CheckUpdate {
-	cu.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (cu *CheckUpdate) AddStatusIDs(ids ...uuid.UUID) *CheckUpdate {
+	cu.mutation.AddStatusIDs(ids...)
 	return cu
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (cu *CheckUpdate) AddStatus(s ...*Status) *CheckUpdate {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (cu *CheckUpdate) AddStatuses(s ...*Status) *CheckUpdate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return cu.AddStatuIDs(ids...)
+	return cu.AddStatusIDs(ids...)
 }
 
 // Mutation returns the CheckMutation object of the builder.
@@ -121,25 +121,25 @@ func (cu *CheckUpdate) RemoveCredential(c ...*Credential) *CheckUpdate {
 	return cu.RemoveCredentialIDs(ids...)
 }
 
-// ClearStatus clears all "status" edges to the Status entity.
-func (cu *CheckUpdate) ClearStatus() *CheckUpdate {
-	cu.mutation.ClearStatus()
+// ClearStatuses clears all "statuses" edges to the Status entity.
+func (cu *CheckUpdate) ClearStatuses() *CheckUpdate {
+	cu.mutation.ClearStatuses()
 	return cu
 }
 
-// RemoveStatuIDs removes the "status" edge to Status entities by IDs.
-func (cu *CheckUpdate) RemoveStatuIDs(ids ...uuid.UUID) *CheckUpdate {
-	cu.mutation.RemoveStatuIDs(ids...)
+// RemoveStatusIDs removes the "statuses" edge to Status entities by IDs.
+func (cu *CheckUpdate) RemoveStatusIDs(ids ...uuid.UUID) *CheckUpdate {
+	cu.mutation.RemoveStatusIDs(ids...)
 	return cu
 }
 
-// RemoveStatus removes "status" edges to Status entities.
-func (cu *CheckUpdate) RemoveStatus(s ...*Status) *CheckUpdate {
+// RemoveStatuses removes "statuses" edges to Status entities.
+func (cu *CheckUpdate) RemoveStatuses(s ...*Status) *CheckUpdate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return cu.RemoveStatuIDs(ids...)
+	return cu.RemoveStatusIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -250,12 +250,12 @@ func (cu *CheckUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.StatusCleared() {
+	if cu.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -263,12 +263,12 @@ func (cu *CheckUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedStatusIDs(); len(nodes) > 0 && !cu.mutation.StatusCleared() {
+	if nodes := cu.mutation.RemovedStatusesIDs(); len(nodes) > 0 && !cu.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -279,12 +279,12 @@ func (cu *CheckUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -365,19 +365,19 @@ func (cuo *CheckUpdateOne) AddCredential(c ...*Credential) *CheckUpdateOne {
 	return cuo.AddCredentialIDs(ids...)
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (cuo *CheckUpdateOne) AddStatuIDs(ids ...uuid.UUID) *CheckUpdateOne {
-	cuo.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (cuo *CheckUpdateOne) AddStatusIDs(ids ...uuid.UUID) *CheckUpdateOne {
+	cuo.mutation.AddStatusIDs(ids...)
 	return cuo
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (cuo *CheckUpdateOne) AddStatus(s ...*Status) *CheckUpdateOne {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (cuo *CheckUpdateOne) AddStatuses(s ...*Status) *CheckUpdateOne {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return cuo.AddStatuIDs(ids...)
+	return cuo.AddStatusIDs(ids...)
 }
 
 // Mutation returns the CheckMutation object of the builder.
@@ -406,25 +406,25 @@ func (cuo *CheckUpdateOne) RemoveCredential(c ...*Credential) *CheckUpdateOne {
 	return cuo.RemoveCredentialIDs(ids...)
 }
 
-// ClearStatus clears all "status" edges to the Status entity.
-func (cuo *CheckUpdateOne) ClearStatus() *CheckUpdateOne {
-	cuo.mutation.ClearStatus()
+// ClearStatuses clears all "statuses" edges to the Status entity.
+func (cuo *CheckUpdateOne) ClearStatuses() *CheckUpdateOne {
+	cuo.mutation.ClearStatuses()
 	return cuo
 }
 
-// RemoveStatuIDs removes the "status" edge to Status entities by IDs.
-func (cuo *CheckUpdateOne) RemoveStatuIDs(ids ...uuid.UUID) *CheckUpdateOne {
-	cuo.mutation.RemoveStatuIDs(ids...)
+// RemoveStatusIDs removes the "statuses" edge to Status entities by IDs.
+func (cuo *CheckUpdateOne) RemoveStatusIDs(ids ...uuid.UUID) *CheckUpdateOne {
+	cuo.mutation.RemoveStatusIDs(ids...)
 	return cuo
 }
 
-// RemoveStatus removes "status" edges to Status entities.
-func (cuo *CheckUpdateOne) RemoveStatus(s ...*Status) *CheckUpdateOne {
+// RemoveStatuses removes "statuses" edges to Status entities.
+func (cuo *CheckUpdateOne) RemoveStatuses(s ...*Status) *CheckUpdateOne {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return cuo.RemoveStatuIDs(ids...)
+	return cuo.RemoveStatusIDs(ids...)
 }
 
 // Where appends a list predicates to the CheckUpdate builder.
@@ -565,12 +565,12 @@ func (cuo *CheckUpdateOne) sqlSave(ctx context.Context) (_node *Check, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.StatusCleared() {
+	if cuo.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -578,12 +578,12 @@ func (cuo *CheckUpdateOne) sqlSave(ctx context.Context) (_node *Check, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedStatusIDs(); len(nodes) > 0 && !cuo.mutation.StatusCleared() {
+	if nodes := cuo.mutation.RemovedStatusesIDs(); len(nodes) > 0 && !cuo.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -594,12 +594,12 @@ func (cuo *CheckUpdateOne) sqlSave(ctx context.Context) (_node *Check, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   check.StatusTable,
-			Columns: []string{check.StatusColumn},
+			Table:   check.StatusesTable,
+			Columns: []string{check.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),

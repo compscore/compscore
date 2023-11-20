@@ -35,9 +35,9 @@ type User struct {
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
 	// Credential of the user
-	Credential []*Credential `json:"credential,omitempty"`
+	Credentials []*Credential `json:"credential,omitempty"`
 	// Status of the user
-	Status []*Status `json:"status,omitempty"`
+	Statuses []*Status `json:"status,omitempty"`
 	// Scores for the user
 	Scores []*Score `json:"scores,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -45,22 +45,22 @@ type UserEdges struct {
 	loadedTypes [3]bool
 }
 
-// CredentialOrErr returns the Credential value or an error if the edge
+// CredentialsOrErr returns the Credentials value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) CredentialOrErr() ([]*Credential, error) {
+func (e UserEdges) CredentialsOrErr() ([]*Credential, error) {
 	if e.loadedTypes[0] {
-		return e.Credential, nil
+		return e.Credentials, nil
 	}
-	return nil, &NotLoadedError{edge: "credential"}
+	return nil, &NotLoadedError{edge: "credentials"}
 }
 
-// StatusOrErr returns the Status value or an error if the edge
+// StatusesOrErr returns the Statuses value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) StatusOrErr() ([]*Status, error) {
+func (e UserEdges) StatusesOrErr() ([]*Status, error) {
 	if e.loadedTypes[1] {
-		return e.Status, nil
+		return e.Statuses, nil
 	}
-	return nil, &NotLoadedError{edge: "status"}
+	return nil, &NotLoadedError{edge: "statuses"}
 }
 
 // ScoresOrErr returns the Scores value or an error if the edge
@@ -141,14 +141,14 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryCredential queries the "credential" edge of the User entity.
-func (u *User) QueryCredential() *CredentialQuery {
-	return NewUserClient(u.config).QueryCredential(u)
+// QueryCredentials queries the "credentials" edge of the User entity.
+func (u *User) QueryCredentials() *CredentialQuery {
+	return NewUserClient(u.config).QueryCredentials(u)
 }
 
-// QueryStatus queries the "status" edge of the User entity.
-func (u *User) QueryStatus() *StatusQuery {
-	return NewUserClient(u.config).QueryStatus(u)
+// QueryStatuses queries the "statuses" edge of the User entity.
+func (u *User) QueryStatuses() *StatusQuery {
+	return NewUserClient(u.config).QueryStatuses(u)
 }
 
 // QueryScores queries the "scores" edge of the User entity.

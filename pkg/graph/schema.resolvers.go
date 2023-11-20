@@ -6,26 +6,131 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/compscore/compscore/pkg/graph/model"
+	"github.com/compscore/compscore/pkg/ent"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// ID is the resolver for the id field.
+func (r *checkResolver) ID(ctx context.Context, obj *ent.Check) (string, error) {
+	return obj.ID.String(), nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// Credentials is the resolver for the credentials field.
+func (r *checkResolver) Credentials(ctx context.Context, obj *ent.Check) ([]*ent.Credential, error) {
+	return obj.QueryCredential().All(ctx)
 }
 
-// Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+// Statuses is the resolver for the statuses field.
+func (r *checkResolver) Statuses(ctx context.Context, obj *ent.Check) ([]*ent.Status, error) {
+	return obj.QueryStatuses().All(ctx)
+}
 
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+// ID is the resolver for the id field.
+func (r *credentialResolver) ID(ctx context.Context, obj *ent.Credential) (string, error) {
+	return obj.ID.String(), nil
+}
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+// User is the resolver for the user field.
+func (r *credentialResolver) User(ctx context.Context, obj *ent.Credential) (*ent.User, error) {
+	return obj.QueryUser().Only(ctx)
+}
+
+// ID is the resolver for the id field.
+func (r *roundResolver) ID(ctx context.Context, obj *ent.Round) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// Statuses is the resolver for the statuses field.
+func (r *roundResolver) Statuses(ctx context.Context, obj *ent.Round) ([]*ent.Status, error) {
+	return obj.QueryStatuses().All(ctx)
+}
+
+// Scores is the resolver for the scores field.
+func (r *roundResolver) Scores(ctx context.Context, obj *ent.Round) ([]*ent.Score, error) {
+	return obj.QueryScores().All(ctx)
+}
+
+// ID is the resolver for the id field.
+func (r *scoreResolver) ID(ctx context.Context, obj *ent.Score) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// Round is the resolver for the round field.
+func (r *scoreResolver) Round(ctx context.Context, obj *ent.Score) (*ent.Round, error) {
+	return obj.QueryRound().Only(ctx)
+}
+
+// User is the resolver for the user field.
+func (r *scoreResolver) User(ctx context.Context, obj *ent.Score) (*ent.User, error) {
+	return obj.QueryUser().Only(ctx)
+}
+
+// ID is the resolver for the id field.
+func (r *statusResolver) ID(ctx context.Context, obj *ent.Status) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// Timestamp is the resolver for the timestamp field.
+func (r *statusResolver) Timestamp(ctx context.Context, obj *ent.Status) (string, error) {
+	return obj.Timestamp.String(), nil
+}
+
+// Round is the resolver for the round field.
+func (r *statusResolver) Round(ctx context.Context, obj *ent.Status) (*ent.Round, error) {
+	return obj.QueryRound().Only(ctx)
+}
+
+// Check is the resolver for the check field.
+func (r *statusResolver) Check(ctx context.Context, obj *ent.Status) (*ent.Check, error) {
+	return obj.QueryCheck().Only(ctx)
+}
+
+// User is the resolver for the user field.
+func (r *statusResolver) User(ctx context.Context, obj *ent.Status) (*ent.User, error) {
+	return obj.QueryUser().Only(ctx)
+}
+
+// ID is the resolver for the id field.
+func (r *userResolver) ID(ctx context.Context, obj *ent.User) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// Credentials is the resolver for the credentials field.
+func (r *userResolver) Credentials(ctx context.Context, obj *ent.User) ([]*ent.Credential, error) {
+	return obj.QueryCredentials().All(ctx)
+}
+
+// Statuses is the resolver for the statuses field.
+func (r *userResolver) Statuses(ctx context.Context, obj *ent.User) ([]*ent.Status, error) {
+	return obj.QueryStatuses().All(ctx)
+}
+
+// Scores is the resolver for the scores field.
+func (r *userResolver) Scores(ctx context.Context, obj *ent.User) ([]*ent.Score, error) {
+	return obj.QueryScores().All(ctx)
+}
+
+// Check returns CheckResolver implementation.
+func (r *Resolver) Check() CheckResolver { return &checkResolver{r} }
+
+// Credential returns CredentialResolver implementation.
+func (r *Resolver) Credential() CredentialResolver { return &credentialResolver{r} }
+
+// Round returns RoundResolver implementation.
+func (r *Resolver) Round() RoundResolver { return &roundResolver{r} }
+
+// Score returns ScoreResolver implementation.
+func (r *Resolver) Score() ScoreResolver { return &scoreResolver{r} }
+
+// Status returns StatusResolver implementation.
+func (r *Resolver) Status() StatusResolver { return &statusResolver{r} }
+
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
+type checkResolver struct{ *Resolver }
+type credentialResolver struct{ *Resolver }
+type roundResolver struct{ *Resolver }
+type scoreResolver struct{ *Resolver }
+type statusResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

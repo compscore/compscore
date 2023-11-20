@@ -46,7 +46,7 @@ func (Check) Edges() []ent.Edge {
 				},
 			).
 			Ref("check"),
-		edge.From("status", Status.Type).
+		edge.From("statuses", Status.Type).
 			Comment("Status of the check").
 			StructTag(`json:"status,omitempty"`).
 			Annotations(

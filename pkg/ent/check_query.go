@@ -26,7 +26,7 @@ type CheckQuery struct {
 	inters         []Interceptor
 	predicates     []predicate.Check
 	withCredential *CredentialQuery
-	withStatus     *StatusQuery
+	withStatuses   *StatusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,8 +85,8 @@ func (cq *CheckQuery) QueryCredential() *CredentialQuery {
 	return query
 }
 
-// QueryStatus chains the current query on the "status" edge.
-func (cq *CheckQuery) QueryStatus() *StatusQuery {
+// QueryStatuses chains the current query on the "statuses" edge.
+func (cq *CheckQuery) QueryStatuses() *StatusQuery {
 	query := (&StatusClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
@@ -99,7 +99,7 @@ func (cq *CheckQuery) QueryStatus() *StatusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(check.Table, check.FieldID, selector),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusTable, check.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusesTable, check.StatusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -300,7 +300,7 @@ func (cq *CheckQuery) Clone() *CheckQuery {
 		inters:         append([]Interceptor{}, cq.inters...),
 		predicates:     append([]predicate.Check{}, cq.predicates...),
 		withCredential: cq.withCredential.Clone(),
-		withStatus:     cq.withStatus.Clone(),
+		withStatuses:   cq.withStatuses.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -318,14 +318,14 @@ func (cq *CheckQuery) WithCredential(opts ...func(*CredentialQuery)) *CheckQuery
 	return cq
 }
 
-// WithStatus tells the query-builder to eager-load the nodes that are connected to
-// the "status" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CheckQuery) WithStatus(opts ...func(*StatusQuery)) *CheckQuery {
+// WithStatuses tells the query-builder to eager-load the nodes that are connected to
+// the "statuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CheckQuery) WithStatuses(opts ...func(*StatusQuery)) *CheckQuery {
 	query := (&StatusClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withStatus = query
+	cq.withStatuses = query
 	return cq
 }
 
@@ -409,7 +409,7 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
 			cq.withCredential != nil,
-			cq.withStatus != nil,
+			cq.withStatuses != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -437,10 +437,10 @@ func (cq *CheckQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Check,
 			return nil, err
 		}
 	}
-	if query := cq.withStatus; query != nil {
-		if err := cq.loadStatus(ctx, query, nodes,
-			func(n *Check) { n.Edges.Status = []*Status{} },
-			func(n *Check, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+	if query := cq.withStatuses; query != nil {
+		if err := cq.loadStatuses(ctx, query, nodes,
+			func(n *Check) { n.Edges.Statuses = []*Status{} },
+			func(n *Check, e *Status) { n.Edges.Statuses = append(n.Edges.Statuses, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -478,7 +478,7 @@ func (cq *CheckQuery) loadCredential(ctx context.Context, query *CredentialQuery
 	}
 	return nil
 }
-func (cq *CheckQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes []*Check, init func(*Check), assign func(*Check, *Status)) error {
+func (cq *CheckQuery) loadStatuses(ctx context.Context, query *StatusQuery, nodes []*Check, init func(*Check), assign func(*Check, *Status)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*Check)
 	for i := range nodes {
@@ -490,7 +490,7 @@ func (cq *CheckQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 	}
 	query.withFKs = true
 	query.Where(predicate.Status(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(check.StatusColumn), fks...))
+		s.Where(sql.InValues(s.C(check.StatusesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

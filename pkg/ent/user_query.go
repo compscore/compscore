@@ -22,13 +22,13 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx            *QueryContext
-	order          []user.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.User
-	withCredential *CredentialQuery
-	withStatus     *StatusQuery
-	withScores     *ScoreQuery
+	ctx             *QueryContext
+	order           []user.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.User
+	withCredentials *CredentialQuery
+	withStatuses    *StatusQuery
+	withScores      *ScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,8 +65,8 @@ func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	return uq
 }
 
-// QueryCredential chains the current query on the "credential" edge.
-func (uq *UserQuery) QueryCredential() *CredentialQuery {
+// QueryCredentials chains the current query on the "credentials" edge.
+func (uq *UserQuery) QueryCredentials() *CredentialQuery {
 	query := (&CredentialClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
@@ -79,7 +79,7 @@ func (uq *UserQuery) QueryCredential() *CredentialQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(credential.Table, credential.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.CredentialTable, user.CredentialColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.CredentialsTable, user.CredentialsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -87,8 +87,8 @@ func (uq *UserQuery) QueryCredential() *CredentialQuery {
 	return query
 }
 
-// QueryStatus chains the current query on the "status" edge.
-func (uq *UserQuery) QueryStatus() *StatusQuery {
+// QueryStatuses chains the current query on the "statuses" edge.
+func (uq *UserQuery) QueryStatuses() *StatusQuery {
 	query := (&StatusClient{config: uq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := uq.prepareQuery(ctx); err != nil {
@@ -101,7 +101,7 @@ func (uq *UserQuery) QueryStatus() *StatusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.StatusTable, user.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.StatusesTable, user.StatusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -318,39 +318,39 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:         uq.config,
-		ctx:            uq.ctx.Clone(),
-		order:          append([]user.OrderOption{}, uq.order...),
-		inters:         append([]Interceptor{}, uq.inters...),
-		predicates:     append([]predicate.User{}, uq.predicates...),
-		withCredential: uq.withCredential.Clone(),
-		withStatus:     uq.withStatus.Clone(),
-		withScores:     uq.withScores.Clone(),
+		config:          uq.config,
+		ctx:             uq.ctx.Clone(),
+		order:           append([]user.OrderOption{}, uq.order...),
+		inters:          append([]Interceptor{}, uq.inters...),
+		predicates:      append([]predicate.User{}, uq.predicates...),
+		withCredentials: uq.withCredentials.Clone(),
+		withStatuses:    uq.withStatuses.Clone(),
+		withScores:      uq.withScores.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
 }
 
-// WithCredential tells the query-builder to eager-load the nodes that are connected to
-// the "credential" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithCredential(opts ...func(*CredentialQuery)) *UserQuery {
+// WithCredentials tells the query-builder to eager-load the nodes that are connected to
+// the "credentials" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithCredentials(opts ...func(*CredentialQuery)) *UserQuery {
 	query := (&CredentialClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withCredential = query
+	uq.withCredentials = query
 	return uq
 }
 
-// WithStatus tells the query-builder to eager-load the nodes that are connected to
-// the "status" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithStatus(opts ...func(*StatusQuery)) *UserQuery {
+// WithStatuses tells the query-builder to eager-load the nodes that are connected to
+// the "statuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithStatuses(opts ...func(*StatusQuery)) *UserQuery {
 	query := (&StatusClient{config: uq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withStatus = query
+	uq.withStatuses = query
 	return uq
 }
 
@@ -444,8 +444,8 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
 		loadedTypes = [3]bool{
-			uq.withCredential != nil,
-			uq.withStatus != nil,
+			uq.withCredentials != nil,
+			uq.withStatuses != nil,
 			uq.withScores != nil,
 		}
 	)
@@ -467,17 +467,17 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := uq.withCredential; query != nil {
-		if err := uq.loadCredential(ctx, query, nodes,
-			func(n *User) { n.Edges.Credential = []*Credential{} },
-			func(n *User, e *Credential) { n.Edges.Credential = append(n.Edges.Credential, e) }); err != nil {
+	if query := uq.withCredentials; query != nil {
+		if err := uq.loadCredentials(ctx, query, nodes,
+			func(n *User) { n.Edges.Credentials = []*Credential{} },
+			func(n *User, e *Credential) { n.Edges.Credentials = append(n.Edges.Credentials, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withStatus; query != nil {
-		if err := uq.loadStatus(ctx, query, nodes,
-			func(n *User) { n.Edges.Status = []*Status{} },
-			func(n *User, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+	if query := uq.withStatuses; query != nil {
+		if err := uq.loadStatuses(ctx, query, nodes,
+			func(n *User) { n.Edges.Statuses = []*Status{} },
+			func(n *User, e *Status) { n.Edges.Statuses = append(n.Edges.Statuses, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -491,7 +491,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	return nodes, nil
 }
 
-func (uq *UserQuery) loadCredential(ctx context.Context, query *CredentialQuery, nodes []*User, init func(*User), assign func(*User, *Credential)) error {
+func (uq *UserQuery) loadCredentials(ctx context.Context, query *CredentialQuery, nodes []*User, init func(*User), assign func(*User, *Credential)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*User)
 	for i := range nodes {
@@ -503,7 +503,7 @@ func (uq *UserQuery) loadCredential(ctx context.Context, query *CredentialQuery,
 	}
 	query.withFKs = true
 	query.Where(predicate.Credential(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.CredentialColumn), fks...))
+		s.Where(sql.InValues(s.C(user.CredentialsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -522,7 +522,7 @@ func (uq *UserQuery) loadCredential(ctx context.Context, query *CredentialQuery,
 	}
 	return nil
 }
-func (uq *UserQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes []*User, init func(*User), assign func(*User, *Status)) error {
+func (uq *UserQuery) loadStatuses(ctx context.Context, query *StatusQuery, nodes []*User, init func(*User), assign func(*User, *Status)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*User)
 	for i := range nodes {
@@ -534,7 +534,7 @@ func (uq *UserQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes [
 	}
 	query.withFKs = true
 	query.Where(predicate.Status(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(user.StatusColumn), fks...))
+		s.Where(sql.InValues(s.C(user.StatusesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

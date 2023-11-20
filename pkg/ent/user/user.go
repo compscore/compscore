@@ -23,28 +23,28 @@ const (
 	FieldTeamNumber = "team_number"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
-	// EdgeCredential holds the string denoting the credential edge name in mutations.
-	EdgeCredential = "credential"
-	// EdgeStatus holds the string denoting the status edge name in mutations.
-	EdgeStatus = "status"
+	// EdgeCredentials holds the string denoting the credentials edge name in mutations.
+	EdgeCredentials = "credentials"
+	// EdgeStatuses holds the string denoting the statuses edge name in mutations.
+	EdgeStatuses = "statuses"
 	// EdgeScores holds the string denoting the scores edge name in mutations.
 	EdgeScores = "scores"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// CredentialTable is the table that holds the credential relation/edge.
-	CredentialTable = "credentials"
-	// CredentialInverseTable is the table name for the Credential entity.
+	// CredentialsTable is the table that holds the credentials relation/edge.
+	CredentialsTable = "credentials"
+	// CredentialsInverseTable is the table name for the Credential entity.
 	// It exists in this package in order to avoid circular dependency with the "credential" package.
-	CredentialInverseTable = "credentials"
-	// CredentialColumn is the table column denoting the credential relation/edge.
-	CredentialColumn = "credential_user"
-	// StatusTable is the table that holds the status relation/edge.
-	StatusTable = "status"
-	// StatusInverseTable is the table name for the Status entity.
+	CredentialsInverseTable = "credentials"
+	// CredentialsColumn is the table column denoting the credentials relation/edge.
+	CredentialsColumn = "credential_user"
+	// StatusesTable is the table that holds the statuses relation/edge.
+	StatusesTable = "status"
+	// StatusesInverseTable is the table name for the Status entity.
 	// It exists in this package in order to avoid circular dependency with the "status" package.
-	StatusInverseTable = "status"
-	// StatusColumn is the table column denoting the status relation/edge.
-	StatusColumn = "status_user"
+	StatusesInverseTable = "status"
+	// StatusesColumn is the table column denoting the statuses relation/edge.
+	StatusesColumn = "status_user"
 	// ScoresTable is the table that holds the scores relation/edge.
 	ScoresTable = "scores"
 	// ScoresInverseTable is the table name for the Score entity.
@@ -136,31 +136,31 @@ func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
 }
 
-// ByCredentialCount orders the results by credential count.
-func ByCredentialCount(opts ...sql.OrderTermOption) OrderOption {
+// ByCredentialsCount orders the results by credentials count.
+func ByCredentialsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCredentialStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newCredentialsStep(), opts...)
 	}
 }
 
-// ByCredential orders the results by credential terms.
-func ByCredential(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByCredentials orders the results by credentials terms.
+func ByCredentials(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCredentialStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newCredentialsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByStatusCount orders the results by status count.
-func ByStatusCount(opts ...sql.OrderTermOption) OrderOption {
+// ByStatusesCount orders the results by statuses count.
+func ByStatusesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newStatusStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newStatusesStep(), opts...)
 	}
 }
 
-// ByStatus orders the results by status terms.
-func ByStatus(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByStatuses orders the results by statuses terms.
+func ByStatuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStatusStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newStatusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -177,18 +177,18 @@ func ByScores(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newScoresStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newCredentialStep() *sqlgraph.Step {
+func newCredentialsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CredentialInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, CredentialTable, CredentialColumn),
+		sqlgraph.To(CredentialsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CredentialsTable, CredentialsColumn),
 	)
 }
-func newStatusStep() *sqlgraph.Step {
+func newStatusesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(StatusInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
+		sqlgraph.To(StatusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, StatusesTable, StatusesColumn),
 	)
 }
 func newScoresStep() *sqlgraph.Step {

@@ -65,19 +65,19 @@ func (ru *RoundUpdate) SetNillableCompleted(b *bool) *RoundUpdate {
 	return ru
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (ru *RoundUpdate) AddStatuIDs(ids ...uuid.UUID) *RoundUpdate {
-	ru.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (ru *RoundUpdate) AddStatusIDs(ids ...uuid.UUID) *RoundUpdate {
+	ru.mutation.AddStatusIDs(ids...)
 	return ru
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (ru *RoundUpdate) AddStatus(s ...*Status) *RoundUpdate {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (ru *RoundUpdate) AddStatuses(s ...*Status) *RoundUpdate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return ru.AddStatuIDs(ids...)
+	return ru.AddStatusIDs(ids...)
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by IDs.
@@ -100,25 +100,25 @@ func (ru *RoundUpdate) Mutation() *RoundMutation {
 	return ru.mutation
 }
 
-// ClearStatus clears all "status" edges to the Status entity.
-func (ru *RoundUpdate) ClearStatus() *RoundUpdate {
-	ru.mutation.ClearStatus()
+// ClearStatuses clears all "statuses" edges to the Status entity.
+func (ru *RoundUpdate) ClearStatuses() *RoundUpdate {
+	ru.mutation.ClearStatuses()
 	return ru
 }
 
-// RemoveStatuIDs removes the "status" edge to Status entities by IDs.
-func (ru *RoundUpdate) RemoveStatuIDs(ids ...uuid.UUID) *RoundUpdate {
-	ru.mutation.RemoveStatuIDs(ids...)
+// RemoveStatusIDs removes the "statuses" edge to Status entities by IDs.
+func (ru *RoundUpdate) RemoveStatusIDs(ids ...uuid.UUID) *RoundUpdate {
+	ru.mutation.RemoveStatusIDs(ids...)
 	return ru
 }
 
-// RemoveStatus removes "status" edges to Status entities.
-func (ru *RoundUpdate) RemoveStatus(s ...*Status) *RoundUpdate {
+// RemoveStatuses removes "statuses" edges to Status entities.
+func (ru *RoundUpdate) RemoveStatuses(s ...*Status) *RoundUpdate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return ru.RemoveStatuIDs(ids...)
+	return ru.RemoveStatusIDs(ids...)
 }
 
 // ClearScores clears all "scores" edges to the Score entity.
@@ -200,12 +200,12 @@ func (ru *RoundUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.Completed(); ok {
 		_spec.SetField(round.FieldCompleted, field.TypeBool, value)
 	}
-	if ru.mutation.StatusCleared() {
+	if ru.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -213,12 +213,12 @@ func (ru *RoundUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RemovedStatusIDs(); len(nodes) > 0 && !ru.mutation.StatusCleared() {
+	if nodes := ru.mutation.RemovedStatusesIDs(); len(nodes) > 0 && !ru.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -229,12 +229,12 @@ func (ru *RoundUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -345,19 +345,19 @@ func (ruo *RoundUpdateOne) SetNillableCompleted(b *bool) *RoundUpdateOne {
 	return ruo
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (ruo *RoundUpdateOne) AddStatuIDs(ids ...uuid.UUID) *RoundUpdateOne {
-	ruo.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (ruo *RoundUpdateOne) AddStatusIDs(ids ...uuid.UUID) *RoundUpdateOne {
+	ruo.mutation.AddStatusIDs(ids...)
 	return ruo
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (ruo *RoundUpdateOne) AddStatus(s ...*Status) *RoundUpdateOne {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (ruo *RoundUpdateOne) AddStatuses(s ...*Status) *RoundUpdateOne {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return ruo.AddStatuIDs(ids...)
+	return ruo.AddStatusIDs(ids...)
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by IDs.
@@ -380,25 +380,25 @@ func (ruo *RoundUpdateOne) Mutation() *RoundMutation {
 	return ruo.mutation
 }
 
-// ClearStatus clears all "status" edges to the Status entity.
-func (ruo *RoundUpdateOne) ClearStatus() *RoundUpdateOne {
-	ruo.mutation.ClearStatus()
+// ClearStatuses clears all "statuses" edges to the Status entity.
+func (ruo *RoundUpdateOne) ClearStatuses() *RoundUpdateOne {
+	ruo.mutation.ClearStatuses()
 	return ruo
 }
 
-// RemoveStatuIDs removes the "status" edge to Status entities by IDs.
-func (ruo *RoundUpdateOne) RemoveStatuIDs(ids ...uuid.UUID) *RoundUpdateOne {
-	ruo.mutation.RemoveStatuIDs(ids...)
+// RemoveStatusIDs removes the "statuses" edge to Status entities by IDs.
+func (ruo *RoundUpdateOne) RemoveStatusIDs(ids ...uuid.UUID) *RoundUpdateOne {
+	ruo.mutation.RemoveStatusIDs(ids...)
 	return ruo
 }
 
-// RemoveStatus removes "status" edges to Status entities.
-func (ruo *RoundUpdateOne) RemoveStatus(s ...*Status) *RoundUpdateOne {
+// RemoveStatuses removes "statuses" edges to Status entities.
+func (ruo *RoundUpdateOne) RemoveStatuses(s ...*Status) *RoundUpdateOne {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return ruo.RemoveStatuIDs(ids...)
+	return ruo.RemoveStatusIDs(ids...)
 }
 
 // ClearScores clears all "scores" edges to the Score entity.
@@ -510,12 +510,12 @@ func (ruo *RoundUpdateOne) sqlSave(ctx context.Context) (_node *Round, err error
 	if value, ok := ruo.mutation.Completed(); ok {
 		_spec.SetField(round.FieldCompleted, field.TypeBool, value)
 	}
-	if ruo.mutation.StatusCleared() {
+	if ruo.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -523,12 +523,12 @@ func (ruo *RoundUpdateOne) sqlSave(ctx context.Context) (_node *Round, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RemovedStatusIDs(); len(nodes) > 0 && !ruo.mutation.StatusCleared() {
+	if nodes := ruo.mutation.RemovedStatusesIDs(); len(nodes) > 0 && !ruo.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -539,12 +539,12 @@ func (ruo *RoundUpdateOne) sqlSave(ctx context.Context) (_node *Round, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),

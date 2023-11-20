@@ -77,14 +77,14 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 	return uc
 }
 
-// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+// AddCredentialIDs adds the "credentials" edge to the Credential entity by IDs.
 func (uc *UserCreate) AddCredentialIDs(ids ...uuid.UUID) *UserCreate {
 	uc.mutation.AddCredentialIDs(ids...)
 	return uc
 }
 
-// AddCredential adds the "credential" edges to the Credential entity.
-func (uc *UserCreate) AddCredential(c ...*Credential) *UserCreate {
+// AddCredentials adds the "credentials" edges to the Credential entity.
+func (uc *UserCreate) AddCredentials(c ...*Credential) *UserCreate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -92,19 +92,19 @@ func (uc *UserCreate) AddCredential(c ...*Credential) *UserCreate {
 	return uc.AddCredentialIDs(ids...)
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (uc *UserCreate) AddStatuIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (uc *UserCreate) AddStatusIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddStatusIDs(ids...)
 	return uc
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (uc *UserCreate) AddStatus(s ...*Status) *UserCreate {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (uc *UserCreate) AddStatuses(s ...*Status) *UserCreate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return uc.AddStatuIDs(ids...)
+	return uc.AddStatusIDs(ids...)
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by IDs.
@@ -244,12 +244,12 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = value
 	}
-	if nodes := uc.mutation.CredentialIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.CredentialsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -260,12 +260,12 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),

@@ -269,21 +269,21 @@ func RoleNotIn(vs ...Role) predicate.User {
 	return predicate.User(sql.FieldNotIn(FieldRole, vs...))
 }
 
-// HasCredential applies the HasEdge predicate on the "credential" edge.
-func HasCredential() predicate.User {
+// HasCredentials applies the HasEdge predicate on the "credentials" edge.
+func HasCredentials() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CredentialTable, CredentialColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, CredentialsTable, CredentialsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasCredentialWith applies the HasEdge predicate on the "credential" edge with a given conditions (other predicates).
-func HasCredentialWith(preds ...predicate.Credential) predicate.User {
+// HasCredentialsWith applies the HasEdge predicate on the "credentials" edge with a given conditions (other predicates).
+func HasCredentialsWith(preds ...predicate.Credential) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newCredentialStep()
+		step := newCredentialsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -292,21 +292,21 @@ func HasCredentialWith(preds ...predicate.Credential) predicate.User {
 	})
 }
 
-// HasStatus applies the HasEdge predicate on the "status" edge.
-func HasStatus() predicate.User {
+// HasStatuses applies the HasEdge predicate on the "statuses" edge.
+func HasStatuses() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, StatusTable, StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, StatusesTable, StatusesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasStatusWith applies the HasEdge predicate on the "status" edge with a given conditions (other predicates).
-func HasStatusWith(preds ...predicate.Status) predicate.User {
+// HasStatusesWith applies the HasEdge predicate on the "statuses" edge with a given conditions (other predicates).
+func HasStatusesWith(preds ...predicate.Status) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newStatusStep()
+		step := newStatusesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

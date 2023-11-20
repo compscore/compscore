@@ -37,7 +37,7 @@ func (Round) Fields() []ent.Field {
 // Edges of the Round.
 func (Round) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("status", Status.Type).
+		edge.From("statuses", Status.Type).
 			Comment("Status of the round").
 			StructTag(`json:"status,omitempty"`).
 			Annotations(

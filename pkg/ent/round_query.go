@@ -21,12 +21,12 @@ import (
 // RoundQuery is the builder for querying Round entities.
 type RoundQuery struct {
 	config
-	ctx        *QueryContext
-	order      []round.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Round
-	withStatus *StatusQuery
-	withScores *ScoreQuery
+	ctx          *QueryContext
+	order        []round.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Round
+	withStatuses *StatusQuery
+	withScores   *ScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,8 +63,8 @@ func (rq *RoundQuery) Order(o ...round.OrderOption) *RoundQuery {
 	return rq
 }
 
-// QueryStatus chains the current query on the "status" edge.
-func (rq *RoundQuery) QueryStatus() *StatusQuery {
+// QueryStatuses chains the current query on the "statuses" edge.
+func (rq *RoundQuery) QueryStatuses() *StatusQuery {
 	query := (&StatusClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
@@ -77,7 +77,7 @@ func (rq *RoundQuery) QueryStatus() *StatusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(round.Table, round.FieldID, selector),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusTable, round.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusesTable, round.StatusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,27 +294,27 @@ func (rq *RoundQuery) Clone() *RoundQuery {
 		return nil
 	}
 	return &RoundQuery{
-		config:     rq.config,
-		ctx:        rq.ctx.Clone(),
-		order:      append([]round.OrderOption{}, rq.order...),
-		inters:     append([]Interceptor{}, rq.inters...),
-		predicates: append([]predicate.Round{}, rq.predicates...),
-		withStatus: rq.withStatus.Clone(),
-		withScores: rq.withScores.Clone(),
+		config:       rq.config,
+		ctx:          rq.ctx.Clone(),
+		order:        append([]round.OrderOption{}, rq.order...),
+		inters:       append([]Interceptor{}, rq.inters...),
+		predicates:   append([]predicate.Round{}, rq.predicates...),
+		withStatuses: rq.withStatuses.Clone(),
+		withScores:   rq.withScores.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
 	}
 }
 
-// WithStatus tells the query-builder to eager-load the nodes that are connected to
-// the "status" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RoundQuery) WithStatus(opts ...func(*StatusQuery)) *RoundQuery {
+// WithStatuses tells the query-builder to eager-load the nodes that are connected to
+// the "statuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RoundQuery) WithStatuses(opts ...func(*StatusQuery)) *RoundQuery {
 	query := (&StatusClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rq.withStatus = query
+	rq.withStatuses = query
 	return rq
 }
 
@@ -408,7 +408,7 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 		nodes       = []*Round{}
 		_spec       = rq.querySpec()
 		loadedTypes = [2]bool{
-			rq.withStatus != nil,
+			rq.withStatuses != nil,
 			rq.withScores != nil,
 		}
 	)
@@ -430,10 +430,10 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := rq.withStatus; query != nil {
-		if err := rq.loadStatus(ctx, query, nodes,
-			func(n *Round) { n.Edges.Status = []*Status{} },
-			func(n *Round, e *Status) { n.Edges.Status = append(n.Edges.Status, e) }); err != nil {
+	if query := rq.withStatuses; query != nil {
+		if err := rq.loadStatuses(ctx, query, nodes,
+			func(n *Round) { n.Edges.Statuses = []*Status{} },
+			func(n *Round, e *Status) { n.Edges.Statuses = append(n.Edges.Statuses, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -447,7 +447,7 @@ func (rq *RoundQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Round,
 	return nodes, nil
 }
 
-func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes []*Round, init func(*Round), assign func(*Round, *Status)) error {
+func (rq *RoundQuery) loadStatuses(ctx context.Context, query *StatusQuery, nodes []*Round, init func(*Round), assign func(*Round, *Status)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[uuid.UUID]*Round)
 	for i := range nodes {
@@ -459,7 +459,7 @@ func (rq *RoundQuery) loadStatus(ctx context.Context, query *StatusQuery, nodes 
 	}
 	query.withFKs = true
 	query.Where(predicate.Status(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(round.StatusColumn), fks...))
+		s.Where(sql.InValues(s.C(round.StatusesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

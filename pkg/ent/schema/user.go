@@ -50,7 +50,7 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("credential", Credential.Type).
+		edge.From("credentials", Credential.Type).
 			Comment("Credential of the user").
 			StructTag(`json:"credential,omitempty"`).
 			Annotations(
@@ -59,7 +59,7 @@ func (User) Edges() []ent.Edge {
 				},
 			).
 			Ref("user"),
-		edge.From("status", Status.Type).
+		edge.From("statuses", Status.Type).
 			Comment("Status of the user").
 			StructTag(`json:"status,omitempty"`).
 			Annotations(

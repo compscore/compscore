@@ -56,19 +56,19 @@ func (rc *RoundCreate) SetNillableID(u *uuid.UUID) *RoundCreate {
 	return rc
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (rc *RoundCreate) AddStatuIDs(ids ...uuid.UUID) *RoundCreate {
-	rc.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (rc *RoundCreate) AddStatusIDs(ids ...uuid.UUID) *RoundCreate {
+	rc.mutation.AddStatusIDs(ids...)
 	return rc
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (rc *RoundCreate) AddStatus(s ...*Status) *RoundCreate {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (rc *RoundCreate) AddStatuses(s ...*Status) *RoundCreate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return rc.AddStatuIDs(ids...)
+	return rc.AddStatusIDs(ids...)
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by IDs.
@@ -187,12 +187,12 @@ func (rc *RoundCreate) createSpec() (*Round, *sqlgraph.CreateSpec) {
 		_spec.SetField(round.FieldCompleted, field.TypeBool, value)
 		_node.Completed = value
 	}
-	if nodes := rc.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   round.StatusTable,
-			Columns: []string{round.StatusColumn},
+			Table:   round.StatusesTable,
+			Columns: []string{round.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),

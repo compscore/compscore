@@ -85,3 +85,29 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  Check:
+    model:
+      - github.com/compscore/compscore/pkg/ent.Check
+  Credential:
+    model:
+      - github.com/compscore/compscore/pkg/ent.Credential
+  Round:
+    model:
+      - github.com/compscore/compscore/pkg/ent.Round
+  Score:
+    model:
+      - github.com/compscore/compscore/pkg/ent.Score
+  Status:
+    model:
+      - github.com/compscore/compscore/pkg/ent.Status
+  User:
+    model:
+      - github.com/compscore/compscore/pkg/ent.User
+  RoleEnum:
+    model:
+      - github.com/compscore/compscore/pkg/ent/user.Role
+  StatusEnum:
+    model:
+      - github.com/compscore/compscore/pkg/ent/status.Status
+
+  

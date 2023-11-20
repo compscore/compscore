@@ -370,15 +370,15 @@ func (c *CheckClient) QueryCredential(ch *Check) *CredentialQuery {
 	return query
 }
 
-// QueryStatus queries the status edge of a Check.
-func (c *CheckClient) QueryStatus(ch *Check) *StatusQuery {
+// QueryStatuses queries the statuses edge of a Check.
+func (c *CheckClient) QueryStatuses(ch *Check) *StatusQuery {
 	query := (&StatusClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ch.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(check.Table, check.FieldID, id),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusTable, check.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, check.StatusesTable, check.StatusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -684,15 +684,15 @@ func (c *RoundClient) GetX(ctx context.Context, id uuid.UUID) *Round {
 	return obj
 }
 
-// QueryStatus queries the status edge of a Round.
-func (c *RoundClient) QueryStatus(r *Round) *StatusQuery {
+// QueryStatuses queries the statuses edge of a Round.
+func (c *RoundClient) QueryStatuses(r *Round) *StatusQuery {
 	query := (&StatusClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(round.Table, round.FieldID, id),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusTable, round.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, round.StatusesTable, round.StatusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -1195,15 +1195,15 @@ func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
 	return obj
 }
 
-// QueryCredential queries the credential edge of a User.
-func (c *UserClient) QueryCredential(u *User) *CredentialQuery {
+// QueryCredentials queries the credentials edge of a User.
+func (c *UserClient) QueryCredentials(u *User) *CredentialQuery {
 	query := (&CredentialClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(credential.Table, credential.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.CredentialTable, user.CredentialColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.CredentialsTable, user.CredentialsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -1211,15 +1211,15 @@ func (c *UserClient) QueryCredential(u *User) *CredentialQuery {
 	return query
 }
 
-// QueryStatus queries the status edge of a User.
-func (c *UserClient) QueryStatus(u *User) *StatusQuery {
+// QueryStatuses queries the statuses edge of a User.
+func (c *UserClient) QueryStatuses(u *User) *StatusQuery {
 	query := (&StatusClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := u.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(status.Table, status.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, user.StatusTable, user.StatusColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, user.StatusesTable, user.StatusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

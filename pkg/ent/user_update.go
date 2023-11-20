@@ -100,14 +100,14 @@ func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
 	return uu
 }
 
-// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+// AddCredentialIDs adds the "credentials" edge to the Credential entity by IDs.
 func (uu *UserUpdate) AddCredentialIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddCredentialIDs(ids...)
 	return uu
 }
 
-// AddCredential adds the "credential" edges to the Credential entity.
-func (uu *UserUpdate) AddCredential(c ...*Credential) *UserUpdate {
+// AddCredentials adds the "credentials" edges to the Credential entity.
+func (uu *UserUpdate) AddCredentials(c ...*Credential) *UserUpdate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -115,19 +115,19 @@ func (uu *UserUpdate) AddCredential(c ...*Credential) *UserUpdate {
 	return uu.AddCredentialIDs(ids...)
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (uu *UserUpdate) AddStatuIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (uu *UserUpdate) AddStatusIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddStatusIDs(ids...)
 	return uu
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (uu *UserUpdate) AddStatus(s ...*Status) *UserUpdate {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (uu *UserUpdate) AddStatuses(s ...*Status) *UserUpdate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return uu.AddStatuIDs(ids...)
+	return uu.AddStatusIDs(ids...)
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by IDs.
@@ -150,20 +150,20 @@ func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearCredential clears all "credential" edges to the Credential entity.
-func (uu *UserUpdate) ClearCredential() *UserUpdate {
-	uu.mutation.ClearCredential()
+// ClearCredentials clears all "credentials" edges to the Credential entity.
+func (uu *UserUpdate) ClearCredentials() *UserUpdate {
+	uu.mutation.ClearCredentials()
 	return uu
 }
 
-// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+// RemoveCredentialIDs removes the "credentials" edge to Credential entities by IDs.
 func (uu *UserUpdate) RemoveCredentialIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemoveCredentialIDs(ids...)
 	return uu
 }
 
-// RemoveCredential removes "credential" edges to Credential entities.
-func (uu *UserUpdate) RemoveCredential(c ...*Credential) *UserUpdate {
+// RemoveCredentials removes "credentials" edges to Credential entities.
+func (uu *UserUpdate) RemoveCredentials(c ...*Credential) *UserUpdate {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -171,25 +171,25 @@ func (uu *UserUpdate) RemoveCredential(c ...*Credential) *UserUpdate {
 	return uu.RemoveCredentialIDs(ids...)
 }
 
-// ClearStatus clears all "status" edges to the Status entity.
-func (uu *UserUpdate) ClearStatus() *UserUpdate {
-	uu.mutation.ClearStatus()
+// ClearStatuses clears all "statuses" edges to the Status entity.
+func (uu *UserUpdate) ClearStatuses() *UserUpdate {
+	uu.mutation.ClearStatuses()
 	return uu
 }
 
-// RemoveStatuIDs removes the "status" edge to Status entities by IDs.
-func (uu *UserUpdate) RemoveStatuIDs(ids ...uuid.UUID) *UserUpdate {
-	uu.mutation.RemoveStatuIDs(ids...)
+// RemoveStatusIDs removes the "statuses" edge to Status entities by IDs.
+func (uu *UserUpdate) RemoveStatusIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveStatusIDs(ids...)
 	return uu
 }
 
-// RemoveStatus removes "status" edges to Status entities.
-func (uu *UserUpdate) RemoveStatus(s ...*Status) *UserUpdate {
+// RemoveStatuses removes "statuses" edges to Status entities.
+func (uu *UserUpdate) RemoveStatuses(s ...*Status) *UserUpdate {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return uu.RemoveStatuIDs(ids...)
+	return uu.RemoveStatusIDs(ids...)
 }
 
 // ClearScores clears all "scores" edges to the Score entity.
@@ -290,12 +290,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
-	if uu.mutation.CredentialCleared() {
+	if uu.mutation.CredentialsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -303,12 +303,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !uu.mutation.CredentialCleared() {
+	if nodes := uu.mutation.RemovedCredentialsIDs(); len(nodes) > 0 && !uu.mutation.CredentialsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -319,12 +319,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.CredentialIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.CredentialsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -335,12 +335,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.StatusCleared() {
+	if uu.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -348,12 +348,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedStatusIDs(); len(nodes) > 0 && !uu.mutation.StatusCleared() {
+	if nodes := uu.mutation.RemovedStatusesIDs(); len(nodes) > 0 && !uu.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -364,12 +364,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := uu.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -514,14 +514,14 @@ func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
 	return uuo
 }
 
-// AddCredentialIDs adds the "credential" edge to the Credential entity by IDs.
+// AddCredentialIDs adds the "credentials" edge to the Credential entity by IDs.
 func (uuo *UserUpdateOne) AddCredentialIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddCredentialIDs(ids...)
 	return uuo
 }
 
-// AddCredential adds the "credential" edges to the Credential entity.
-func (uuo *UserUpdateOne) AddCredential(c ...*Credential) *UserUpdateOne {
+// AddCredentials adds the "credentials" edges to the Credential entity.
+func (uuo *UserUpdateOne) AddCredentials(c ...*Credential) *UserUpdateOne {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -529,19 +529,19 @@ func (uuo *UserUpdateOne) AddCredential(c ...*Credential) *UserUpdateOne {
 	return uuo.AddCredentialIDs(ids...)
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by IDs.
-func (uuo *UserUpdateOne) AddStatuIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.AddStatuIDs(ids...)
+// AddStatusIDs adds the "statuses" edge to the Status entity by IDs.
+func (uuo *UserUpdateOne) AddStatusIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddStatusIDs(ids...)
 	return uuo
 }
 
-// AddStatus adds the "status" edges to the Status entity.
-func (uuo *UserUpdateOne) AddStatus(s ...*Status) *UserUpdateOne {
+// AddStatuses adds the "statuses" edges to the Status entity.
+func (uuo *UserUpdateOne) AddStatuses(s ...*Status) *UserUpdateOne {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return uuo.AddStatuIDs(ids...)
+	return uuo.AddStatusIDs(ids...)
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by IDs.
@@ -564,20 +564,20 @@ func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearCredential clears all "credential" edges to the Credential entity.
-func (uuo *UserUpdateOne) ClearCredential() *UserUpdateOne {
-	uuo.mutation.ClearCredential()
+// ClearCredentials clears all "credentials" edges to the Credential entity.
+func (uuo *UserUpdateOne) ClearCredentials() *UserUpdateOne {
+	uuo.mutation.ClearCredentials()
 	return uuo
 }
 
-// RemoveCredentialIDs removes the "credential" edge to Credential entities by IDs.
+// RemoveCredentialIDs removes the "credentials" edge to Credential entities by IDs.
 func (uuo *UserUpdateOne) RemoveCredentialIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemoveCredentialIDs(ids...)
 	return uuo
 }
 
-// RemoveCredential removes "credential" edges to Credential entities.
-func (uuo *UserUpdateOne) RemoveCredential(c ...*Credential) *UserUpdateOne {
+// RemoveCredentials removes "credentials" edges to Credential entities.
+func (uuo *UserUpdateOne) RemoveCredentials(c ...*Credential) *UserUpdateOne {
 	ids := make([]uuid.UUID, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
@@ -585,25 +585,25 @@ func (uuo *UserUpdateOne) RemoveCredential(c ...*Credential) *UserUpdateOne {
 	return uuo.RemoveCredentialIDs(ids...)
 }
 
-// ClearStatus clears all "status" edges to the Status entity.
-func (uuo *UserUpdateOne) ClearStatus() *UserUpdateOne {
-	uuo.mutation.ClearStatus()
+// ClearStatuses clears all "statuses" edges to the Status entity.
+func (uuo *UserUpdateOne) ClearStatuses() *UserUpdateOne {
+	uuo.mutation.ClearStatuses()
 	return uuo
 }
 
-// RemoveStatuIDs removes the "status" edge to Status entities by IDs.
-func (uuo *UserUpdateOne) RemoveStatuIDs(ids ...uuid.UUID) *UserUpdateOne {
-	uuo.mutation.RemoveStatuIDs(ids...)
+// RemoveStatusIDs removes the "statuses" edge to Status entities by IDs.
+func (uuo *UserUpdateOne) RemoveStatusIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveStatusIDs(ids...)
 	return uuo
 }
 
-// RemoveStatus removes "status" edges to Status entities.
-func (uuo *UserUpdateOne) RemoveStatus(s ...*Status) *UserUpdateOne {
+// RemoveStatuses removes "statuses" edges to Status entities.
+func (uuo *UserUpdateOne) RemoveStatuses(s ...*Status) *UserUpdateOne {
 	ids := make([]uuid.UUID, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
-	return uuo.RemoveStatuIDs(ids...)
+	return uuo.RemoveStatusIDs(ids...)
 }
 
 // ClearScores clears all "scores" edges to the Score entity.
@@ -734,12 +734,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
-	if uuo.mutation.CredentialCleared() {
+	if uuo.mutation.CredentialsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -747,12 +747,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedCredentialIDs(); len(nodes) > 0 && !uuo.mutation.CredentialCleared() {
+	if nodes := uuo.mutation.RemovedCredentialsIDs(); len(nodes) > 0 && !uuo.mutation.CredentialsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -763,12 +763,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.CredentialIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.CredentialsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.CredentialTable,
-			Columns: []string{user.CredentialColumn},
+			Table:   user.CredentialsTable,
+			Columns: []string{user.CredentialsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(credential.FieldID, field.TypeUUID),
@@ -779,12 +779,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.StatusCleared() {
+	if uuo.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -792,12 +792,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedStatusIDs(); len(nodes) > 0 && !uuo.mutation.StatusCleared() {
+	if nodes := uuo.mutation.RemovedStatusesIDs(); len(nodes) > 0 && !uuo.mutation.StatusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),
@@ -808,12 +808,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.StatusIDs(); len(nodes) > 0 {
+	if nodes := uuo.mutation.StatusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   user.StatusTable,
-			Columns: []string{user.StatusColumn},
+			Table:   user.StatusesTable,
+			Columns: []string{user.StatusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(status.FieldID, field.TypeUUID),

@@ -51,9 +51,9 @@ type CheckMutation struct {
 	credential        map[uuid.UUID]struct{}
 	removedcredential map[uuid.UUID]struct{}
 	clearedcredential bool
-	status            map[uuid.UUID]struct{}
-	removedstatus     map[uuid.UUID]struct{}
-	clearedstatus     bool
+	statuses          map[uuid.UUID]struct{}
+	removedstatuses   map[uuid.UUID]struct{}
+	clearedstatuses   bool
 	done              bool
 	oldValue          func(context.Context) (*Check, error)
 	predicates        []predicate.Check
@@ -309,58 +309,58 @@ func (m *CheckMutation) ResetCredential() {
 	m.removedcredential = nil
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by ids.
-func (m *CheckMutation) AddStatuIDs(ids ...uuid.UUID) {
-	if m.status == nil {
-		m.status = make(map[uuid.UUID]struct{})
+// AddStatusIDs adds the "statuses" edge to the Status entity by ids.
+func (m *CheckMutation) AddStatusIDs(ids ...uuid.UUID) {
+	if m.statuses == nil {
+		m.statuses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		m.status[ids[i]] = struct{}{}
+		m.statuses[ids[i]] = struct{}{}
 	}
 }
 
-// ClearStatus clears the "status" edge to the Status entity.
-func (m *CheckMutation) ClearStatus() {
-	m.clearedstatus = true
+// ClearStatuses clears the "statuses" edge to the Status entity.
+func (m *CheckMutation) ClearStatuses() {
+	m.clearedstatuses = true
 }
 
-// StatusCleared reports if the "status" edge to the Status entity was cleared.
-func (m *CheckMutation) StatusCleared() bool {
-	return m.clearedstatus
+// StatusesCleared reports if the "statuses" edge to the Status entity was cleared.
+func (m *CheckMutation) StatusesCleared() bool {
+	return m.clearedstatuses
 }
 
-// RemoveStatuIDs removes the "status" edge to the Status entity by IDs.
-func (m *CheckMutation) RemoveStatuIDs(ids ...uuid.UUID) {
-	if m.removedstatus == nil {
-		m.removedstatus = make(map[uuid.UUID]struct{})
+// RemoveStatusIDs removes the "statuses" edge to the Status entity by IDs.
+func (m *CheckMutation) RemoveStatusIDs(ids ...uuid.UUID) {
+	if m.removedstatuses == nil {
+		m.removedstatuses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		delete(m.status, ids[i])
-		m.removedstatus[ids[i]] = struct{}{}
+		delete(m.statuses, ids[i])
+		m.removedstatuses[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedStatus returns the removed IDs of the "status" edge to the Status entity.
-func (m *CheckMutation) RemovedStatusIDs() (ids []uuid.UUID) {
-	for id := range m.removedstatus {
+// RemovedStatuses returns the removed IDs of the "statuses" edge to the Status entity.
+func (m *CheckMutation) RemovedStatusesIDs() (ids []uuid.UUID) {
+	for id := range m.removedstatuses {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// StatusIDs returns the "status" edge IDs in the mutation.
-func (m *CheckMutation) StatusIDs() (ids []uuid.UUID) {
-	for id := range m.status {
+// StatusesIDs returns the "statuses" edge IDs in the mutation.
+func (m *CheckMutation) StatusesIDs() (ids []uuid.UUID) {
+	for id := range m.statuses {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetStatus resets all changes to the "status" edge.
-func (m *CheckMutation) ResetStatus() {
-	m.status = nil
-	m.clearedstatus = false
-	m.removedstatus = nil
+// ResetStatuses resets all changes to the "statuses" edge.
+func (m *CheckMutation) ResetStatuses() {
+	m.statuses = nil
+	m.clearedstatuses = false
+	m.removedstatuses = nil
 }
 
 // Where appends a list predicates to the CheckMutation builder.
@@ -532,8 +532,8 @@ func (m *CheckMutation) AddedEdges() []string {
 	if m.credential != nil {
 		edges = append(edges, check.EdgeCredential)
 	}
-	if m.status != nil {
-		edges = append(edges, check.EdgeStatus)
+	if m.statuses != nil {
+		edges = append(edges, check.EdgeStatuses)
 	}
 	return edges
 }
@@ -548,9 +548,9 @@ func (m *CheckMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case check.EdgeStatus:
-		ids := make([]ent.Value, 0, len(m.status))
-		for id := range m.status {
+	case check.EdgeStatuses:
+		ids := make([]ent.Value, 0, len(m.statuses))
+		for id := range m.statuses {
 			ids = append(ids, id)
 		}
 		return ids
@@ -564,8 +564,8 @@ func (m *CheckMutation) RemovedEdges() []string {
 	if m.removedcredential != nil {
 		edges = append(edges, check.EdgeCredential)
 	}
-	if m.removedstatus != nil {
-		edges = append(edges, check.EdgeStatus)
+	if m.removedstatuses != nil {
+		edges = append(edges, check.EdgeStatuses)
 	}
 	return edges
 }
@@ -580,9 +580,9 @@ func (m *CheckMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case check.EdgeStatus:
-		ids := make([]ent.Value, 0, len(m.removedstatus))
-		for id := range m.removedstatus {
+	case check.EdgeStatuses:
+		ids := make([]ent.Value, 0, len(m.removedstatuses))
+		for id := range m.removedstatuses {
 			ids = append(ids, id)
 		}
 		return ids
@@ -596,8 +596,8 @@ func (m *CheckMutation) ClearedEdges() []string {
 	if m.clearedcredential {
 		edges = append(edges, check.EdgeCredential)
 	}
-	if m.clearedstatus {
-		edges = append(edges, check.EdgeStatus)
+	if m.clearedstatuses {
+		edges = append(edges, check.EdgeStatuses)
 	}
 	return edges
 }
@@ -608,8 +608,8 @@ func (m *CheckMutation) EdgeCleared(name string) bool {
 	switch name {
 	case check.EdgeCredential:
 		return m.clearedcredential
-	case check.EdgeStatus:
-		return m.clearedstatus
+	case check.EdgeStatuses:
+		return m.clearedstatuses
 	}
 	return false
 }
@@ -629,8 +629,8 @@ func (m *CheckMutation) ResetEdge(name string) error {
 	case check.EdgeCredential:
 		m.ResetCredential()
 		return nil
-	case check.EdgeStatus:
-		m.ResetStatus()
+	case check.EdgeStatuses:
+		m.ResetStatuses()
 		return nil
 	}
 	return fmt.Errorf("unknown Check edge %s", name)
@@ -1097,22 +1097,22 @@ func (m *CredentialMutation) ResetEdge(name string) error {
 // RoundMutation represents an operation that mutates the Round nodes in the graph.
 type RoundMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	number        *int
-	addnumber     *int
-	completed     *bool
-	clearedFields map[string]struct{}
-	status        map[uuid.UUID]struct{}
-	removedstatus map[uuid.UUID]struct{}
-	clearedstatus bool
-	scores        map[uuid.UUID]struct{}
-	removedscores map[uuid.UUID]struct{}
-	clearedscores bool
-	done          bool
-	oldValue      func(context.Context) (*Round, error)
-	predicates    []predicate.Round
+	op              Op
+	typ             string
+	id              *uuid.UUID
+	number          *int
+	addnumber       *int
+	completed       *bool
+	clearedFields   map[string]struct{}
+	statuses        map[uuid.UUID]struct{}
+	removedstatuses map[uuid.UUID]struct{}
+	clearedstatuses bool
+	scores          map[uuid.UUID]struct{}
+	removedscores   map[uuid.UUID]struct{}
+	clearedscores   bool
+	done            bool
+	oldValue        func(context.Context) (*Round, error)
+	predicates      []predicate.Round
 }
 
 var _ ent.Mutation = (*RoundMutation)(nil)
@@ -1311,58 +1311,58 @@ func (m *RoundMutation) ResetCompleted() {
 	m.completed = nil
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by ids.
-func (m *RoundMutation) AddStatuIDs(ids ...uuid.UUID) {
-	if m.status == nil {
-		m.status = make(map[uuid.UUID]struct{})
+// AddStatusIDs adds the "statuses" edge to the Status entity by ids.
+func (m *RoundMutation) AddStatusIDs(ids ...uuid.UUID) {
+	if m.statuses == nil {
+		m.statuses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		m.status[ids[i]] = struct{}{}
+		m.statuses[ids[i]] = struct{}{}
 	}
 }
 
-// ClearStatus clears the "status" edge to the Status entity.
-func (m *RoundMutation) ClearStatus() {
-	m.clearedstatus = true
+// ClearStatuses clears the "statuses" edge to the Status entity.
+func (m *RoundMutation) ClearStatuses() {
+	m.clearedstatuses = true
 }
 
-// StatusCleared reports if the "status" edge to the Status entity was cleared.
-func (m *RoundMutation) StatusCleared() bool {
-	return m.clearedstatus
+// StatusesCleared reports if the "statuses" edge to the Status entity was cleared.
+func (m *RoundMutation) StatusesCleared() bool {
+	return m.clearedstatuses
 }
 
-// RemoveStatuIDs removes the "status" edge to the Status entity by IDs.
-func (m *RoundMutation) RemoveStatuIDs(ids ...uuid.UUID) {
-	if m.removedstatus == nil {
-		m.removedstatus = make(map[uuid.UUID]struct{})
+// RemoveStatusIDs removes the "statuses" edge to the Status entity by IDs.
+func (m *RoundMutation) RemoveStatusIDs(ids ...uuid.UUID) {
+	if m.removedstatuses == nil {
+		m.removedstatuses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		delete(m.status, ids[i])
-		m.removedstatus[ids[i]] = struct{}{}
+		delete(m.statuses, ids[i])
+		m.removedstatuses[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedStatus returns the removed IDs of the "status" edge to the Status entity.
-func (m *RoundMutation) RemovedStatusIDs() (ids []uuid.UUID) {
-	for id := range m.removedstatus {
+// RemovedStatuses returns the removed IDs of the "statuses" edge to the Status entity.
+func (m *RoundMutation) RemovedStatusesIDs() (ids []uuid.UUID) {
+	for id := range m.removedstatuses {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// StatusIDs returns the "status" edge IDs in the mutation.
-func (m *RoundMutation) StatusIDs() (ids []uuid.UUID) {
-	for id := range m.status {
+// StatusesIDs returns the "statuses" edge IDs in the mutation.
+func (m *RoundMutation) StatusesIDs() (ids []uuid.UUID) {
+	for id := range m.statuses {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetStatus resets all changes to the "status" edge.
-func (m *RoundMutation) ResetStatus() {
-	m.status = nil
-	m.clearedstatus = false
-	m.removedstatus = nil
+// ResetStatuses resets all changes to the "statuses" edge.
+func (m *RoundMutation) ResetStatuses() {
+	m.statuses = nil
+	m.clearedstatuses = false
+	m.removedstatuses = nil
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by ids.
@@ -1585,8 +1585,8 @@ func (m *RoundMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RoundMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.status != nil {
-		edges = append(edges, round.EdgeStatus)
+	if m.statuses != nil {
+		edges = append(edges, round.EdgeStatuses)
 	}
 	if m.scores != nil {
 		edges = append(edges, round.EdgeScores)
@@ -1598,9 +1598,9 @@ func (m *RoundMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *RoundMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case round.EdgeStatus:
-		ids := make([]ent.Value, 0, len(m.status))
-		for id := range m.status {
+	case round.EdgeStatuses:
+		ids := make([]ent.Value, 0, len(m.statuses))
+		for id := range m.statuses {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1617,8 +1617,8 @@ func (m *RoundMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RoundMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedstatus != nil {
-		edges = append(edges, round.EdgeStatus)
+	if m.removedstatuses != nil {
+		edges = append(edges, round.EdgeStatuses)
 	}
 	if m.removedscores != nil {
 		edges = append(edges, round.EdgeScores)
@@ -1630,9 +1630,9 @@ func (m *RoundMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RoundMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case round.EdgeStatus:
-		ids := make([]ent.Value, 0, len(m.removedstatus))
-		for id := range m.removedstatus {
+	case round.EdgeStatuses:
+		ids := make([]ent.Value, 0, len(m.removedstatuses))
+		for id := range m.removedstatuses {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1649,8 +1649,8 @@ func (m *RoundMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RoundMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedstatus {
-		edges = append(edges, round.EdgeStatus)
+	if m.clearedstatuses {
+		edges = append(edges, round.EdgeStatuses)
 	}
 	if m.clearedscores {
 		edges = append(edges, round.EdgeScores)
@@ -1662,8 +1662,8 @@ func (m *RoundMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *RoundMutation) EdgeCleared(name string) bool {
 	switch name {
-	case round.EdgeStatus:
-		return m.clearedstatus
+	case round.EdgeStatuses:
+		return m.clearedstatuses
 	case round.EdgeScores:
 		return m.clearedscores
 	}
@@ -1682,8 +1682,8 @@ func (m *RoundMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *RoundMutation) ResetEdge(name string) error {
 	switch name {
-	case round.EdgeStatus:
-		m.ResetStatus()
+	case round.EdgeStatuses:
+		m.ResetStatuses()
 		return nil
 	case round.EdgeScores:
 		m.ResetScores()
@@ -2926,27 +2926,27 @@ func (m *StatusMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *uuid.UUID
-	name              *string
-	password          *string
-	team_number       *int
-	addteam_number    *int
-	role              *user.Role
-	clearedFields     map[string]struct{}
-	credential        map[uuid.UUID]struct{}
-	removedcredential map[uuid.UUID]struct{}
-	clearedcredential bool
-	status            map[uuid.UUID]struct{}
-	removedstatus     map[uuid.UUID]struct{}
-	clearedstatus     bool
-	scores            map[uuid.UUID]struct{}
-	removedscores     map[uuid.UUID]struct{}
-	clearedscores     bool
-	done              bool
-	oldValue          func(context.Context) (*User, error)
-	predicates        []predicate.User
+	op                 Op
+	typ                string
+	id                 *uuid.UUID
+	name               *string
+	password           *string
+	team_number        *int
+	addteam_number     *int
+	role               *user.Role
+	clearedFields      map[string]struct{}
+	credentials        map[uuid.UUID]struct{}
+	removedcredentials map[uuid.UUID]struct{}
+	clearedcredentials bool
+	statuses           map[uuid.UUID]struct{}
+	removedstatuses    map[uuid.UUID]struct{}
+	clearedstatuses    bool
+	scores             map[uuid.UUID]struct{}
+	removedscores      map[uuid.UUID]struct{}
+	clearedscores      bool
+	done               bool
+	oldValue           func(context.Context) (*User, error)
+	predicates         []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -3231,112 +3231,112 @@ func (m *UserMutation) ResetRole() {
 	m.role = nil
 }
 
-// AddCredentialIDs adds the "credential" edge to the Credential entity by ids.
+// AddCredentialIDs adds the "credentials" edge to the Credential entity by ids.
 func (m *UserMutation) AddCredentialIDs(ids ...uuid.UUID) {
-	if m.credential == nil {
-		m.credential = make(map[uuid.UUID]struct{})
+	if m.credentials == nil {
+		m.credentials = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		m.credential[ids[i]] = struct{}{}
+		m.credentials[ids[i]] = struct{}{}
 	}
 }
 
-// ClearCredential clears the "credential" edge to the Credential entity.
-func (m *UserMutation) ClearCredential() {
-	m.clearedcredential = true
+// ClearCredentials clears the "credentials" edge to the Credential entity.
+func (m *UserMutation) ClearCredentials() {
+	m.clearedcredentials = true
 }
 
-// CredentialCleared reports if the "credential" edge to the Credential entity was cleared.
-func (m *UserMutation) CredentialCleared() bool {
-	return m.clearedcredential
+// CredentialsCleared reports if the "credentials" edge to the Credential entity was cleared.
+func (m *UserMutation) CredentialsCleared() bool {
+	return m.clearedcredentials
 }
 
-// RemoveCredentialIDs removes the "credential" edge to the Credential entity by IDs.
+// RemoveCredentialIDs removes the "credentials" edge to the Credential entity by IDs.
 func (m *UserMutation) RemoveCredentialIDs(ids ...uuid.UUID) {
-	if m.removedcredential == nil {
-		m.removedcredential = make(map[uuid.UUID]struct{})
+	if m.removedcredentials == nil {
+		m.removedcredentials = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		delete(m.credential, ids[i])
-		m.removedcredential[ids[i]] = struct{}{}
+		delete(m.credentials, ids[i])
+		m.removedcredentials[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedCredential returns the removed IDs of the "credential" edge to the Credential entity.
-func (m *UserMutation) RemovedCredentialIDs() (ids []uuid.UUID) {
-	for id := range m.removedcredential {
+// RemovedCredentials returns the removed IDs of the "credentials" edge to the Credential entity.
+func (m *UserMutation) RemovedCredentialsIDs() (ids []uuid.UUID) {
+	for id := range m.removedcredentials {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// CredentialIDs returns the "credential" edge IDs in the mutation.
-func (m *UserMutation) CredentialIDs() (ids []uuid.UUID) {
-	for id := range m.credential {
+// CredentialsIDs returns the "credentials" edge IDs in the mutation.
+func (m *UserMutation) CredentialsIDs() (ids []uuid.UUID) {
+	for id := range m.credentials {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetCredential resets all changes to the "credential" edge.
-func (m *UserMutation) ResetCredential() {
-	m.credential = nil
-	m.clearedcredential = false
-	m.removedcredential = nil
+// ResetCredentials resets all changes to the "credentials" edge.
+func (m *UserMutation) ResetCredentials() {
+	m.credentials = nil
+	m.clearedcredentials = false
+	m.removedcredentials = nil
 }
 
-// AddStatuIDs adds the "status" edge to the Status entity by ids.
-func (m *UserMutation) AddStatuIDs(ids ...uuid.UUID) {
-	if m.status == nil {
-		m.status = make(map[uuid.UUID]struct{})
+// AddStatusIDs adds the "statuses" edge to the Status entity by ids.
+func (m *UserMutation) AddStatusIDs(ids ...uuid.UUID) {
+	if m.statuses == nil {
+		m.statuses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		m.status[ids[i]] = struct{}{}
+		m.statuses[ids[i]] = struct{}{}
 	}
 }
 
-// ClearStatus clears the "status" edge to the Status entity.
-func (m *UserMutation) ClearStatus() {
-	m.clearedstatus = true
+// ClearStatuses clears the "statuses" edge to the Status entity.
+func (m *UserMutation) ClearStatuses() {
+	m.clearedstatuses = true
 }
 
-// StatusCleared reports if the "status" edge to the Status entity was cleared.
-func (m *UserMutation) StatusCleared() bool {
-	return m.clearedstatus
+// StatusesCleared reports if the "statuses" edge to the Status entity was cleared.
+func (m *UserMutation) StatusesCleared() bool {
+	return m.clearedstatuses
 }
 
-// RemoveStatuIDs removes the "status" edge to the Status entity by IDs.
-func (m *UserMutation) RemoveStatuIDs(ids ...uuid.UUID) {
-	if m.removedstatus == nil {
-		m.removedstatus = make(map[uuid.UUID]struct{})
+// RemoveStatusIDs removes the "statuses" edge to the Status entity by IDs.
+func (m *UserMutation) RemoveStatusIDs(ids ...uuid.UUID) {
+	if m.removedstatuses == nil {
+		m.removedstatuses = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
-		delete(m.status, ids[i])
-		m.removedstatus[ids[i]] = struct{}{}
+		delete(m.statuses, ids[i])
+		m.removedstatuses[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedStatus returns the removed IDs of the "status" edge to the Status entity.
-func (m *UserMutation) RemovedStatusIDs() (ids []uuid.UUID) {
-	for id := range m.removedstatus {
+// RemovedStatuses returns the removed IDs of the "statuses" edge to the Status entity.
+func (m *UserMutation) RemovedStatusesIDs() (ids []uuid.UUID) {
+	for id := range m.removedstatuses {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// StatusIDs returns the "status" edge IDs in the mutation.
-func (m *UserMutation) StatusIDs() (ids []uuid.UUID) {
-	for id := range m.status {
+// StatusesIDs returns the "statuses" edge IDs in the mutation.
+func (m *UserMutation) StatusesIDs() (ids []uuid.UUID) {
+	for id := range m.statuses {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetStatus resets all changes to the "status" edge.
-func (m *UserMutation) ResetStatus() {
-	m.status = nil
-	m.clearedstatus = false
-	m.removedstatus = nil
+// ResetStatuses resets all changes to the "statuses" edge.
+func (m *UserMutation) ResetStatuses() {
+	m.statuses = nil
+	m.clearedstatuses = false
+	m.removedstatuses = nil
 }
 
 // AddScoreIDs adds the "scores" edge to the Score entity by ids.
@@ -3602,11 +3602,11 @@ func (m *UserMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.credential != nil {
-		edges = append(edges, user.EdgeCredential)
+	if m.credentials != nil {
+		edges = append(edges, user.EdgeCredentials)
 	}
-	if m.status != nil {
-		edges = append(edges, user.EdgeStatus)
+	if m.statuses != nil {
+		edges = append(edges, user.EdgeStatuses)
 	}
 	if m.scores != nil {
 		edges = append(edges, user.EdgeScores)
@@ -3618,15 +3618,15 @@ func (m *UserMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeCredential:
-		ids := make([]ent.Value, 0, len(m.credential))
-		for id := range m.credential {
+	case user.EdgeCredentials:
+		ids := make([]ent.Value, 0, len(m.credentials))
+		for id := range m.credentials {
 			ids = append(ids, id)
 		}
 		return ids
-	case user.EdgeStatus:
-		ids := make([]ent.Value, 0, len(m.status))
-		for id := range m.status {
+	case user.EdgeStatuses:
+		ids := make([]ent.Value, 0, len(m.statuses))
+		for id := range m.statuses {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3643,11 +3643,11 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedcredential != nil {
-		edges = append(edges, user.EdgeCredential)
+	if m.removedcredentials != nil {
+		edges = append(edges, user.EdgeCredentials)
 	}
-	if m.removedstatus != nil {
-		edges = append(edges, user.EdgeStatus)
+	if m.removedstatuses != nil {
+		edges = append(edges, user.EdgeStatuses)
 	}
 	if m.removedscores != nil {
 		edges = append(edges, user.EdgeScores)
@@ -3659,15 +3659,15 @@ func (m *UserMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case user.EdgeCredential:
-		ids := make([]ent.Value, 0, len(m.removedcredential))
-		for id := range m.removedcredential {
+	case user.EdgeCredentials:
+		ids := make([]ent.Value, 0, len(m.removedcredentials))
+		for id := range m.removedcredentials {
 			ids = append(ids, id)
 		}
 		return ids
-	case user.EdgeStatus:
-		ids := make([]ent.Value, 0, len(m.removedstatus))
-		for id := range m.removedstatus {
+	case user.EdgeStatuses:
+		ids := make([]ent.Value, 0, len(m.removedstatuses))
+		for id := range m.removedstatuses {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3684,11 +3684,11 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.clearedcredential {
-		edges = append(edges, user.EdgeCredential)
+	if m.clearedcredentials {
+		edges = append(edges, user.EdgeCredentials)
 	}
-	if m.clearedstatus {
-		edges = append(edges, user.EdgeStatus)
+	if m.clearedstatuses {
+		edges = append(edges, user.EdgeStatuses)
 	}
 	if m.clearedscores {
 		edges = append(edges, user.EdgeScores)
@@ -3700,10 +3700,10 @@ func (m *UserMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
-	case user.EdgeCredential:
-		return m.clearedcredential
-	case user.EdgeStatus:
-		return m.clearedstatus
+	case user.EdgeCredentials:
+		return m.clearedcredentials
+	case user.EdgeStatuses:
+		return m.clearedstatuses
 	case user.EdgeScores:
 		return m.clearedscores
 	}
@@ -3722,11 +3722,11 @@ func (m *UserMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
-	case user.EdgeCredential:
-		m.ResetCredential()
+	case user.EdgeCredentials:
+		m.ResetCredentials()
 		return nil
-	case user.EdgeStatus:
-		m.ResetStatus()
+	case user.EdgeStatuses:
+		m.ResetStatuses()
 		return nil
 	case user.EdgeScores:
 		m.ResetScores()
