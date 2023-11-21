@@ -6,8 +6,11 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/compscore/compscore/pkg/ent"
+	"github.com/compscore/compscore/pkg/ent/status"
+	"github.com/compscore/compscore/pkg/ent/user"
 )
 
 // ID is the resolver for the id field.
@@ -33,6 +36,131 @@ func (r *credentialResolver) ID(ctx context.Context, obj *ent.Credential) (strin
 // User is the resolver for the user field.
 func (r *credentialResolver) User(ctx context.Context, obj *ent.Credential) (*ent.User, error) {
 	return obj.QueryUser().Only(ctx)
+}
+
+// CreateCheck is the resolver for the createCheck field.
+func (r *mutationResolver) CreateCheck(ctx context.Context, name string, weight int) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: CreateCheck - createCheck"))
+}
+
+// UpdateCheck is the resolver for the updateCheck field.
+func (r *mutationResolver) UpdateCheck(ctx context.Context, id string, name *string, weight *int) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: UpdateCheck - updateCheck"))
+}
+
+// DeleteCheck is the resolver for the deleteCheck field.
+func (r *mutationResolver) DeleteCheck(ctx context.Context, id string) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: DeleteCheck - deleteCheck"))
+}
+
+// UpdateCredential is the resolver for the updateCredential field.
+func (r *mutationResolver) UpdateCredential(ctx context.Context, id string, password *string) (*ent.Credential, error) {
+	panic(fmt.Errorf("not implemented: UpdateCredential - updateCredential"))
+}
+
+// UpdateRound is the resolver for the updateRound field.
+func (r *mutationResolver) UpdateRound(ctx context.Context, id string, number *int, completed *bool) (*ent.Round, error) {
+	panic(fmt.Errorf("not implemented: UpdateRound - updateRound"))
+}
+
+// DeleteRound is the resolver for the deleteRound field.
+func (r *mutationResolver) DeleteRound(ctx context.Context, id string) (*ent.Round, error) {
+	panic(fmt.Errorf("not implemented: DeleteRound - deleteRound"))
+}
+
+// UpdateScore is the resolver for the updateScore field.
+func (r *mutationResolver) UpdateScore(ctx context.Context, id string) (*ent.Score, error) {
+	panic(fmt.Errorf("not implemented: UpdateScore - updateScore"))
+}
+
+// DeleteScore is the resolver for the deleteScore field.
+func (r *mutationResolver) DeleteScore(ctx context.Context, id string) (*ent.Score, error) {
+	panic(fmt.Errorf("not implemented: DeleteScore - deleteScore"))
+}
+
+// UpdateStatus is the resolver for the updateStatus field.
+func (r *mutationResolver) UpdateStatus(ctx context.Context, id string, status *status.Status, message *string, timestamp *string, points *int) (*ent.Status, error) {
+	panic(fmt.Errorf("not implemented: UpdateStatus - updateStatus"))
+}
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, name string, teamNumber int, role user.Role) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+}
+
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, name *string, teamNumber *int, role *user.Role) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, name string, password string) (string, error) {
+	panic(fmt.Errorf("not implemented: Login - login"))
+}
+
+// Checks is the resolver for the checks field.
+func (r *queryResolver) Checks(ctx context.Context) ([]*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: Checks - checks"))
+}
+
+// Check is the resolver for the check field.
+func (r *queryResolver) Check(ctx context.Context, id string) (*ent.Check, error) {
+	panic(fmt.Errorf("not implemented: Check - check"))
+}
+
+// Credentials is the resolver for the credentials field.
+func (r *queryResolver) Credentials(ctx context.Context) ([]*ent.Credential, error) {
+	panic(fmt.Errorf("not implemented: Credentials - credentials"))
+}
+
+// Credential is the resolver for the credential field.
+func (r *queryResolver) Credential(ctx context.Context, id string) (*ent.Credential, error) {
+	panic(fmt.Errorf("not implemented: Credential - credential"))
+}
+
+// Rounds is the resolver for the rounds field.
+func (r *queryResolver) Rounds(ctx context.Context) ([]*ent.Round, error) {
+	panic(fmt.Errorf("not implemented: Rounds - rounds"))
+}
+
+// Round is the resolver for the round field.
+func (r *queryResolver) Round(ctx context.Context, id string) (*ent.Round, error) {
+	panic(fmt.Errorf("not implemented: Round - round"))
+}
+
+// Scores is the resolver for the scores field.
+func (r *queryResolver) Scores(ctx context.Context) ([]*ent.Score, error) {
+	panic(fmt.Errorf("not implemented: Scores - scores"))
+}
+
+// Score is the resolver for the score field.
+func (r *queryResolver) Score(ctx context.Context, id string) (*ent.Score, error) {
+	panic(fmt.Errorf("not implemented: Score - score"))
+}
+
+// Statuses is the resolver for the statuses field.
+func (r *queryResolver) Statuses(ctx context.Context) ([]*ent.Status, error) {
+	panic(fmt.Errorf("not implemented: Statuses - statuses"))
+}
+
+// Status is the resolver for the status field.
+func (r *queryResolver) Status(ctx context.Context, id string) (*ent.Status, error) {
+	panic(fmt.Errorf("not implemented: Status - status"))
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*ent.User, error) {
+	panic(fmt.Errorf("not implemented: Users - users"))
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*ent.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
 }
 
 // ID is the resolver for the id field.
@@ -116,6 +244,12 @@ func (r *Resolver) Check() CheckResolver { return &checkResolver{r} }
 // Credential returns CredentialResolver implementation.
 func (r *Resolver) Credential() CredentialResolver { return &credentialResolver{r} }
 
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
 // Round returns RoundResolver implementation.
 func (r *Resolver) Round() RoundResolver { return &roundResolver{r} }
 
@@ -130,6 +264,8 @@ func (r *Resolver) User() UserResolver { return &userResolver{r} }
 
 type checkResolver struct{ *Resolver }
 type credentialResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
 type roundResolver struct{ *Resolver }
 type scoreResolver struct{ *Resolver }
 type statusResolver struct{ *Resolver }
