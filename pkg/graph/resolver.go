@@ -9,5 +9,5 @@ import "github.com/compscore/compscore/pkg/ent"
 //go:generate go run github.com/99designs/gqlgen generate
 
 type Resolver struct {
-	ent *ent.Client
+	Ent *ent.Client
 }
