@@ -58,3 +58,31 @@ type User {
   statuses: [Status!]!
   scores: [Score!]!
 }
+
+type mutation {
+  createCheck(name: String!, weight: Int!): Check!
+  updateCheck(id: ID!, name: String, weight: Int): Check!
+  deleteCheck(id: ID!): Check!
+
+  updateCredential(id: ID!, password: String): Credential!
+
+  updateRound(id: ID!, number: Int, completed: Boolean): Round!
+  deleteRound(id: ID!): Round!
+
+  updateScore(id: ID!): Score!
+  deleteScore(id: ID!): Score!
+
+  updateStatus(
+    id: ID!
+    status: StatusEnum
+    message: String
+    timestamp: String
+    points: Int
+  ): Status!
+
+  createUser(name: String!, team_number: Int!, role: RoleEnum!): User!
+  updateUser(id: ID!, name: String, team_number: Int, role: RoleEnum): User!
+  deleteUser(id: ID!): User!
+
+  login(name: String!, password: String!): String!
+}
