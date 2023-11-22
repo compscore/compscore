@@ -7,10 +7,14 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/compscore/compscore/pkg/ent"
+	"github.com/compscore/compscore/pkg/ent/round"
+	"github.com/compscore/compscore/pkg/ent/score"
 	"github.com/compscore/compscore/pkg/ent/status"
 	"github.com/compscore/compscore/pkg/ent/user"
+	"github.com/google/uuid"
 )
 
 // ID is the resolver for the id field.
@@ -40,127 +44,321 @@ func (r *credentialResolver) User(ctx context.Context, obj *ent.Credential) (*en
 
 // CreateCheck is the resolver for the createCheck field.
 func (r *mutationResolver) CreateCheck(ctx context.Context, name string, weight int) (*ent.Check, error) {
-	panic(fmt.Errorf("not implemented: CreateCheck - createCheck"))
+	return r.Ent.Check.Create().
+		SetName(name).
+		SetWeight(weight).
+		Save(ctx)
 }
 
 // UpdateCheck is the resolver for the updateCheck field.
-func (r *mutationResolver) UpdateCheck(ctx context.Context, id string, name *string, weight *int) (*ent.Check, error) {
-	panic(fmt.Errorf("not implemented: UpdateCheck - updateCheck"))
+func (r *mutationResolver) UpdateCheck(ctx context.Context, id string, name string, weight int) (*ent.Check, error) {
+	// TODO: make fields optional
+	// TODO: expand options
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Check.UpdateOneID(uuid).
+		SetName(name).
+		SetWeight(weight).
+		Save(ctx)
 }
 
 // DeleteCheck is the resolver for the deleteCheck field.
-func (r *mutationResolver) DeleteCheck(ctx context.Context, id string) (*ent.Check, error) {
-	panic(fmt.Errorf("not implemented: DeleteCheck - deleteCheck"))
+func (r *mutationResolver) DeleteCheck(ctx context.Context, id string) (string, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return "", err
+	}
+
+	err = r.Ent.Check.DeleteOneID(uuid).Exec(ctx)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("successfully deleted check: id=%s", id), nil
 }
 
 // UpdateCredential is the resolver for the updateCredential field.
-func (r *mutationResolver) UpdateCredential(ctx context.Context, id string, password *string) (*ent.Credential, error) {
-	panic(fmt.Errorf("not implemented: UpdateCredential - updateCredential"))
+func (r *mutationResolver) UpdateCredential(ctx context.Context, id string, password string) (*ent.Credential, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Credential.UpdateOneID(uuid).
+		SetPassword(password).
+		Save(ctx)
 }
 
 // UpdateRound is the resolver for the updateRound field.
-func (r *mutationResolver) UpdateRound(ctx context.Context, id string, number *int, completed *bool) (*ent.Round, error) {
-	panic(fmt.Errorf("not implemented: UpdateRound - updateRound"))
+func (r *mutationResolver) UpdateRound(ctx context.Context, id string, number int, completed bool) (*ent.Round, error) {
+	// TODO: make fields optional
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Round.UpdateOneID(uuid).
+		SetNumber(number).
+		SetCompleted(completed).
+		Save(ctx)
 }
 
 // DeleteRound is the resolver for the deleteRound field.
-func (r *mutationResolver) DeleteRound(ctx context.Context, id string) (*ent.Round, error) {
-	panic(fmt.Errorf("not implemented: DeleteRound - deleteRound"))
+func (r *mutationResolver) DeleteRound(ctx context.Context, id string) (string, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return "", err
+	}
+
+	err = r.Ent.Round.DeleteOneID(uuid).Exec(ctx)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("successfully deleted round: id=%s", id), nil
 }
 
 // UpdateScore is the resolver for the updateScore field.
 func (r *mutationResolver) UpdateScore(ctx context.Context, id string) (*ent.Score, error) {
-	panic(fmt.Errorf("not implemented: UpdateScore - updateScore"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	entScore, err := r.Ent.Score.Query().
+		WithRound().
+		WithUser().
+		Where(
+			score.IDEQ(uuid),
+		).
+		Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	newScore, err := r.Ent.Status.Query().
+		Where(
+			status.HasRoundWith(
+				round.NumberLTE(
+					entScore.Edges.Round.Number,
+				),
+			),
+			status.HasUserWith(
+				user.TeamNumberEQ(
+					entScore.Edges.User.TeamNumber,
+				),
+			),
+			status.StatusEQ(
+				status.StatusSuccess,
+			),
+		).
+		Aggregate(
+			ent.Sum(
+				status.FieldPoints,
+			),
+		).Int(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Score.UpdateOneID(uuid).
+		SetScore(newScore).
+		Save(ctx)
 }
 
 // DeleteScore is the resolver for the deleteScore field.
-func (r *mutationResolver) DeleteScore(ctx context.Context, id string) (*ent.Score, error) {
-	panic(fmt.Errorf("not implemented: DeleteScore - deleteScore"))
+func (r *mutationResolver) DeleteScore(ctx context.Context, id string) (string, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return "", err
+	}
+
+	err = r.Ent.Score.DeleteOneID(uuid).Exec(ctx)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("successfully deleted score: id=%s", id), nil
 }
 
 // UpdateStatus is the resolver for the updateStatus field.
-func (r *mutationResolver) UpdateStatus(ctx context.Context, id string, status *status.Status, message *string, timestamp *string, points *int) (*ent.Status, error) {
-	panic(fmt.Errorf("not implemented: UpdateStatus - updateStatus"))
+func (r *mutationResolver) UpdateStatus(ctx context.Context, id string, status status.Status, message string, timestamp string, points int) (*ent.Status, error) {
+	// TODO: make fields optional
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	time, err := time.Parse(time.RFC3339, timestamp)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Status.UpdateOneID(uuid).
+		SetStatus(status).
+		SetMessage(message).
+		SetTimestamp(time).
+		SetPoints(points).
+		Save(ctx)
 }
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, name string, teamNumber int, role user.Role) (*ent.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	// TODO: add password
+	// TODO: hash password
+
+	return r.Ent.User.Create().
+		SetName(name).
+		SetTeamNumber(teamNumber).
+		SetRole(role).
+		Save(ctx)
 }
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, name *string, teamNumber *int, role *user.Role) (*ent.User, error) {
-	panic(fmt.Errorf("not implemented: UpdateUser - updateUser"))
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, name string, teamNumber int, role user.Role) (*ent.User, error) {
+	// TODO: add password
+	// TODO: hash password
+	// TODO: make fields optional
+
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.User.UpdateOneID(uuid).
+		SetName(name).
+		SetTeamNumber(teamNumber).
+		SetRole(role).
+		Save(ctx)
 }
 
 // DeleteUser is the resolver for the deleteUser field.
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*ent.User, error) {
-	panic(fmt.Errorf("not implemented: DeleteUser - deleteUser"))
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (string, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return "", err
+	}
+
+	err = r.Ent.User.DeleteOneID(uuid).Exec(ctx)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("successfully deleted user: id=%s", id), nil
 }
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, name string, password string) (string, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
+	entUser, err := r.Ent.User.Query().
+		Where(
+			user.NameEQ(name),
+		).
+		Only(ctx)
+	if err != nil {
+		return "", fmt.Errorf("invalid username or password")
+	}
+
+	// TODO: hash password
+
+	if entUser.Password != password {
+		return "", fmt.Errorf("invalid username or password")
+	}
+
+	// TODO: generate JWT token
+
+	return entUser.ID.String(), nil
 }
 
 // Checks is the resolver for the checks field.
 func (r *queryResolver) Checks(ctx context.Context) ([]*ent.Check, error) {
-	panic(fmt.Errorf("not implemented: Checks - checks"))
+	return r.Ent.Check.Query().All(ctx)
 }
 
 // Check is the resolver for the check field.
 func (r *queryResolver) Check(ctx context.Context, id string) (*ent.Check, error) {
-	panic(fmt.Errorf("not implemented: Check - check"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Check.Get(ctx, uuid)
 }
 
 // Credentials is the resolver for the credentials field.
 func (r *queryResolver) Credentials(ctx context.Context) ([]*ent.Credential, error) {
-	panic(fmt.Errorf("not implemented: Credentials - credentials"))
+	return r.Ent.Credential.Query().All(ctx)
 }
 
 // Credential is the resolver for the credential field.
 func (r *queryResolver) Credential(ctx context.Context, id string) (*ent.Credential, error) {
-	panic(fmt.Errorf("not implemented: Credential - credential"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Credential.Get(ctx, uuid)
 }
 
 // Rounds is the resolver for the rounds field.
 func (r *queryResolver) Rounds(ctx context.Context) ([]*ent.Round, error) {
-	panic(fmt.Errorf("not implemented: Rounds - rounds"))
+	return r.Ent.Round.Query().All(ctx)
 }
 
 // Round is the resolver for the round field.
 func (r *queryResolver) Round(ctx context.Context, id string) (*ent.Round, error) {
-	panic(fmt.Errorf("not implemented: Round - round"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Round.Get(ctx, uuid)
 }
 
 // Scores is the resolver for the scores field.
 func (r *queryResolver) Scores(ctx context.Context) ([]*ent.Score, error) {
-	panic(fmt.Errorf("not implemented: Scores - scores"))
+	return r.Ent.Score.Query().All(ctx)
 }
 
 // Score is the resolver for the score field.
 func (r *queryResolver) Score(ctx context.Context, id string) (*ent.Score, error) {
-	panic(fmt.Errorf("not implemented: Score - score"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Score.Get(ctx, uuid)
 }
 
 // Statuses is the resolver for the statuses field.
 func (r *queryResolver) Statuses(ctx context.Context) ([]*ent.Status, error) {
-	panic(fmt.Errorf("not implemented: Statuses - statuses"))
+	return r.Ent.Status.Query().All(ctx)
 }
 
 // Status is the resolver for the status field.
 func (r *queryResolver) Status(ctx context.Context, id string) (*ent.Status, error) {
-	panic(fmt.Errorf("not implemented: Status - status"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.Status.Get(ctx, uuid)
 }
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*ent.User, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+	return r.Ent.User.Query().All(ctx)
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*ent.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Ent.User.Get(ctx, uuid)
 }
 
 // ID is the resolver for the id field.

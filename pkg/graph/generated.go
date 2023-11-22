@@ -77,12 +77,12 @@ type ComplexityRoot struct {
 		DeleteScore      func(childComplexity int, id string) int
 		DeleteUser       func(childComplexity int, id string) int
 		Login            func(childComplexity int, name string, password string) int
-		UpdateCheck      func(childComplexity int, id string, name *string, weight *int) int
-		UpdateCredential func(childComplexity int, id string, password *string) int
-		UpdateRound      func(childComplexity int, id string, number *int, completed *bool) int
+		UpdateCheck      func(childComplexity int, id string, name string, weight int) int
+		UpdateCredential func(childComplexity int, id string, password string) int
+		UpdateRound      func(childComplexity int, id string, number int, completed bool) int
 		UpdateScore      func(childComplexity int, id string) int
-		UpdateStatus     func(childComplexity int, id string, status *status.Status, message *string, timestamp *string, points *int) int
-		UpdateUser       func(childComplexity int, id string, name *string, teamNumber *int, role *user.Role) int
+		UpdateStatus     func(childComplexity int, id string, status status.Status, message string, timestamp string, points int) int
+		UpdateUser       func(childComplexity int, id string, name string, teamNumber int, role user.Role) int
 	}
 
 	Query struct {
@@ -150,17 +150,17 @@ type CredentialResolver interface {
 }
 type MutationResolver interface {
 	CreateCheck(ctx context.Context, name string, weight int) (*ent.Check, error)
-	UpdateCheck(ctx context.Context, id string, name *string, weight *int) (*ent.Check, error)
-	DeleteCheck(ctx context.Context, id string) (*ent.Check, error)
-	UpdateCredential(ctx context.Context, id string, password *string) (*ent.Credential, error)
-	UpdateRound(ctx context.Context, id string, number *int, completed *bool) (*ent.Round, error)
-	DeleteRound(ctx context.Context, id string) (*ent.Round, error)
+	UpdateCheck(ctx context.Context, id string, name string, weight int) (*ent.Check, error)
+	DeleteCheck(ctx context.Context, id string) (string, error)
+	UpdateCredential(ctx context.Context, id string, password string) (*ent.Credential, error)
+	UpdateRound(ctx context.Context, id string, number int, completed bool) (*ent.Round, error)
+	DeleteRound(ctx context.Context, id string) (string, error)
 	UpdateScore(ctx context.Context, id string) (*ent.Score, error)
-	DeleteScore(ctx context.Context, id string) (*ent.Score, error)
-	UpdateStatus(ctx context.Context, id string, status *status.Status, message *string, timestamp *string, points *int) (*ent.Status, error)
+	DeleteScore(ctx context.Context, id string) (string, error)
+	UpdateStatus(ctx context.Context, id string, status status.Status, message string, timestamp string, points int) (*ent.Status, error)
 	CreateUser(ctx context.Context, name string, teamNumber int, role user.Role) (*ent.User, error)
-	UpdateUser(ctx context.Context, id string, name *string, teamNumber *int, role *user.Role) (*ent.User, error)
-	DeleteUser(ctx context.Context, id string) (*ent.User, error)
+	UpdateUser(ctx context.Context, id string, name string, teamNumber int, role user.Role) (*ent.User, error)
+	DeleteUser(ctx context.Context, id string) (string, error)
 	Login(ctx context.Context, name string, password string) (string, error)
 }
 type QueryResolver interface {
@@ -375,7 +375,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateCheck(childComplexity, args["id"].(string), args["name"].(*string), args["weight"].(*int)), true
+		return e.complexity.Mutation.UpdateCheck(childComplexity, args["id"].(string), args["name"].(string), args["weight"].(int)), true
 
 	case "Mutation.updateCredential":
 		if e.complexity.Mutation.UpdateCredential == nil {
@@ -387,7 +387,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateCredential(childComplexity, args["id"].(string), args["password"].(*string)), true
+		return e.complexity.Mutation.UpdateCredential(childComplexity, args["id"].(string), args["password"].(string)), true
 
 	case "Mutation.updateRound":
 		if e.complexity.Mutation.UpdateRound == nil {
@@ -399,7 +399,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateRound(childComplexity, args["id"].(string), args["number"].(*int), args["completed"].(*bool)), true
+		return e.complexity.Mutation.UpdateRound(childComplexity, args["id"].(string), args["number"].(int), args["completed"].(bool)), true
 
 	case "Mutation.updateScore":
 		if e.complexity.Mutation.UpdateScore == nil {
@@ -423,7 +423,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateStatus(childComplexity, args["id"].(string), args["status"].(*status.Status), args["message"].(*string), args["timestamp"].(*string), args["points"].(*int)), true
+		return e.complexity.Mutation.UpdateStatus(childComplexity, args["id"].(string), args["status"].(status.Status), args["message"].(string), args["timestamp"].(string), args["points"].(int)), true
 
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
@@ -435,7 +435,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["name"].(*string), args["team_number"].(*int), args["role"].(*user.Role)), true
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["id"].(string), args["name"].(string), args["team_number"].(int), args["role"].(user.Role)), true
 
 	case "Query.check":
 		if e.complexity.Query.Check == nil {
@@ -995,19 +995,19 @@ func (ec *executionContext) field_Mutation_updateCheck_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
-	var arg1 *string
+	var arg1 string
 	if tmp, ok := rawArgs["name"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["name"] = arg1
-	var arg2 *int
+	var arg2 int
 	if tmp, ok := rawArgs["weight"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("weight"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1028,10 +1028,10 @@ func (ec *executionContext) field_Mutation_updateCredential_args(ctx context.Con
 		}
 	}
 	args["id"] = arg0
-	var arg1 *string
+	var arg1 string
 	if tmp, ok := rawArgs["password"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1052,19 +1052,19 @@ func (ec *executionContext) field_Mutation_updateRound_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
-	var arg1 *int
+	var arg1 int
 	if tmp, ok := rawArgs["number"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("number"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["number"] = arg1
-	var arg2 *bool
+	var arg2 bool
 	if tmp, ok := rawArgs["completed"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("completed"))
-		arg2, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		arg2, err = ec.unmarshalNBoolean2bool(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1100,37 +1100,37 @@ func (ec *executionContext) field_Mutation_updateStatus_args(ctx context.Context
 		}
 	}
 	args["id"] = arg0
-	var arg1 *status.Status
+	var arg1 status.Status
 	if tmp, ok := rawArgs["status"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-		arg1, err = ec.unmarshalOStatusEnum2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋstatusᚐStatus(ctx, tmp)
+		arg1, err = ec.unmarshalNStatusEnum2githubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋstatusᚐStatus(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["status"] = arg1
-	var arg2 *string
+	var arg2 string
 	if tmp, ok := rawArgs["message"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("message"))
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["message"] = arg2
-	var arg3 *string
+	var arg3 string
 	if tmp, ok := rawArgs["timestamp"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timestamp"))
-		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg3, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["timestamp"] = arg3
-	var arg4 *int
+	var arg4 int
 	if tmp, ok := rawArgs["points"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("points"))
-		arg4, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg4, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1151,28 +1151,28 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 		}
 	}
 	args["id"] = arg0
-	var arg1 *string
+	var arg1 string
 	if tmp, ok := rawArgs["name"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["name"] = arg1
-	var arg2 *int
+	var arg2 int
 	if tmp, ok := rawArgs["team_number"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("team_number"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["team_number"] = arg2
-	var arg3 *user.Role
+	var arg3 user.Role
 	if tmp, ok := rawArgs["role"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-		arg3, err = ec.unmarshalORoleEnum2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋuserᚐRole(ctx, tmp)
+		arg3, err = ec.unmarshalNRoleEnum2githubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋuserᚐRole(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1799,7 +1799,7 @@ func (ec *executionContext) _Mutation_updateCheck(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateCheck(rctx, fc.Args["id"].(string), fc.Args["name"].(*string), fc.Args["weight"].(*int))
+		return ec.resolvers.Mutation().UpdateCheck(rctx, fc.Args["id"].(string), fc.Args["name"].(string), fc.Args["weight"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1878,9 +1878,9 @@ func (ec *executionContext) _Mutation_deleteCheck(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Check)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNCheck2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐCheck(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteCheck(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1890,19 +1890,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteCheck(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Check_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Check_name(ctx, field)
-			case "weight":
-				return ec.fieldContext_Check_weight(ctx, field)
-			case "credentials":
-				return ec.fieldContext_Check_credentials(ctx, field)
-			case "statuses":
-				return ec.fieldContext_Check_statuses(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Check", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	defer func() {
@@ -1933,7 +1921,7 @@ func (ec *executionContext) _Mutation_updateCredential(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateCredential(rctx, fc.Args["id"].(string), fc.Args["password"].(*string))
+		return ec.resolvers.Mutation().UpdateCredential(rctx, fc.Args["id"].(string), fc.Args["password"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1996,7 +1984,7 @@ func (ec *executionContext) _Mutation_updateRound(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateRound(rctx, fc.Args["id"].(string), fc.Args["number"].(*int), fc.Args["completed"].(*bool))
+		return ec.resolvers.Mutation().UpdateRound(rctx, fc.Args["id"].(string), fc.Args["number"].(int), fc.Args["completed"].(bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2075,9 +2063,9 @@ func (ec *executionContext) _Mutation_deleteRound(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Round)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNRound2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐRound(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteRound(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2087,19 +2075,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteRound(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Round_id(ctx, field)
-			case "number":
-				return ec.fieldContext_Round_number(ctx, field)
-			case "completed":
-				return ec.fieldContext_Round_completed(ctx, field)
-			case "statuses":
-				return ec.fieldContext_Round_statuses(ctx, field)
-			case "scores":
-				return ec.fieldContext_Round_scores(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Round", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	defer func() {
@@ -2207,9 +2183,9 @@ func (ec *executionContext) _Mutation_deleteScore(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Score)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNScore2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐScore(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2219,17 +2195,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteScore(ctx context.Contex
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Score_id(ctx, field)
-			case "score":
-				return ec.fieldContext_Score_score(ctx, field)
-			case "round":
-				return ec.fieldContext_Score_round(ctx, field)
-			case "user":
-				return ec.fieldContext_Score_user(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Score", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	defer func() {
@@ -2260,7 +2226,7 @@ func (ec *executionContext) _Mutation_updateStatus(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateStatus(rctx, fc.Args["id"].(string), fc.Args["status"].(*status.Status), fc.Args["message"].(*string), fc.Args["timestamp"].(*string), fc.Args["points"].(*int))
+		return ec.resolvers.Mutation().UpdateStatus(rctx, fc.Args["id"].(string), fc.Args["status"].(status.Status), fc.Args["message"].(string), fc.Args["timestamp"].(string), fc.Args["points"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2404,7 +2370,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(string), fc.Args["name"].(*string), fc.Args["team_number"].(*int), fc.Args["role"].(*user.Role))
+		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["id"].(string), fc.Args["name"].(string), fc.Args["team_number"].(int), fc.Args["role"].(user.Role))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2487,9 +2453,9 @@ func (ec *executionContext) _Mutation_deleteUser(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚐUser(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2499,23 +2465,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteUser(ctx context.Context
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
-			case "team_number":
-				return ec.fieldContext_User_team_number(ctx, field)
-			case "role":
-				return ec.fieldContext_User_role(ctx, field)
-			case "credentials":
-				return ec.fieldContext_User_credentials(ctx, field)
-			case "statuses":
-				return ec.fieldContext_User_statuses(ctx, field)
-			case "scores":
-				return ec.fieldContext_User_scores(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	defer func() {
@@ -8904,56 +8854,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	res := graphql.MarshalBoolean(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
-	return res
-}
-
-func (ec *executionContext) unmarshalORoleEnum2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋuserᚐRole(ctx context.Context, v interface{}) (*user.Role, error) {
-	if v == nil {
-		return nil, nil
-	}
-	tmp, err := graphql.UnmarshalString(v)
-	res := user.Role(tmp)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalORoleEnum2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋuserᚐRole(ctx context.Context, sel ast.SelectionSet, v *user.Role) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalString(string(*v))
-	return res
-}
-
-func (ec *executionContext) unmarshalOStatusEnum2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋstatusᚐStatus(ctx context.Context, v interface{}) (*status.Status, error) {
-	if v == nil {
-		return nil, nil
-	}
-	tmp, err := graphql.UnmarshalString(v)
-	res := status.Status(tmp)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOStatusEnum2ᚖgithubᚗcomᚋcompscoreᚋcompscoreᚋpkgᚋentᚋstatusᚐStatus(ctx context.Context, sel ast.SelectionSet, v *status.Status) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalString(string(*v))
 	return res
 }
 

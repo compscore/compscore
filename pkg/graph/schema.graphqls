@@ -80,28 +80,28 @@ type Query {
 }
 type Mutation {
   createCheck(name: String!, weight: Int!): Check!
-  updateCheck(id: ID!, name: String, weight: Int): Check!
-  deleteCheck(id: ID!): Check!
+  updateCheck(id: ID!, name: String!, weight: Int!): Check!
+  deleteCheck(id: ID!): String!
 
-  updateCredential(id: ID!, password: String): Credential!
+  updateCredential(id: ID!, password: String!): Credential!
 
-  updateRound(id: ID!, number: Int, completed: Boolean): Round!
-  deleteRound(id: ID!): Round!
+  updateRound(id: ID!, number: Int!, completed: Boolean!): Round!
+  deleteRound(id: ID!): String!
 
   updateScore(id: ID!): Score!
-  deleteScore(id: ID!): Score!
+  deleteScore(id: ID!): String!
 
   updateStatus(
     id: ID!
-    status: StatusEnum
-    message: String
-    timestamp: String
-    points: Int
+    status: StatusEnum!
+    message: String!
+    timestamp: String!
+    points: Int!
   ): Status!
 
   createUser(name: String!, team_number: Int!, role: RoleEnum!): User!
-  updateUser(id: ID!, name: String, team_number: Int, role: RoleEnum): User!
-  deleteUser(id: ID!): User!
+  updateUser(id: ID!, name: String!, team_number: Int!, role: RoleEnum!): User!
+  deleteUser(id: ID!): String!
 
   login(name: String!, password: String!): String!
 }
